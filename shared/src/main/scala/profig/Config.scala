@@ -1,5 +1,6 @@
 package profig
 
+import java.util.Properties
 import java.util.concurrent.atomic.AtomicBoolean
 
 import io.circe._
@@ -48,14 +49,27 @@ object Config {
 
   def store[T](value: T, path: String = ""): Unit = macro Macros.store[T]
 
-  def merge(json: Json, path: String = ""): Unit = synchronized {
+  def merge(json: Json, path: String = "", defaults: Boolean = false): Unit = synchronized {
     val list = path2List(path)
     if (path.nonEmpty) {
       val updated = ConfigUtil.createJson(list.mkString("."), json)
-      this.json = this.json.deepMerge(updated)
+      if (defaults) {
+        this.json = updated.deepMerge(this.json)
+      } else {
+        this.json = this.json.deepMerge(updated)
+      }
     } else {
-      this.json = this.json.deepMerge(json)
+      if (defaults) {
+        this.json = json.deepMerge(this.json)
+      } else {
+        this.json = this.json.deepMerge(json)
+      }
     }
+  }
+
+  def merge(properties: Properties, path: String = "", defaults: Boolean = false): Unit = {
+    val json = ConfigUtil.properties2Json(properties)
+    merge(json, path, defaults)
   }
 
   private def path2List(path: String): List[String] = path.split('.').toList
