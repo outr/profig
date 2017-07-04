@@ -8,12 +8,22 @@ class ConfigSpec extends WordSpec with Matchers {
     "initialize properly" in {
       Config.init(List("-this.is.an.argument", "Wahoo!"))
     }
+    "load a String argument" in {
+      Config.as[String]("this.is.an.argument") should be("Wahoo!")
+    }
     "store a single String" in {
-      Config.store[String]("Matt", "people.me.name")
+      Config.store("Matt", "people.me.name")
     }
     "load a case class from a path with default arguments" in {
       val person = Config.as[Person]("people.me")
       person should be(Person("Matt"))
+    }
+    "storage a case class" in {
+      Config.store(Person("John Doe", 123), "people.john")
+    }
+    "load the stored case class from path" in {
+      val person = Config.as[Person]("people.john")
+      person should be(Person("John Doe", 123))
     }
   }
 }
