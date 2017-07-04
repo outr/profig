@@ -1,6 +1,5 @@
 package profig
 
-import java.util.Properties
 import java.util.concurrent.atomic.AtomicBoolean
 
 import io.circe._
@@ -8,9 +7,9 @@ import io.circe._
 import scala.collection.JavaConverters._
 import scala.language.experimental.macros
 
-object Config {
+object Config extends ConfigPath(Nil) {
   private val initialized = new AtomicBoolean(false)
-  private var json: Json = Json.obj()
+  private[profig] var json: Json = Json.obj()
 
   def init(args: Seq[String],
            loadEnvironment: Boolean = true,
@@ -28,48 +27,53 @@ object Config {
     val argsJson = ConfigUtil.args2Json(args)
     json = env.deepMerge(props).deepMerge(argsJson)
   }
+}
 
-  def get(path: String): Option[Json] = {
-    val list = path2List(path)
+class ConfigPath(val path: List[String]) {
+  def apply(path: String*): ConfigPath = {
+    val list = path.flatMap(path2List).toList
+    new ConfigPath(this.path ::: list)
+  }
+
+  def as[T]: T = macro Macros.as[T]
+
+  def store[T](value: T): Unit = macro Macros.store[T]
+
+  def get(): Option[Json] = {
     def find(path: List[String], cursor: ACursor): Option[Json] = if (path.tail.isEmpty) {
       cursor.get[Json](path.head).toOption
     } else {
       find(path.tail, cursor.downField(path.head))
     }
-    if (list.nonEmpty) {
-      find(list.tail, json.hcursor.downField(list.head))
-    } else {
-      Some(json)
-    }
-  }
-
-  def apply(path: String): Json = get(path).getOrElse(Json.obj())
-
-  def as[T](path: String): T = macro Macros.as[T]
-
-  def store[T](value: T, path: String = ""): Unit = macro Macros.store[T]
-
-  def merge(json: Json, path: String = "", defaults: Boolean = false): Unit = synchronized {
-    val list = path2List(path)
     if (path.nonEmpty) {
-      val updated = ConfigUtil.createJson(list.mkString("."), json)
-      if (defaults) {
-        this.json = updated.deepMerge(this.json)
-      } else {
-        this.json = this.json.deepMerge(updated)
-      }
+      find(path.tail, Config.json.hcursor.downField(path.head))
     } else {
-      if (defaults) {
-        this.json = json.deepMerge(this.json)
-      } else {
-        this.json = this.json.deepMerge(json)
-      }
+      Some(Config.json)
     }
   }
 
-  def merge(properties: Properties, path: String = "", defaults: Boolean = false): Unit = {
-    val json = ConfigUtil.properties2Json(properties)
-    merge(json, path, defaults)
+  def apply(): Json = get().getOrElse(Json.obj())
+
+  def exists(): Boolean = get().nonEmpty
+
+  def merge(json: Json): Unit = combine(json, defaults = false)
+  def defaults(json: Json): Unit = combine(json, defaults = true)
+
+  protected def combine(json: Json, defaults: Boolean): Unit = synchronized {
+    if (path.nonEmpty) {
+      val updated = ConfigUtil.createJson(path.mkString("."), json)
+      if (defaults) {
+        Config.json = updated.deepMerge(Config.json)
+      } else {
+        Config.json = Config.json.deepMerge(updated)
+      }
+    } else {
+      if (defaults) {
+        Config.json = json.deepMerge(Config.json)
+      } else {
+        Config.json = Config.json.deepMerge(json)
+      }
+    }
   }
 
   private def path2List(path: String): List[String] = path.split('.').toList
