@@ -10,9 +10,10 @@ lazy val root = crossProject.in(file("."))
         "io.circe" %%% "circe-core",
         "io.circe" %%% "circe-generic",
         "io.circe" %%% "circe-parser",
-        "io.circe" %%% "circe-optics"
+        "io.circe" %%% "circe-generic-extras"
       ).map(_ % "0.8.0"),
       libraryDependencies ++= Seq(
+        "org.scala-lang" % "scala-reflect" % scalaVersion.value,
         "org.scalatest" %%% "scalatest" % "3.0.3" % "test"
       )
     )

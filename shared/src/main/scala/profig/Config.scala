@@ -5,6 +5,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 import io.circe._
 
 import scala.collection.JavaConverters._
+import scala.language.experimental.macros
 
 object Config {
   private val initialized = new AtomicBoolean(false)
@@ -14,12 +15,12 @@ object Config {
            loadEnvironment: Boolean = true,
            loadProperties: Boolean = true): Unit = if (initialized.compareAndSet(false, true)) {
     val env = if (loadEnvironment) {
-      Json.obj("environment" -> ConfigUtil.map2Json(System.getenv().asScala.toMap))
+      ConfigUtil.map2Json(System.getenv().asScala.toMap)
     } else {
       Json.obj()
     }
     val props = if (loadProperties) {
-      Json.obj("properties" -> ConfigUtil.properties2Json(System.getProperties))
+      ConfigUtil.properties2Json(System.getProperties)
     } else {
       Json.obj()
     }
@@ -43,19 +44,14 @@ object Config {
 
   def apply(path: String): Json = get(path).getOrElse(Json.obj())
 
-  def as[T](path: String)(implicit decoder: Decoder[T]): T = decoder.decodeJson(apply(path)) match {
-    case Left(failure) => throw failure
-    case Right(t) => t
-  }
+  def as[T](path: String): T = macro Macros.as[T]
 
-  def store[T](t: T, path: String = "")(implicit encoder: Encoder[T]): Unit = {
-    val json = encoder(t)
-    merge(json, path2List(path): _*)
-  }
+  def store[T](value: T, path: String = ""): Unit = macro Macros.store[T]
 
-  def merge(json: Json, path: String*): Unit = synchronized {
+  def merge(json: Json, path: String = ""): Unit = synchronized {
+    val list = path2List(path)
     if (path.nonEmpty) {
-      val updated = ConfigUtil.createJson(path.mkString("."), json)
+      val updated = ConfigUtil.createJson(list.mkString("."), json)
       this.json = this.json.deepMerge(updated)
     } else {
       this.json = this.json.deepMerge(json)
@@ -63,13 +59,4 @@ object Config {
   }
 
   private def path2List(path: String): List[String] = path.split('.').toList
-
-  def main(args: Array[String]): Unit = {
-    import io.circe.generic.auto._
-    init(args)
-    store(Person("Matt", 38), "people.me")
-    println(as[Person]("people.me"))
-  }
 }
-
-case class Person(name: String, age: Int = 21)
