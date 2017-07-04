@@ -2,7 +2,7 @@ package profig
 
 trait ConfigApplication {
   def main(args: Array[String]): Unit = {
-    Config.init(args)
+    Config.merge(args)
     run()
   }
 

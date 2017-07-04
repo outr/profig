@@ -20,16 +20,14 @@ Powerful configuration management for Scala (JSON, properties, command-line argu
 * [X] Storing case classes
 * [X] Trait for application startup (JVM and Scala.js)
 * [ ] Loading
-    * [ ] JSON
+    * [X] JSON
         * [X] Directly
-        * [ ] From Disk (JVM-only)
-        * [ ] From ClassLoader
-    * [ ] Properties
+        * [X] From Disk (JVM-only)
+        * [X] From ClassLoader
+    * [X] Properties
         * [X] Directly
-        * [ ] From Disk (JVM-only)
-        * [ ] From ClassLoader
-    * [ ] Automatic lookup of default locations
-* [ ] Save to disk
-* [ ] Support change notification
+        * [X] From Disk (JVM-only)
+        * [X] From ClassLoader
+    * [X] Automatic lookup of default locations
 * [ ] Document classes
 * [ ] Document README

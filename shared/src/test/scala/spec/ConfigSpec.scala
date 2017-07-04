@@ -5,8 +5,8 @@ import profig.Config
 
 class ConfigSpec extends WordSpec with Matchers {
   "Config" should {
-    "initialize properly" in {
-      Config.init(List("-this.is.an.argument", "Wahoo!"))
+    "load arguments" in {
+      Config.merge(List("-this.is.an.argument", "Wahoo!"))
     }
     "load a String argument" in {
       Config("this.is.an.argument").as[String] should be("Wahoo!")
