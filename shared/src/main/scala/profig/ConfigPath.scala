@@ -47,13 +47,19 @@ class ConfigPath(val path: List[String]) {
     */
   def get(): Option[Json] = {
     def find(path: List[String], cursor: ACursor): Option[Json] = if (path.tail.isEmpty) {
-      cursor.get[Json](path.head).toOption
+      cursor.get[Json](path.head) match {
+        case Left(_) => None
+        case Right(value) => Some(value)
+      }
     } else {
       find(path.tail, cursor.downField(path.head))
     }
     if (path.nonEmpty) {
       if (path.tail.isEmpty) {
-        Config.json.hcursor.get[Json](path.head).toOption
+        Config.json.hcursor.get[Json](path.head) match {
+          case Left(_) => None
+          case Right(value) => Some(value)
+        }
       } else {
         find(path.tail, Config.json.hcursor.downField(path.head))
       }

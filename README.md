@@ -109,7 +109,7 @@ ScalaDocs and the specs: https://github.com/outr/profig/blob/master/shared/src/t
 
 # Roadmap
 
-## 1.0.0 (In-Progress)
+## 1.0.0 (Released 07.04.2017)
 
 * [X] Merge support
     * [X] Defaults support (only apply if value doesn't already exist)
