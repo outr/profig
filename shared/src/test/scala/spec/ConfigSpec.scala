@@ -29,3 +29,10 @@ class ConfigSpec extends WordSpec with Matchers {
 }
 
 case class Person(name: String, age: Int = 21)
+
+object Test {
+  def main(args: Array[String]): Unit = {
+    // TODO: why doesn't this work?
+    println(Config("java")())
+  }
+}

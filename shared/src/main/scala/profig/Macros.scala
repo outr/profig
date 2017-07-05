@@ -18,7 +18,7 @@ object Macros {
          val json = $configPath()
          implicit val decoder = implicitly[Decoder[$t]]
          decoder.decodeJson(json) match {
-           case Left(failure) => throw new RuntimeException(s"Failed to decoder from $$json", failure)
+           case Left(failure) => throw new RuntimeException(s"Failed to decode from $$json ($${json.getClass})", failure)
            case Right(value) => value
          }
        """)

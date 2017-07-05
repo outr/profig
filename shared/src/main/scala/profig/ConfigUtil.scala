@@ -7,7 +7,13 @@ import io.circe._
 import scala.annotation.tailrec
 import scala.collection.JavaConverters._
 
+/**
+  * Primarily intended for internal use.
+  */
 object ConfigUtil {
+  /**
+    * Converts a `Map[String, String]` into a Json object with dot-separation.
+    */
   def map2Json(map: Map[String, String]): Json = {
     var json = Json.obj()
     map.foreach {
@@ -16,6 +22,9 @@ object ConfigUtil {
     json
   }
 
+  /**
+    * Converts a `Properties` into a Json object with dot-separation.
+    */
   def properties2Json(properties: Properties): Json = {
     val map = properties.asScala.map {
       case (key, value) => key.toString -> value.toString
@@ -23,6 +32,9 @@ object ConfigUtil {
     map2Json(map)
   }
 
+  /**
+    * Converts a sequence of args into a Json object with dot-separation.
+    */
   @tailrec
   final def args2Json(args: Seq[String], json: Json = Json.obj(), index: Int = 1): Json = if (args.isEmpty) {
     json
@@ -55,17 +67,14 @@ object ConfigUtil {
     args2Json(seq, json.deepMerge(j), i)
   }
 
-  private val IntegerRegex = """(\d+)""".r
-  private val DecimalRegex = """(\d*[.]\d*)""".r
+  /**
+    * Converts a String based on its value into a Json object.
+    */
+  def string2JSON(s: String): Json = Json.fromString(s)
 
-  def string2JSON(s: String): Json = s match {
-    case "true" => Json.True
-    case "false" => Json.False
-    case IntegerRegex(i) => Json.fromInt(i.toInt)
-    case DecimalRegex(d) => Json.fromBigDecimal(BigDecimal(d))
-    case _ => Json.fromString(s)
-  }
-
+  /**
+    * Creates a Json representation breaking `name` for dot-separation.
+    */
   def createJson(name: String, value: Json): Json = {
     val index = name.indexOf('.')
     if (index == -1) {
