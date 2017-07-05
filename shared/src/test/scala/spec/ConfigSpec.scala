@@ -30,6 +30,10 @@ class ConfigSpec extends WordSpec with Matchers {
       val person = Config("people")("john").as[Person]
       person should be(Person("John Doe", 123))
     }
+    "load an optional value that is not there" in {
+      val value = Config("this.does.not.exist").as[Option[String]]
+      value should be(None)
+    }
   }
 }
 

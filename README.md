@@ -109,6 +109,11 @@ ScalaDocs and the specs: https://github.com/outr/profig/blob/master/shared/src/t
 
 # Roadmap
 
+## 1.1.0 (In-Progress)
+
+* [ ] HOCON support (integrate https://github.com/unicredit/shocon)
+* [ ] Migration support for Typesafe Config
+
 ## 1.0.0 (Released 07.04.2017)
 
 * [X] Merge support
