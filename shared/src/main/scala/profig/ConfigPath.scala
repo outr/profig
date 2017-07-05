@@ -52,7 +52,11 @@ class ConfigPath(val path: List[String]) {
       find(path.tail, cursor.downField(path.head))
     }
     if (path.nonEmpty) {
-      find(path.tail, Config.json.hcursor.downField(path.head))
+      if (path.tail.isEmpty) {
+        Config.json.hcursor.get[Json](path.head).toOption
+      } else {
+        find(path.tail, Config.json.hcursor.downField(path.head))
+      }
     } else {
       Some(Config.json)
     }

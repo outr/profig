@@ -51,7 +51,7 @@ via the command-line. In order to effectively do this we can simply invoke `Conf
 
 For a more managed representation this can be handled for you by using the `ConfigApplication` mix-in:
 
-```
+```scala
 object MyApplication extends ConfigApplication {
   override def run(): Unit = // this is now the main entry point invoked after command-line arguments are loaded
 }
@@ -62,9 +62,50 @@ object MyApplication extends ConfigApplication {
 As stated above, system properties and environment variables are automatically loaded into the configuration. So if we
 wanted to access the system property "java.version" we can easily do so:
 
-`val javaVersion = Config("java.version").as[String]`
+```scala
+val javaVersion = Config("java.version").as[String]
+```
 
-TODO: finish the tutorial
+You can also load from a higher level as a case class to get more information. For example:
+
+```scala
+case class JVMInfo(version: String, specification: Specification)
+
+case class Specification(vendor: String, name: String, version: String)
+
+val info = Config("java").as[JVMInfo]
+```
+
+Configuration files will automatically be loaded from config.json, config.conf, configuration.json, configuration.conf,
+application.conf, and application.json if found in the application path or in the classpath.
+
+If default values or `Option` values are defined in the case class they will be used if the value is not available in
+the config. However, if any required parameters are missing an exception will be thrown when attempting to read.
+
+### Storing values
+
+Adding values at runtime is almost exactly the same as reading values. For example, if we want to store a basic
+configuration:
+
+```scala
+case class MyConfig(path: String = "/my/application",
+                    timeout: Long = 1000L,
+                    username: String = "root",
+                    password: String = "password")
+                    
+Config.merge(MyConfig(path = "/another/path"))
+```
+
+If you would prefer to merge in an object without overwriting existing values you can use `defaults` instead of `merge`:
+
+```scala
+Config.defaults(MyConfig(path = "/another/path"))
+```
+
+### Next steps
+
+This only scratches the surface of the features and functionality Profig provides. For additional information read the
+ScalaDocs and the specs: https://github.com/outr/profig/blob/master/shared/src/test/scala/spec/ConfigSpec.scala
 
 # Roadmap
 

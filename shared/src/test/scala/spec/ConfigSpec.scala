@@ -11,6 +11,11 @@ class ConfigSpec extends WordSpec with Matchers {
     "load a String argument" in {
       Config("this.is.an.argument").as[String] should be("Wahoo!")
     }
+    "load JVM information from properties" in {
+      val info = Config("java").as[JVMInfo]
+      info.specification.vendor should be("Oracle Corporation")
+      info.specification.version should be("1.8")
+    }
     "store a single String" in {
       Config("people", "me", "name").store("Matt")
     }
@@ -30,9 +35,6 @@ class ConfigSpec extends WordSpec with Matchers {
 
 case class Person(name: String, age: Int = 21)
 
-object Test {
-  def main(args: Array[String]): Unit = {
-    // TODO: why doesn't this work?
-    println(Config("java")())
-  }
-}
+case class JVMInfo(version: String, specification: Specification)
+
+case class Specification(vendor: String, name: String, version: String)
