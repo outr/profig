@@ -12,9 +12,13 @@ import scala.language.experimental.macros
   * @see profig.ConfigApplication for convenience initialization
   */
 object Config extends ConfigPath(Nil) {
-  private[profig] val env = ConfigUtil.map2Json(System.getenv().asScala.toMap)
+  private val envMap = System.getenv().asScala.toMap
+  private[profig] val env = ConfigUtil.map2Json(envMap)
+  private[profig] val envConverted = ConfigUtil.map2Json(envMap.map {
+    case (key, value) => key.toLowerCase.replace('_', '.') -> value
+  })
   private[profig] val props = ConfigUtil.properties2Json(System.getProperties)
-  private[profig] var json: Json = env.deepMerge(props)
+  private[profig] var json: Json = env.deepMerge(envConverted).deepMerge(props)
 
   // Platform-specific initialization
   ProfigPlatform.init()
