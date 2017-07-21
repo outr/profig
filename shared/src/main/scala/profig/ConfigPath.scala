@@ -133,10 +133,6 @@ class ConfigPath(val path: List[String]) {
         case Right(value) => value
       }
       combine(json, defaults)
-    } else {                                // Properties?
-      val properties = new Properties()
-      properties.load(new StringReader(string))
-      combine(properties, defaults)
     }
   }
 
