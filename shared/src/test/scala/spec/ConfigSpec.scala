@@ -11,6 +11,9 @@ class ConfigSpec extends WordSpec with Matchers {
     "load a String argument" in {
       Config("this.is.an.argument").as[String] should be("Wahoo!")
     }
+    "load Json arguments" in {
+      Config.merge("{ \"this.is.another.argument\" : 12345 }")
+    }
     "load JVM information from properties" in {
       val info = Config("java").as[JVMInfo]
       info.specification.vendor should be("Oracle Corporation")
