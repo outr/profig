@@ -1,6 +1,5 @@
 package profig
 
-import java.io.StringReader
 import java.util.Properties
 
 import io.circe.{ACursor, Json}
