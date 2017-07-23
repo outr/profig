@@ -93,12 +93,12 @@ class ConfigPath(val path: List[String]) {
   def defaults(args: Seq[String]): Unit = combine(args, defaults = true)
 
   /**
-    * Merges a string of content auto-detected to JSON or Properties.
+    * Merges a string of content auto-detected to JSON.
     */
   def merge(string: String): Unit = combine(string, defaults = false)
 
   /**
-    * Loads defaults for a string of content auto-detected to JSON or Properties.
+    * Loads defaults for a string of content auto-detected to JSON.
     */
   def defaults(string: String): Unit = combine(string, defaults = true)
 
@@ -123,7 +123,7 @@ class ConfigPath(val path: List[String]) {
   def defaults(properties: Properties): Unit = combine(properties, defaults = true)
 
   /**
-    * Combines a string of content auto-detected to JSON or Properties.
+    * Combines a string of content auto-detected to JSON.
     */
   def combine(string: String, defaults: Boolean): Unit = {
     if (string.trim.startsWith("{")) {      // JSON detected
