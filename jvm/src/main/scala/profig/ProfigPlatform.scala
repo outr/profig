@@ -17,6 +17,13 @@ object ProfigPlatform {
     *   - application.json
     * The order matters, so later configuration files will overwrite former. Similarly, files will overwrite
     * configuration in the classloader.
+    *
+    * Additionally, defaults can be defined to avoid overriding system properties and environment variables using the
+    * following files:
+    *   - defaults.json
+    *   - defaults.conf
+    * These files will never overwrite existing settings and is a great way to define defaults for your application
+    * while avoiding replacing user-defined values.
     */
   def init(): Unit = {
     val paths = List(
@@ -27,6 +34,15 @@ object ProfigPlatform {
       "application.conf",
       "application.json"
     )
+    val defaults = List(
+      "defaults.json",
+      "defaults.conf"
+    )
+    defaults.foreach { path =>
+      Option(getClass.getClassLoader.getResource(path)).foreach { url =>
+        Config.defaults(url)
+      }
+    }
     paths.foreach { path =>
       Option(getClass.getClassLoader.getResource(path)).foreach { url =>
         Config.merge(url)

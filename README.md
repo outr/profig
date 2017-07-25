@@ -2,8 +2,8 @@
 
 [![Build Status](https://travis-ci.org/outr/profig.svg?branch=master)](https://travis-ci.org/outr/profig)
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/outr/profig)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.outr/profig-core_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.outr/profig-core_2.12)
-[![Latest version](https://index.scala-lang.org/outr/profig/profig-core/latest.svg)](https://index.scala-lang.org/outr/profig)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.outr/profig_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.outr/profig_2.12)
+[![Latest version](https://index.scala-lang.org/outr/profig/profig/latest.svg)](https://index.scala-lang.org/outr/profig)
 
 Powerful configuration management for Scala (JSON, properties, command-line arguments, and environment variables)
 
@@ -31,8 +31,8 @@ and overriding configuration in your application.
 Profig is published to Sonatype OSS and synchronized to Maven Central supporting JVM and Scala.js on 2.11 and 2.12:
 
 ```
-libraryDependencies += "com.outr" %% "profig" % "1.0.1"   // Scala
-libraryDependencies += "com.outr" %%% "profig" % "1.0.1"  // Scala.js / Cross-Build
+libraryDependencies += "com.outr" %% "profig" % "1.0.2"   // Scala
+libraryDependencies += "com.outr" %%% "profig" % "1.0.2"  // Scala.js / Cross-Build
 ```
 
 ## Getting Started
