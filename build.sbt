@@ -11,9 +11,13 @@ lazy val macros = crossProject.in(file("macros"))
       "io.circe" %%% "circe-core",
       "io.circe" %%% "circe-generic",
       "io.circe" %%% "circe-parser",
+      "io.circe" %%% "circe-literal",
       "io.circe" %%% "circe-generic-extras"
     ).map(_ % "0.8.0"),
-    libraryDependencies += "org.scala-lang" % "scala-reflect" % scalaVersion.value
+    libraryDependencies ++= Seq(
+      "org.scala-lang" % "scala-reflect" % scalaVersion.value,
+      "io.circe" %% "circe-jawn" % "0.8.0"
+    )
   )
 
 lazy val macrosJS = macros.js

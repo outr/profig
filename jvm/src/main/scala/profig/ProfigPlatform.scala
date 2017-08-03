@@ -1,11 +1,13 @@
 package profig
 
-import java.io.File
+import java.util.concurrent.atomic.AtomicBoolean
 
 /**
   * Platform-specific initialization for JVM
   */
 object ProfigPlatform {
+  val initialized: AtomicBoolean = new AtomicBoolean(false)
+
   /**
     * Called upon initialization of Config at first use. Attempts to load the following from the classloader and then
     * from the local filesystem:
@@ -25,28 +27,5 @@ object ProfigPlatform {
     * These files will never overwrite existing settings and is a great way to define defaults for your application
     * while avoiding replacing user-defined values.
     */
-  def init(): Unit = {
-    PlatformMacros.defaults.foreach { path =>
-      Option(getClass.getClassLoader.getResource(path)).foreach { url =>
-        Config.defaults(url)
-      }
-    }
-    PlatformMacros.defaults.foreach { path =>
-      val file = new File(path)
-      if (file.exists()) {
-        Config.defaults(file)
-      }
-    }
-    PlatformMacros.paths.foreach { path =>
-      Option(getClass.getClassLoader.getResource(path)).foreach { url =>
-        Config.merge(url)
-      }
-    }
-    PlatformMacros.paths.foreach { path =>
-      val file = new File(path)
-      if (file.exists()) {
-        Config.merge(file)
-      }
-    }
-  }
+  def init(): Unit = ProfigJVM.init()
 }

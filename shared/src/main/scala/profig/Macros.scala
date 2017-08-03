@@ -1,9 +1,13 @@
 package profig
 
+import java.util.concurrent.atomic.AtomicBoolean
+
 import scala.language.experimental.macros
 import scala.reflect.macros.blackbox
 
 object Macros {
+  val inlined: AtomicBoolean = new AtomicBoolean(false)
+
   def as[T](c: blackbox.Context)(implicit t: c.WeakTypeTag[T]): c.Expr[T] = {
     import c.universe._
 
@@ -46,7 +50,22 @@ object Macros {
 
     c.Expr[Unit](
       q"""
-         profig.ProfigPlatform.init()
+         if (profig.ProfigPlatform.initialized.compareAndSet(false, true)) {
+           profig.ProfigPlatform.init()
+         }
+         profig.Config.merge($args)
+       """)
+  }
+
+  def initMacro(c: blackbox.Context)(args: c.Expr[Seq[String]]): c.Expr[Unit] = {
+    import c.universe._
+
+    profig.Macros.inlined.set(true)
+    c.Expr[Unit](
+      q"""
+         if (profig.ProfigPlatform.initialized.compareAndSet(false, true)) {
+           profig.ProfigPlatform.init()
+         }
          profig.Config.merge($args)
        """)
   }
@@ -57,8 +76,7 @@ object Macros {
     val mainClass = c.prefix.tree
     c.Expr[Unit](
       q"""
-         profig.ProfigPlatform.init()
-         profig.Config.merge($args)
+         profig.Config.init($args)
          $mainClass.run()
        """)
   }

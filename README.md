@@ -109,10 +109,14 @@ ScalaDocs and the specs: https://github.com/outr/profig/blob/master/shared/src/t
 
 # Roadmap
 
-## 1.1.0 (In-Progress)
+## 1.2.0 (In-Progress)
+
+* [ ] HOCON support (integrate https://github.com/unicredit/shocon)
+
+## 1.1.0 (Released 08.03.2017)
 
 * [X] Compile-time integration of configuration into Scala.js projects
-* [ ] HOCON support (integrate https://github.com/unicredit/shocon)
+* [X] Usability of Config within Macros at compile-time in Scala and Scala.js
 
 ## 1.0.0 (Released 07.04.2017)
 
