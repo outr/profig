@@ -19,6 +19,5 @@ object Config extends ConfigPath(Nil) {
   private[profig] val props = ConfigUtil.properties2Json(System.getProperties)
   private[profig] var json: Json = envConverted.deepMerge(props)
 
-  // Platform-specific initialization
-  ProfigPlatform.init()
+  def init(args: Seq[String] = Seq.empty): Unit = macro Macros.init
 }

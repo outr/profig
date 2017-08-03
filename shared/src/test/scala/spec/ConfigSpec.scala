@@ -5,8 +5,8 @@ import profig.Config
 
 class ConfigSpec extends WordSpec with Matchers {
   "Config" should {
-    "load arguments" in {
-      Config.merge(List("-this.is.an.argument", "Wahoo!"))
+    "initialize" in {
+      Config.init(List("-this.is.an.argument", "Wahoo!"))
     }
     "load a String argument" in {
       Config("this.is.an.argument").as[String] should be("Wahoo!")
@@ -36,6 +36,10 @@ class ConfigSpec extends WordSpec with Matchers {
     "load an optional value that is not there" in {
       val value = Config("this.does.not.exist").as[Option[String]]
       value should be(None)
+    }
+    "verify that test.value was loaded" in {
+      val value = Config("test.value").as[Option[Boolean]]
+      value should be(Some(true))
     }
   }
 }

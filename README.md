@@ -111,8 +111,8 @@ ScalaDocs and the specs: https://github.com/outr/profig/blob/master/shared/src/t
 
 ## 1.1.0 (In-Progress)
 
+* [X] Compile-time integration of configuration into Scala.js projects
 * [ ] HOCON support (integrate https://github.com/unicredit/shocon)
-* [ ] Migration support for Typesafe Config
 
 ## 1.0.0 (Released 07.04.2017)
 

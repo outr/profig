@@ -26,29 +26,23 @@ object ProfigPlatform {
     * while avoiding replacing user-defined values.
     */
   def init(): Unit = {
-    val paths = List(
-      "config.json",
-      "config.conf",
-      "configuration.json",
-      "configuration.conf",
-      "application.conf",
-      "application.json"
-    )
-    val defaults = List(
-      "defaults.json",
-      "defaults.conf"
-    )
-    defaults.foreach { path =>
+    PlatformMacros.defaults.foreach { path =>
       Option(getClass.getClassLoader.getResource(path)).foreach { url =>
         Config.defaults(url)
       }
     }
-    paths.foreach { path =>
+    PlatformMacros.defaults.foreach { path =>
+      val file = new File(path)
+      if (file.exists()) {
+        Config.defaults(file)
+      }
+    }
+    PlatformMacros.paths.foreach { path =>
       Option(getClass.getClassLoader.getResource(path)).foreach { url =>
         Config.merge(url)
       }
     }
-    paths.foreach { path =>
+    PlatformMacros.paths.foreach { path =>
       val file = new File(path)
       if (file.exists()) {
         Config.merge(file)
