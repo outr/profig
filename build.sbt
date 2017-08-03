@@ -1,6 +1,6 @@
 name := "profig"
 organization in ThisBuild := "com.outr"
-version in ThisBuild := "1.1.0-SNAPSHOT"
+version in ThisBuild := "1.1.0"
 scalaVersion in ThisBuild := "2.12.3"
 crossScalaVersions in ThisBuild := List("2.12.3", "2.11.11")
 
@@ -11,7 +11,6 @@ lazy val macros = crossProject.in(file("macros"))
       "io.circe" %%% "circe-core",
       "io.circe" %%% "circe-generic",
       "io.circe" %%% "circe-parser",
-      "io.circe" %%% "circe-literal",
       "io.circe" %%% "circe-generic-extras"
     ).map(_ % "0.8.0"),
     libraryDependencies ++= Seq(

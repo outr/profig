@@ -31,8 +31,8 @@ and overriding configuration in your application.
 Profig is published to Sonatype OSS and synchronized to Maven Central supporting JVM and Scala.js on 2.11 and 2.12:
 
 ```
-libraryDependencies += "com.outr" %% "profig" % "1.0.2"   // Scala
-libraryDependencies += "com.outr" %%% "profig" % "1.0.2"  // Scala.js / Cross-Build
+libraryDependencies += "com.outr" %% "profig" % "1.1.0"   // Scala
+libraryDependencies += "com.outr" %%% "profig" % "1.1.0"  // Scala.js / Cross-Build
 ```
 
 ## Getting Started
@@ -56,6 +56,10 @@ object MyApplication extends ConfigApplication {
   override def run(): Unit = // this is now the main entry point invoked after command-line arguments are loaded
 }
 ```
+
+If you choose not to use `ConfigApplication` just make sure to call `Config.init(args)` prior to using to make sure all
+configuration files are properly loaded. This invocation will handle compile-time injection for Scala.js via Macro, so
+make sure to call it in the application using it, not in dependency libraries or you may miss out on configuration.
 
 ### Accessing values
 
