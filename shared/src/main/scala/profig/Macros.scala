@@ -15,7 +15,7 @@ object Macros {
 
     c.Expr[T](
       q"""
-         parser.parse($jsonString) match {
+         io.circe.parser.parse($jsonString) match {
            case Left(t) => throw t
            case Right(json) => profig.JsonUtil.fromJson[$t](json)
          }
@@ -43,7 +43,7 @@ object Macros {
   def toJsonString[T](c: blackbox.Context)(value: c.Expr[T])(implicit t: c.WeakTypeTag[T]): c.Expr[String] = {
     import c.universe._
 
-    c.Expr[String](q"profig.JsonUtil.toJson[$t]($value).pretty(Printer.noSpaces)")
+    c.Expr[String](q"profig.JsonUtil.toJson[$t]($value).pretty(io.circe.Printer.noSpaces)")
   }
 
   def toJson[T](c: blackbox.Context)(value: c.Expr[T])(implicit t: c.WeakTypeTag[T]): c.Expr[Json] = {
