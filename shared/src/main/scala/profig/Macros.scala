@@ -10,27 +10,37 @@ import scala.reflect.macros.blackbox
 object Macros {
   val inlined: AtomicBoolean = new AtomicBoolean(false)
 
-  def fromJsonString[T](c: blackbox.Context)(jsonString: c.Expr[String])(implicit t: c.WeakTypeTag[T]): c.Expr[T] = {
+  def fromJsonString[T](c: blackbox.Context)
+                       (jsonString: c.Expr[String])
+                       (implicit t: c.WeakTypeTag[T]): c.Expr[T] = {
     import c.universe._
 
+    val jsonUtil = c.prefix.tree
     c.Expr[T](
       q"""
          io.circe.parser.parse($jsonString) match {
            case Left(t) => throw t
-           case Right(json) => profig.JsonUtil.fromJson[$t](json)
+           case Right(json) => $jsonUtil.fromJson[$t](json)
          }
        """)
   }
 
-  def fromJson[T](c: blackbox.Context)(json: c.Expr[Json])(implicit t: c.WeakTypeTag[T]): c.Expr[T] = {
+  def fromJson[T](c: blackbox.Context)
+                 (json: c.Expr[Json])
+                 (implicit t: c.WeakTypeTag[T]): c.Expr[T] = {
     import c.universe._
 
+    val jsonUtil = c.prefix.tree
     c.Expr[T](
       q"""
          import io.circe._
          import io.circe.generic.extras.Configuration
          import io.circe.generic.extras.auto._
-         implicit val customConfig: Configuration = Configuration.default.withSnakeCaseKeys.withDefaults
+         implicit val customConfig: Configuration = if ($jsonUtil.convertSnake) {
+           Configuration.default.withSnakeCaseKeys.withDefaults
+         } else {
+           Configuration.default.withDefaults
+         }
 
          implicit val decoder = implicitly[Decoder[$t]]
          decoder.decodeJson($json) match {
@@ -40,21 +50,31 @@ object Macros {
        """)
   }
 
-  def toJsonString[T](c: blackbox.Context)(value: c.Expr[T])(implicit t: c.WeakTypeTag[T]): c.Expr[String] = {
+  def toJsonString[T](c: blackbox.Context)
+                     (value: c.Expr[T])
+                     (implicit t: c.WeakTypeTag[T]): c.Expr[String] = {
     import c.universe._
 
-    c.Expr[String](q"profig.JsonUtil.toJson[$t]($value).pretty(io.circe.Printer.noSpaces)")
+    val jsonUtil = c.prefix.tree
+    c.Expr[String](q"$jsonUtil.toJson[$t]($value).pretty(io.circe.Printer.noSpaces)")
   }
 
-  def toJson[T](c: blackbox.Context)(value: c.Expr[T])(implicit t: c.WeakTypeTag[T]): c.Expr[Json] = {
+  def toJson[T](c: blackbox.Context)
+               (value: c.Expr[T])
+               (implicit t: c.WeakTypeTag[T]): c.Expr[Json] = {
     import c.universe._
 
+    val jsonUtil = c.prefix.tree
     c.Expr[Json](
       q"""
          import io.circe._
          import io.circe.generic.extras.Configuration
          import io.circe.generic.extras.auto._
-         implicit val customConfig: Configuration = Configuration.default.withSnakeCaseKeys.withDefaults
+         implicit val customConfig: Configuration = if ($jsonUtil.convertSnake) {
+           Configuration.default.withSnakeCaseKeys.withDefaults
+         } else {
+           Configuration.default.withDefaults
+         }
 
          val encoder = implicitly[Encoder[$t]]
          encoder($value)
