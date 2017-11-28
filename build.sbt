@@ -1,6 +1,6 @@
 name := "profig"
 organization in ThisBuild := "com.outr"
-version in ThisBuild := "1.1.4-SNAPSHOT"
+version in ThisBuild := "1.1.4"
 scalaVersion in ThisBuild := "2.12.4"
 crossScalaVersions in ThisBuild := List("2.12.4", "2.11.12")
 
