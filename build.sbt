@@ -1,8 +1,8 @@
 name := "profig"
 organization in ThisBuild := "com.outr"
-version in ThisBuild := "1.1.3"
+version in ThisBuild := "1.1.4-SNAPSHOT"
 scalaVersion in ThisBuild := "2.12.4"
-crossScalaVersions in ThisBuild := List("2.12.4", "2.11.11")
+crossScalaVersions in ThisBuild := List("2.12.4", "2.11.12")
 
 lazy val profig = crossProject.in(file("."))
   .settings(

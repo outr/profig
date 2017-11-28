@@ -1,11 +1,12 @@
 package profig
 
 import java.io.File
+import scala.collection.JavaConverters._
 
 object ProfigJVM {
   def init(): Unit = {
     PlatformMacros.defaults.foreach { path =>
-      Option(getClass.getClassLoader.getResource(path)).foreach { url =>
+      getClass.getClassLoader.getResources(path).asScala.foreach { url =>
         Config.defaults(url)
       }
     }
@@ -16,7 +17,7 @@ object ProfigJVM {
       }
     }
     PlatformMacros.paths.foreach { path =>
-      Option(getClass.getClassLoader.getResource(path)).foreach { url =>
+      getClass.getClassLoader.getResources(path).asScala.foreach { url =>
         Config.merge(url)
       }
     }
