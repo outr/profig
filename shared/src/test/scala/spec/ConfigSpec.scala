@@ -41,6 +41,16 @@ class ConfigSpec extends WordSpec with Matchers {
       val value = Config("test.value").as[Option[Boolean]]
       value should be(Some(true))
     }
+    "remove a value" in {
+      Config("people.john.age").as[Option[Int]] should be(Some(123))
+      Config("people.john.age").remove()
+      Config("people.john.age").as[Option[Int]] should be(None)
+    }
+    "add a value back" in {
+      Config("people.john.age").as[Option[Int]] should be(None)
+      Config("people.john.age").store(321)
+      Config("people.john.age").as[Option[Int]] should be(Some(321))
+    }
   }
 }
 

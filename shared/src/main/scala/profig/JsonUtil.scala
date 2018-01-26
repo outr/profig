@@ -4,7 +4,7 @@ import io.circe.Json
 
 import scala.language.experimental.macros
 
-object JsonUtil extends JsonUtil(convertSnake = true)
+object JsonUtil extends JsonUtil(convertSnake = false)
 
 class JsonUtil(val convertSnake: Boolean) {
   def fromJson[T](json: Json): T = macro Macros.fromJson[T]

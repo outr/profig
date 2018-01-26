@@ -18,8 +18,8 @@ class ConfigPath(val path: List[String]) {
     *
     * @return ConfigPath
     */
-  def apply(path1: String, path2: String*): ConfigPath = {
-    val list = path2List(path1) ::: path2.flatMap(path2List).toList
+  def apply(path: String*): ConfigPath = {
+    val list = path.toList.flatMap(path2List)
     new ConfigPath(this.path ::: list)
   }
 
@@ -169,6 +169,27 @@ class ConfigPath(val path: List[String]) {
       }
     }
   }
+
+  /**
+    * Removes a field from this path.
+    *
+    * @param field the field below this path to remove
+    */
+  def remove(field: String): Unit = synchronized {
+    if (path.nonEmpty) {
+      def recurse(path: List[String], cursor: ACursor): Unit = if (path.isEmpty) {
+        Config.json = cursor.downField(field).delete.top.get
+      } else {
+        recurse(path.tail, cursor.downField(path.head))
+      }
+
+      recurse(path.tail, Config.json.hcursor.downField(path.head))
+    } else {
+      Config.json = Json.fromJsonObject(Config.json.asObject.get.remove(field))
+    }
+  }
+
+  def remove(): Unit = Config(path.take(path.length - 1): _*).remove(path.last)
 
   private def path2List(path: String): List[String] = path.split('.').toList
 }
