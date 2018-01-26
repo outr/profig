@@ -9,7 +9,7 @@ object ProfigPlatform {
   val initialized: AtomicBoolean = new AtomicBoolean(false)
 
   /**
-    * Called upon initialization of Config at first use. Attempts to load the following from the classloader and then
+    * Called upon initialization of Profig at first use. Attempts to load the following from the classloader and then
     * from the local filesystem:
     *   - config.json
     *   - config.conf

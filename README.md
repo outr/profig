@@ -42,12 +42,12 @@ Whether you are using this in JVM or JS you need one import to access everything
 `import profig._`
 
 This brings some implicits on specific platforms (for example, loading URLs, Files, Sources, etc. in the JVM) but the
-only class you really need be concerned with is `Config`.
+only class you really need be concerned with is `Profig`.
 
 ### Loading Command-Line arguments
 
 When your application starts it is reasonable to want to allow execution of the application to override existing configuration
-via the command-line. In order to effectively do this we can simply invoke `Config.merge(args)` within our main method.
+via the command-line. In order to effectively do this we can simply invoke `Profig.merge(args)` within our main method.
 
 For a more managed representation this can be handled for you by using the `ConfigApplication` mix-in:
 
@@ -67,7 +67,7 @@ As stated above, system properties and environment variables are automatically l
 wanted to access the system property "java.version" we can easily do so:
 
 ```scala
-val javaVersion = Config("java.version").as[String]
+val javaVersion = Profig("java.version").as[String]
 ```
 
 You can also load from a higher level as a case class to get more information. For example:
@@ -77,7 +77,7 @@ case class JVMInfo(version: String, specification: Specification)
 
 case class Specification(vendor: String, name: String, version: String)
 
-val info = Config("java").as[JVMInfo]
+val info = Profig("java").as[JVMInfo]
 ```
 
 Configuration files will automatically be loaded from config.json, config.conf, configuration.json, configuration.conf,
@@ -97,19 +97,19 @@ case class MyConfig(path: String = "/my/application",
                     username: String = "root",
                     password: String = "password")
                     
-Config.merge(MyConfig(path = "/another/path"))
+Profig.merge(MyConfig(path = "/another/path"))
 ```
 
 If you would prefer to merge in an object without overwriting existing values you can use `defaults` instead of `merge`:
 
 ```scala
-Config.defaults(MyConfig(path = "/another/path"))
+Profig.defaults(MyConfig(path = "/another/path"))
 ```
 
 ### Next steps
 
 This only scratches the surface of the features and functionality Profig provides. For additional information read the
-ScalaDocs and the specs: https://github.com/outr/profig/blob/master/shared/src/test/scala/spec/ConfigSpec.scala
+ScalaDocs and the specs: https://github.com/outr/profig/blob/master/shared/src/test/scala/spec/ProfigSpec.scala
 
 # Roadmap
 

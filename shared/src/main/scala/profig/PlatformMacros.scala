@@ -28,7 +28,7 @@ object PlatformMacros {
     val expressions = ListBuffer.empty[Tree]
 
     def addExpression(jsonString: String, defaults: Boolean): Unit = {
-      val combine = if (defaults) q"profig.Config.defaults(j)" else q"profig.Config.merge(j)"
+      val combine = if (defaults) q"profig.Profig.defaults(j)" else q"profig.Profig.merge(j)"
       if (profig.Macros.inlined.get()) {
         expressions +=
           q"""

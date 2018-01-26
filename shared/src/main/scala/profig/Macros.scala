@@ -103,7 +103,7 @@ object Macros {
          if (profig.ProfigPlatform.initialized.compareAndSet(false, true)) {
            profig.ProfigPlatform.init()
          }
-         profig.Config.merge($args)
+         profig.Profig.merge($args)
        """)
   }
 
@@ -116,7 +116,7 @@ object Macros {
          if (profig.ProfigPlatform.initialized.compareAndSet(false, true)) {
            profig.ProfigPlatform.init()
          }
-         profig.Config.merge($args)
+         profig.Profig.merge($args)
        """)
   }
 
@@ -126,7 +126,7 @@ object Macros {
     val mainClass = c.prefix.tree
     c.Expr[Unit](
       q"""
-         profig.Config.init($args)
+         profig.Profig.init($args)
          $mainClass.run()
        """)
   }

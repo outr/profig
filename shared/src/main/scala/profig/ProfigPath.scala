@@ -7,20 +7,20 @@ import io.circe.{ACursor, Json}
 import scala.language.experimental.macros
 
 /**
-  * ConfigPath is the core of functionality in Profig. Config extends from it for the root path and is used for looking
+  * ProfigPath is the core of functionality in Profig. Profig extends from it for the root path and is used for looking
   * up deeper paths as well.
   *
   * @param path the path defined within the configuration
   */
-class ConfigPath(val path: List[String]) {
+class ProfigPath(val path: List[String]) {
   /**
     * Look up a deeper path below the current path.
     *
-    * @return ConfigPath
+    * @return ProfigPath
     */
-  def apply(path: String*): ConfigPath = {
+  def apply(path: String*): ProfigPath = {
     val list = path.toList.flatMap(path2List)
-    new ConfigPath(this.path ::: list)
+    new ProfigPath(this.path ::: list)
   }
 
   /**
@@ -55,15 +55,15 @@ class ConfigPath(val path: List[String]) {
     }
     if (path.nonEmpty) {
       if (path.tail.isEmpty) {
-        Config.json.hcursor.get[Json](path.head) match {
+        Profig.json.hcursor.get[Json](path.head) match {
           case Left(_) => None
           case Right(value) => Some(value)
         }
       } else {
-        find(path.tail, Config.json.hcursor.downField(path.head))
+        find(path.tail, Profig.json.hcursor.downField(path.head))
       }
     } else {
-      Some(Config.json)
+      Some(Profig.json)
     }
   }
 
@@ -76,7 +76,7 @@ class ConfigPath(val path: List[String]) {
   def apply(): Json = get().getOrElse(Json.obj())
 
   /**
-    * True if this path exists in the Config
+    * True if this path exists in the config
     */
   def exists(): Boolean = get().nonEmpty
 
@@ -157,15 +157,15 @@ class ConfigPath(val path: List[String]) {
     if (path.nonEmpty) {
       val updated = ConfigUtil.createJson(path.mkString("."), json)
       if (defaults) {
-        Config.json = updated.deepMerge(Config.json)
+        Profig.json = updated.deepMerge(Profig.json)
       } else {
-        Config.json = Config.json.deepMerge(updated)
+        Profig.json = Profig.json.deepMerge(updated)
       }
     } else {
       if (defaults) {
-        Config.json = json.deepMerge(Config.json)
+        Profig.json = json.deepMerge(Profig.json)
       } else {
-        Config.json = Config.json.deepMerge(json)
+        Profig.json = Profig.json.deepMerge(json)
       }
     }
   }
@@ -178,18 +178,18 @@ class ConfigPath(val path: List[String]) {
   def remove(field: String): Unit = synchronized {
     if (path.nonEmpty) {
       def recurse(path: List[String], cursor: ACursor): Unit = if (path.isEmpty) {
-        Config.json = cursor.downField(field).delete.top.get
+        Profig.json = cursor.downField(field).delete.top.get
       } else {
         recurse(path.tail, cursor.downField(path.head))
       }
 
-      recurse(path.tail, Config.json.hcursor.downField(path.head))
+      recurse(path.tail, Profig.json.hcursor.downField(path.head))
     } else {
-      Config.json = Json.fromJsonObject(Config.json.asObject.get.remove(field))
+      Profig.json = Json.fromJsonObject(Profig.json.asObject.get.remove(field))
     }
   }
 
-  def remove(): Unit = Config(path.take(path.length - 1): _*).remove(path.last)
+  def remove(): Unit = Profig(path.take(path.length - 1): _*).remove(path.last)
 
   private def path2List(path: String): List[String] = path.split('.').toList
 }

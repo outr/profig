@@ -10,7 +10,7 @@ trait ConfigApplication {
   def main(args: Array[String]): Unit
 
   /**
-    * Loads args into Config and then calls `run()` to start the application.
+    * Loads args into Profig and then calls `run()` to start the application.
     */
   def start(args: Seq[String]): Unit = macro Macros.start
 

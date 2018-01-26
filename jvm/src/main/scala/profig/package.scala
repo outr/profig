@@ -4,7 +4,7 @@ import java.net.URL
 import scala.io.Source
 
 package object profig {
-  implicit class JVMConfigPath(path: ConfigPath) {
+  implicit class JVMProfigPath(path: ProfigPath) {
     /**
       * Combines the `Source` instance into the current path. Source is detected as either JSON or Properties.
       *

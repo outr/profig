@@ -11,7 +11,7 @@ object ProfigPlatform {
   val initialized: AtomicBoolean = new AtomicBoolean(false)
 
   /**
-    * Called upon initialization of Config at first use. Currently does nothing for Scala.js.
+    * Called upon initialization of Profig at first use. Currently does nothing for Scala.js.
     */
   def init(): Unit = macro PlatformMacros.init
 }

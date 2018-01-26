@@ -6,12 +6,12 @@ import scala.collection.JavaConverters._
 import scala.language.experimental.macros
 
 /**
-  * Config provides access to environment variables, properties, and other configuration all merged together into one
+  * Profig provides access to environment variables, properties, and other configuration all merged together into one
   * powerful system. Uses JSON internally to provide merging and integration. Paths are dot-separated.
   *
   * @see profig.ConfigApplication for convenience initialization
   */
-object Config extends ConfigPath(Nil) {
+object Profig extends ProfigPath(Nil) {
   private val envMap = System.getenv().asScala.toMap
   private[profig] val envConverted = ConfigUtil.map2Json(envMap.map {
     case (key, value) => key.toLowerCase.replace('_', '.') -> value
@@ -32,7 +32,7 @@ object Config extends ConfigPath(Nil) {
     * work-around for parser limitations in Scala.js when running on the JVM.
     *
     * Warning: this should only be used when being invoked from another Macro like the following:
-    *   `context.eval(reify(profig.Config.initMacro(Nil)))`
+    *   `context.eval(reify(profig.Profig.initMacro(Nil)))`
     *
     * @param args the command-line arguments to merge into the configuration, if any
     */
