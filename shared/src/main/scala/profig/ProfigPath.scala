@@ -82,8 +82,6 @@ class ProfigPath(val path: List[String]) {
 
   /**
     * Merges a sequence of args. This is primarily useful for merging command-line arguments.
-    *
-    * @see profig.ConfigApplication for a managed mechanism for this
     */
   def merge(args: Seq[String]): Unit = combine(args, defaults = false)
 

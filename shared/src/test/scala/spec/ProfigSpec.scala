@@ -52,10 +52,10 @@ class ProfigSpec extends WordSpec with Matchers {
       Profig("people.john.age").as[Option[Int]] should be(Some(321))
     }
   }
+
+  case class Person(name: String, age: Int = 21)
+
+  case class JVMInfo(version: String, specification: Specification)
+
+  case class Specification(vendor: String, name: String, version: String)
 }
-
-case class Person(name: String, age: Int = 21)
-
-case class JVMInfo(version: String, specification: Specification)
-
-case class Specification(vendor: String, name: String, version: String)

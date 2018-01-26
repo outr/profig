@@ -8,8 +8,6 @@ import scala.language.experimental.macros
 /**
   * Profig provides access to environment variables, properties, and other configuration all merged together into one
   * powerful system. Uses JSON internally to provide merging and integration. Paths are dot-separated.
-  *
-  * @see profig.ConfigApplication for convenience initialization
   */
 object Profig extends ProfigPath(Nil) {
   private val envMap = System.getenv().asScala.toMap

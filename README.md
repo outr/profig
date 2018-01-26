@@ -46,20 +46,13 @@ only class you really need be concerned with is `Profig`.
 
 ### Loading Command-Line arguments
 
-When your application starts it is reasonable to want to allow execution of the application to override existing configuration
-via the command-line. In order to effectively do this we can simply invoke `Profig.merge(args)` within our main method.
+When your application starts it is reasonable to want to allow execution of the application to override existing
+configuration via the command-line. In order to effectively do this we can simply invoke `Profig.merge(args)` within our
+main method.
 
-For a more managed representation this can be handled for you by using the `ConfigApplication` mix-in:
-
-```scala
-object MyApplication extends ConfigApplication {
-  override def run(): Unit = // this is now the main entry point invoked after command-line arguments are loaded
-}
-```
-
-If you choose not to use `ConfigApplication` just make sure to call `Config.init(args)` prior to using to make sure all
-configuration files are properly loaded. This invocation will handle compile-time injection for Scala.js via Macro, so
-make sure to call it in the application using it, not in dependency libraries or you may miss out on configuration.
+Make sure to call `Profig.init(args)` prior to using the library to make sure all configuration files are properly
+loaded. This invocation will handle compile-time injection for Scala.js via Macro, so make sure to call it in the
+application using it, not in dependency libraries or you may miss out on configuration.
 
 ### Accessing values
 
@@ -113,9 +106,14 @@ ScalaDocs and the specs: https://github.com/outr/profig/blob/master/shared/src/t
 
 # Roadmap
 
-## 1.2.0 (In-Progress)
+## 2.0.0 (In-Progress)
 
+* [ ] Auto-init support
+* [ ] Support child `Profig` instances with hierarchical structure
+* [X] Remove field / path support
 * [ ] HOCON support (integrate https://github.com/unicredit/shocon)
+* [ ] Support custom JSON encoding
+* [X] Refactor `Config` to be named `Profig` better disambiguation
 
 ## 1.1.0 (Released 08.03.2017)
 
