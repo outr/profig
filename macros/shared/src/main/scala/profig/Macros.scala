@@ -2,8 +2,6 @@ package profig
 
 import java.util.concurrent.atomic.AtomicBoolean
 
-import io.circe.Json
-
 import scala.language.experimental.macros
 import scala.reflect.macros.blackbox
 
@@ -26,7 +24,7 @@ object Macros {
   }
 
   def fromJson[T](c: blackbox.Context)
-                 (json: c.Expr[Json])
+                 (json: c.Tree)
                  (implicit t: c.WeakTypeTag[T]): c.Expr[T] = {
     import c.universe._
 
@@ -61,24 +59,23 @@ object Macros {
 
   def toJson[T](c: blackbox.Context)
                (value: c.Expr[T])
-               (implicit t: c.WeakTypeTag[T]): c.Expr[Json] = {
+               (implicit t: c.WeakTypeTag[T]): c.Tree = {
     import c.universe._
 
     val jsonUtil = c.prefix.tree
-    c.Expr[Json](
-      q"""
-         import io.circe._
-         import io.circe.generic.extras.Configuration
-         import io.circe.generic.extras.auto._
-         implicit val customConfig: Configuration = if ($jsonUtil.convertSnake) {
-           Configuration.default.withSnakeCaseKeys.withDefaults
-         } else {
-           Configuration.default.withDefaults
-         }
+    q"""
+       import io.circe._
+       import io.circe.generic.extras.Configuration
+       import io.circe.generic.extras.auto._
+       implicit val customConfig: Configuration = if ($jsonUtil.convertSnake) {
+         Configuration.default.withSnakeCaseKeys.withDefaults
+       } else {
+         Configuration.default.withDefaults
+       }
 
-         val encoder = implicitly[Encoder[$t]]
-         encoder($value)
-       """)
+       val encoder = implicitly[Encoder[$t]]
+       encoder($value)
+     """
   }
 
   def as[T](c: blackbox.Context)(implicit t: c.WeakTypeTag[T]): c.Expr[T] = {

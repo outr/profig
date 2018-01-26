@@ -8,10 +8,33 @@ crossScalaVersions in ThisBuild := List("2.12.4", "2.11.12")
 val circeVersion = "0.9.1"
 val scalatestVersion = "3.0.4"
 
-lazy val profig = crossProject(JSPlatform, JVMPlatform)
-  .crossType(CrossType.Full)
-  .in(file("."))
+lazy val root = project.in(file("."))
+  .aggregate(macrosJS, macrosJVM, coreJS, coreJVM)
   .settings(
+    name := "profig",
+    publish := {},
+    publishLocal := {}
+  )
+
+lazy val macros = crossProject(JSPlatform, JVMPlatform)
+  .crossType(CrossType.Full)
+  .in(file("macros"))
+  .settings(
+    name := "profig-macros",
+    libraryDependencies ++= Seq(
+      "org.scala-lang" % "scala-reflect" % scalaVersion.value
+    )
+  )
+
+lazy val macrosJS = macros.js
+lazy val macrosJVM = macros.jvm
+
+lazy val core = crossProject(JSPlatform, JVMPlatform)
+  .crossType(CrossType.Full)
+  .in(file("core"))
+  .dependsOn(macros)
+  .settings(
+    name := "profig",
     libraryDependencies ++= Seq(
       "io.circe" %%% "circe-core",
       "io.circe" %%% "circe-generic",
@@ -25,5 +48,5 @@ lazy val profig = crossProject(JSPlatform, JVMPlatform)
     )
   )
 
-lazy val js = profig.js
-lazy val jvm = profig.jvm
+lazy val coreJS = core.js
+lazy val coreJVM = core.jvm
