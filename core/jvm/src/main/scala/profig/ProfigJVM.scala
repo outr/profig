@@ -1,6 +1,7 @@
 package profig
 
 import java.io.File
+
 import scala.collection.JavaConverters._
 
 object ProfigJVM {

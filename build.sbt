@@ -1,4 +1,4 @@
-import sbtcrossproject.{crossProject, CrossType}
+import sbtcrossproject.{CrossType, crossProject}
 
 organization in ThisBuild := "com.outr"
 version in ThisBuild := "2.0.0-SNAPSHOT"
