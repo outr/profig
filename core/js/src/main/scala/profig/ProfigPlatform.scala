@@ -13,5 +13,5 @@ object ProfigPlatform {
   /**
     * Called upon initialization of Profig at first use. Currently does nothing for Scala.js.
     */
-  def init(): Unit = macro PlatformMacros.init
+  def init(instance: Profig): Unit = macro PlatformMacros.init
 }

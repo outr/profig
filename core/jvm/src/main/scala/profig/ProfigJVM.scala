@@ -4,27 +4,27 @@ import java.io.File
 import scala.collection.JavaConverters._
 
 object ProfigJVM {
-  def init(): Unit = {
+  def init(instance: Profig): Unit = {
     PlatformMacros.defaults.foreach { path =>
       getClass.getClassLoader.getResources(path).asScala.foreach { url =>
-        Profig.defaults(url)
+        instance.defaults(url)
       }
     }
     PlatformMacros.defaults.foreach { path =>
       val file = new File(path)
       if (file.exists()) {
-        Profig.defaults(file)
+        instance.defaults(file)
       }
     }
     PlatformMacros.paths.foreach { path =>
       getClass.getClassLoader.getResources(path).asScala.foreach { url =>
-        Profig.merge(url)
+        instance.merge(url)
       }
     }
     PlatformMacros.paths.foreach { path =>
       val file = new File(path)
       if (file.exists()) {
-        Profig.merge(file)
+        instance.merge(file)
       }
     }
   }

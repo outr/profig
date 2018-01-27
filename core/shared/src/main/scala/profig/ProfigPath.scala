@@ -9,10 +9,11 @@ import scala.language.experimental.macros
 /**
   * ProfigPath is the core of functionality in Profig. Profig extends from it for the root path and is used for looking
   * up deeper paths as well.
-  *
-  * @param path the path defined within the configuration
   */
-class ProfigPath(val path: List[String]) {
+trait ProfigPath {
+  def instance: Profig
+  def path: List[String]
+
   /**
     * Look up a deeper path below the current path.
     *
@@ -20,7 +21,7 @@ class ProfigPath(val path: List[String]) {
     */
   def apply(path: String*): ProfigPath = {
     val list = path.toList.flatMap(path2List)
-    new ProfigPath(this.path ::: list)
+    ProfigPath(instance, this.path ::: list)
   }
 
   /**
@@ -55,15 +56,15 @@ class ProfigPath(val path: List[String]) {
     }
     if (path.nonEmpty) {
       if (path.tail.isEmpty) {
-        Profig.json.hcursor.get[Json](path.head) match {
+        instance.json.hcursor.get[Json](path.head) match {
           case Left(_) => None
           case Right(value) => Some(value)
         }
       } else {
-        find(path.tail, Profig.json.hcursor.downField(path.head))
+        find(path.tail, instance.json.hcursor.downField(path.head))
       }
     } else {
-      Some(Profig.json)
+      Some(instance.json)
     }
   }
 
@@ -155,15 +156,15 @@ class ProfigPath(val path: List[String]) {
     if (path.nonEmpty) {
       val updated = ConfigUtil.createJson(path.mkString("."), json)
       if (defaults) {
-        Profig.json = updated.deepMerge(Profig.json)
+        instance.json = updated.deepMerge(instance.json)
       } else {
-        Profig.json = Profig.json.deepMerge(updated)
+        instance.json = instance.json.deepMerge(updated)
       }
     } else {
       if (defaults) {
-        Profig.json = json.deepMerge(Profig.json)
+        instance.json = json.deepMerge(instance.json)
       } else {
-        Profig.json = Profig.json.deepMerge(json)
+        instance.json = instance.json.deepMerge(json)
       }
     }
   }
@@ -176,18 +177,24 @@ class ProfigPath(val path: List[String]) {
   def remove(field: String): Unit = synchronized {
     if (path.nonEmpty) {
       def recurse(path: List[String], cursor: ACursor): Unit = if (path.isEmpty) {
-        Profig.json = cursor.downField(field).delete.top.get
+        instance.json = cursor.downField(field).delete.top.get
       } else {
         recurse(path.tail, cursor.downField(path.head))
       }
 
-      recurse(path.tail, Profig.json.hcursor.downField(path.head))
+      recurse(path.tail, instance.json.hcursor.downField(path.head))
     } else {
-      Profig.json = Json.fromJsonObject(Profig.json.asObject.get.remove(field))
+      instance.json = Json.fromJsonObject(instance.json.asObject.get.remove(field))
     }
   }
 
-  def remove(): Unit = Profig(path.take(path.length - 1): _*).remove(path.last)
+  def remove(): Unit = instance(path.take(path.length - 1): _*).remove(path.last)
 
   private def path2List(path: String): List[String] = path.split('.').toList
+}
+
+object ProfigPath {
+  def apply(instance: Profig, path: List[String]): ProfigPath = new ProfigSubPath(instance, path)
+
+  class ProfigSubPath(override val instance: Profig, override val path: List[String]) extends ProfigPath
 }

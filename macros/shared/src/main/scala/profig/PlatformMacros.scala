@@ -21,14 +21,14 @@ object PlatformMacros {
     "defaults.conf"
   )
 
-  def init(c: blackbox.Context)(): c.Expr[Unit] = {
+  def init(c: blackbox.Context)(instance: c.Tree): c.Expr[Unit] = {
     import c.universe._
 
     var loading = Set.empty[String]
     val expressions = ListBuffer.empty[Tree]
 
     def addExpression(jsonString: String, defaults: Boolean): Unit = {
-      val combine = if (defaults) q"profig.Profig.defaults(j)" else q"profig.Profig.merge(j)"
+      val combine = if (defaults) q"$instance.defaults(j)" else q"$instance.merge(j)"
       if (profig.Macros.inlined.get()) {
         expressions +=
           q"""

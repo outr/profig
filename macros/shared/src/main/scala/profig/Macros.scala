@@ -34,11 +34,7 @@ object Macros {
          import io.circe._
          import io.circe.generic.extras.Configuration
          import io.circe.generic.extras.auto._
-         implicit val customConfig: Configuration = if ($jsonUtil.convertSnake) {
-           Configuration.default.withSnakeCaseKeys.withDefaults
-         } else {
-           Configuration.default.withDefaults
-         }
+         implicit val customConfig: Configuration = Configuration.default.withDefaults
 
          implicit val decoder = implicitly[Decoder[$t]]
          decoder.decodeJson($json) match {
@@ -67,11 +63,7 @@ object Macros {
        import io.circe._
        import io.circe.generic.extras.Configuration
        import io.circe.generic.extras.auto._
-       implicit val customConfig: Configuration = if ($jsonUtil.convertSnake) {
-         Configuration.default.withSnakeCaseKeys.withDefaults
-       } else {
-         Configuration.default.withDefaults
-       }
+       implicit val customConfig: Configuration = Configuration.default.withDefaults
 
        val encoder = implicitly[Encoder[$t]]
        encoder($value)
@@ -95,10 +87,11 @@ object Macros {
   def init(c: blackbox.Context)(): c.Expr[Unit] = {
     import c.universe._
 
+    val instance = c.prefix.tree
     c.Expr[Unit](
       q"""
          if (profig.ProfigPlatform.initialized.compareAndSet(false, true)) {
-           profig.ProfigPlatform.init()
+           profig.ProfigPlatform.init($instance)
          }
        """)
   }

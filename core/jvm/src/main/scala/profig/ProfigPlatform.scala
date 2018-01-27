@@ -27,5 +27,5 @@ object ProfigPlatform {
     * These files will never overwrite existing settings and is a great way to define defaults for your application
     * while avoiding replacing user-defined values.
     */
-  def init(): Unit = ProfigJVM.init()
+  def init(instance: Profig): Unit = ProfigJVM.init(instance)
 }

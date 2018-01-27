@@ -5,17 +5,9 @@ import io.circe.Json
 import scala.collection.JavaConverters._
 import scala.language.experimental.macros
 
-/**
-  * Profig provides access to environment variables, properties, and other configuration all merged together into one
-  * powerful system. Uses JSON internally to provide merging and integration. Paths are dot-separated.
-  */
-object Profig extends ProfigPath(Nil) {
-  private val envMap = System.getenv().asScala.toMap
-  private[profig] val envConverted = ConfigUtil.map2Json(envMap.map {
-    case (key, value) => key.toLowerCase.replace('_', '.') -> value
-  })
-  private[profig] val props = ConfigUtil.properties2Json(System.getProperties)
-  private[profig] var json: Json = envConverted.deepMerge(props)
+class Profig(private[profig] var json: Json = Json.obj()) extends ProfigPath {
+  override def instance: Profig = this
+  override def path: List[String] = Nil
 
   init()
 
@@ -31,4 +23,34 @@ object Profig extends ProfigPath(Nil) {
     * @param args the command-line arguments to merge into the configuration, if any
     */
   def initMacro(args: Seq[String]): Unit = macro Macros.initMacro
+
+  def loadEnvironmentVariables(asDefault: Boolean = true): Unit = {
+    val envMap = System.getenv().asScala.toMap
+    val envConverted = ConfigUtil.map2Json(envMap.map {
+      case (key, value) => key.toLowerCase.replace('_', '.') -> value
+    })
+    if (asDefault) {
+      defaults(envConverted)
+    } else {
+      merge(envConverted)
+    }
+  }
+
+  def loadProperties(asDefault: Boolean = true): Unit = {
+    val props = ConfigUtil.properties2Json(System.getProperties)
+    if (asDefault) {
+      defaults(props)
+    } else {
+      merge(props)
+    }
+  }
+}
+
+/**
+  * Profig provides access to environment variables, properties, and other configuration all merged together into one
+  * powerful system. Uses JSON internally to provide merging and integration. Paths are dot-separated.
+  */
+object Profig extends Profig(Json.obj()) {
+  loadProperties()
+  loadEnvironmentVariables()
 }

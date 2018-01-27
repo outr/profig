@@ -4,6 +4,7 @@ organization in ThisBuild := "com.outr"
 version in ThisBuild := "2.0.0-SNAPSHOT"
 scalaVersion in ThisBuild := "2.12.4"
 crossScalaVersions in ThisBuild := List("2.12.4", "2.11.12")
+scalacOptions in ThisBuild ++= Seq("-unchecked", "-deprecation")
 
 val circeVersion = "0.9.1"
 val scalatestVersion = "3.0.4"
