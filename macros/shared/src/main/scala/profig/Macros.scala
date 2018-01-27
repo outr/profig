@@ -92,7 +92,7 @@ object Macros {
     c.Expr[Unit](q"$configPath.merge(profig.JsonUtil.toJson[$t]($value))")
   }
 
-  def init(c: blackbox.Context)(args: c.Expr[Seq[String]]): c.Expr[Unit] = {
+  def init(c: blackbox.Context)(): c.Expr[Unit] = {
     import c.universe._
 
     c.Expr[Unit](
@@ -100,7 +100,6 @@ object Macros {
          if (profig.ProfigPlatform.initialized.compareAndSet(false, true)) {
            profig.ProfigPlatform.init()
          }
-         profig.Profig.merge($args)
        """)
   }
 

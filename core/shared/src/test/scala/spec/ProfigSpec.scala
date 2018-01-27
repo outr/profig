@@ -5,8 +5,8 @@ import profig.Profig
 
 class ProfigSpec extends WordSpec with Matchers {
   "Profig" should {
-    "initialize" in {
-      Profig.init(List("-this.is.an.argument", "Wahoo!"))
+    "merge arguments" in {
+      Profig.merge(List("-this.is.an.argument", "Wahoo!"))
     }
     "load a String argument" in {
       Profig("this.is.an.argument").as[String] should be("Wahoo!")

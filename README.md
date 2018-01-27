@@ -31,8 +31,8 @@ and overriding configuration in your application.
 Profig is published to Sonatype OSS and synchronized to Maven Central supporting JVM and Scala.js on 2.11 and 2.12:
 
 ```
-libraryDependencies += "com.outr" %% "profig" % "1.1.4"   // Scala
-libraryDependencies += "com.outr" %%% "profig" % "1.1.4"  // Scala.js / Cross-Build
+libraryDependencies += "com.outr" %% "profig" % "2.0.0"   // Scala
+libraryDependencies += "com.outr" %%% "profig" % "2.0.0"  // Scala.js / Cross-Build
 ```
 
 ## Getting Started
@@ -49,10 +49,6 @@ only class you really need be concerned with is `Profig`.
 When your application starts it is reasonable to want to allow execution of the application to override existing
 configuration via the command-line. In order to effectively do this we can simply invoke `Profig.merge(args)` within our
 main method.
-
-Make sure to call `Profig.init(args)` prior to using the library to make sure all configuration files are properly
-loaded. This invocation will handle compile-time injection for Scala.js via Macro, so make sure to call it in the
-application using it, not in dependency libraries or you may miss out on configuration.
 
 ### Accessing values
 
@@ -108,7 +104,7 @@ ScalaDocs and the specs: https://github.com/outr/profig/blob/master/shared/src/t
 
 ## 2.0.0 (In-Progress)
 
-* [ ] Auto-init support
+* [X] Auto-init support
 * [ ] Support child `Profig` instances with hierarchical structure
 * [X] Remove field / path support
 * [ ] HOCON support (integrate https://github.com/unicredit/shocon)

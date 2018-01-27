@@ -17,13 +17,9 @@ object Profig extends ProfigPath(Nil) {
   private[profig] val props = ConfigUtil.properties2Json(System.getProperties)
   private[profig] var json: Json = envConverted.deepMerge(props)
 
-  /**
-    * Initializes Profig. This must be invoked prior to using. Multiple invocations are allowed, but initialization only
-    * occurs the first time. Additional calls will still merge args submitted by this method.
-    *
-    * @param args the command-line arguments to merge into the configuration, if any
-    */
-  def init(args: Seq[String] = Seq.empty): Unit = macro Macros.init
+  init()
+
+  private def init(): Unit = macro Macros.init
 
   /**
     * Specialized version of init when being used to load configuration for use with a Macro at compile-time. This is a
