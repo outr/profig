@@ -156,15 +156,15 @@ trait ProfigPath {
     if (path.nonEmpty) {
       val updated = ConfigUtil.createJson(path.mkString("."), json)
       if (defaults) {
-        instance.json = updated.deepMerge(instance.json)
+        instance.modify(updated.deepMerge)
       } else {
-        instance.json = instance.json.deepMerge(updated)
+        instance.modify(_.deepMerge(updated))
       }
     } else {
       if (defaults) {
-        instance.json = json.deepMerge(instance.json)
+        instance.modify(json.deepMerge)
       } else {
-        instance.json = instance.json.deepMerge(json)
+        instance.modify(_.deepMerge(json))
       }
     }
   }
@@ -176,15 +176,17 @@ trait ProfigPath {
     */
   def remove(field: String): Unit = synchronized {
     if (path.nonEmpty) {
-      def recurse(path: List[String], cursor: ACursor): Unit = if (path.isEmpty) {
-        instance.json = cursor.downField(field).delete.top.get
+      def recurse(path: List[String], cursor: ACursor): Json = if (path.isEmpty) {
+        cursor.downField(field).delete.top.get
       } else {
         recurse(path.tail, cursor.downField(path.head))
       }
 
-      recurse(path.tail, instance.json.hcursor.downField(path.head))
+      instance.modify { json =>
+        recurse(path.tail, json.hcursor.downField(path.head))
+      }
     } else {
-      instance.json = Json.fromJsonObject(instance.json.asObject.get.remove(field))
+      instance.modify(json => Json.fromJsonObject(json.asObject.get.remove(field)))
     }
   }
 

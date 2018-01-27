@@ -4,54 +4,73 @@ import org.scalatest.{Matchers, WordSpec}
 import profig.Profig
 
 class ProfigSpec extends WordSpec with Matchers {
-  private val instance: Profig = Profig
-
   "Profig" should {
     "merge arguments" in {
-      instance.merge(List("-this.is.an.argument", "Wahoo!"))
+      Profig.merge(List("-this.is.an.argument", "Wahoo!"))
     }
     "load a String argument" in {
-      instance("this.is.an.argument").as[String] should be("Wahoo!")
+      Profig("this.is.an.argument").as[String] should be("Wahoo!")
     }
     "load JSON arguments" in {
-      instance.merge("{ \"this.is.another.argument\" : \"Hola!\" }")
+      Profig.merge("{ \"this.is.another.argument\" : \"Hola!\" }")
     }
     "load JVM information from properties" in {
-      val info = instance("java").as[JVMInfo]
+      val info = Profig("java").as[JVMInfo]
       info.specification.vendor should be("Oracle Corporation")
       info.specification.version should be("1.8")
     }
     "store a single String" in {
-      instance("people", "me", "name").store("Matt")
+      Profig("people", "me", "name").store("Matt")
     }
     "load a case class from a path with default arguments" in {
-      val person = instance("people.me").as[Person]
+      val person = Profig("people.me").as[Person]
       person should be(Person("Matt"))
     }
     "storage a case class" in {
-      instance("people", "john").store(Person("John Doe", 123))
+      Profig("people", "john").store(Person("John Doe", 123))
     }
     "load the stored case class from path" in {
-      val person = instance("people")("john").as[Person]
+      val person = Profig("people")("john").as[Person]
       person should be(Person("John Doe", 123))
     }
     "load an optional value that is not there" in {
-      val value = instance("this.does.not.exist").as[Option[String]]
+      val value = Profig("this.does.not.exist").as[Option[String]]
       value should be(None)
     }
     "verify that test.value was loaded" in {
-      val value = instance("test.value").as[Option[Boolean]]
+      val value = Profig("test.value").as[Option[Boolean]]
       value should be(Some(true))
     }
     "remove a value" in {
-      instance("people.john.age").as[Option[Int]] should be(Some(123))
-      instance("people.john.age").remove()
-      instance("people.john.age").as[Option[Int]] should be(None)
+      Profig("people.john.age").as[Option[Int]] should be(Some(123))
+      Profig("people.john.age").remove()
+      Profig("people.john.age").as[Option[Int]] should be(None)
     }
     "add a value back" in {
-      instance("people.john.age").as[Option[Int]] should be(None)
-      instance("people.john.age").store(321)
-      instance("people.john.age").as[Option[Int]] should be(Some(321))
+      Profig("people.john.age").as[Option[Int]] should be(None)
+      Profig("people.john.age").store(321)
+      Profig("people.john.age").as[Option[Int]] should be(Some(321))
+    }
+    "create a child Profig Profig" in {
+      val child = Profig.child()
+      child("child.info").store("Child Local")
+      Profig("child.info").as[Option[String]] should be(None)
+      child("child.info").as[Option[String]] should be(Some("Child Local"))
+    }
+    "update parent and see in the child" in {
+      val child = Profig.child()
+      child("people.john.age").as[Option[Int]] should be(Some(321))
+      Profig("people.john.age").as[Option[Int]] should be(Some(321))
+      child("people.john.age").store(1234)
+      Profig("people.john.age").as[Option[Int]] should be(Some(321))
+      child("people.john.age").as[Option[Int]] should be(Some(1234))
+      child("people.john.age").remove()
+      child("people.john.age").as[Option[Int]] should be(Some(321))
+      Profig("people.john.age").as[Option[Int]] should be(Some(321))
+    }
+    "see no spill-over in orphaned Profig" in {
+      val orphan = Profig(None)
+      orphan("people.john.age").as[Option[Int]] should be(None)
     }
   }
 
