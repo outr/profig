@@ -102,13 +102,15 @@ ScalaDocs and the specs: https://github.com/outr/profig/blob/master/shared/src/t
 
 # Roadmap
 
+## 2.1.0 (Future)
+
+* [ ] HOCON support (integrate https://github.com/unicredit/shocon)
+
 ## 2.0.0 (In-Progress)
 
 * [X] Auto-init support
-* [ ] Support child `Profig` instances with hierarchical structure
+* [X] Support child `Profig` instances with hierarchical structure
 * [X] Remove field / path support
-* [ ] HOCON support (integrate https://github.com/unicredit/shocon)
-* [ ] Support custom JSON encoding
 * [X] Refactor `Config` to be named `Profig` better disambiguation
 
 ## 1.1.0 (Released 08.03.2017)
