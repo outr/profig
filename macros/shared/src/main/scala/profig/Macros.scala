@@ -100,10 +100,11 @@ object Macros {
     import c.universe._
 
     profig.Macros.inlined.set(true)
+    val instance = c.prefix.tree
     c.Expr[Unit](
       q"""
          if (profig.ProfigPlatform.initialized.compareAndSet(false, true)) {
-           profig.ProfigPlatform.init()
+           profig.ProfigPlatform.init($instance)
          }
          profig.Profig.merge($args)
        """)
