@@ -98,12 +98,17 @@ Profig.defaults(MyConfig(path = "/another/path"))
 ### Next steps
 
 This only scratches the surface of the features and functionality Profig provides. For additional information read the
-ScalaDocs and the specs: https://github.com/outr/profig/blob/master/shared/src/test/scala/spec/ProfigSpec.scala
+ScalaDocs and the specs: https://github.com/outr/profig/blob/master/core/shared/src/test/scala/spec/ProfigSpec.scala
 
 # Roadmap
 
 ## 2.1.0 (In-Progress)
 
+* [ ] Better README documentation
+* [ ] Override loading support
+    * [ ] Modify paths to auto-load
+    * [ ] Allow disabling of loading environment variables
+* [ ] Yaml support (use circe-yaml)
 * [ ] HOCON support (integrate https://github.com/unicredit/shocon)
 
 ## 2.0.0 (Released 01.26.2018)

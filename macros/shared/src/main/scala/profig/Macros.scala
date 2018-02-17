@@ -13,12 +13,11 @@ object Macros {
                        (implicit t: c.WeakTypeTag[T]): c.Expr[T] = {
     import c.universe._
 
-    val jsonUtil = c.prefix.tree
     c.Expr[T](
       q"""
          io.circe.parser.parse($jsonString) match {
            case Left(t) => throw t
-           case Right(json) => $jsonUtil.fromJson[$t](json)
+           case Right(json) => profig.JsonUtil.fromJson[$t](json)
          }
        """)
   }
@@ -28,7 +27,6 @@ object Macros {
                  (implicit t: c.WeakTypeTag[T]): c.Expr[T] = {
     import c.universe._
 
-    val jsonUtil = c.prefix.tree
     c.Expr[T](
       q"""
          import io.circe._
@@ -49,8 +47,7 @@ object Macros {
                      (implicit t: c.WeakTypeTag[T]): c.Expr[String] = {
     import c.universe._
 
-    val jsonUtil = c.prefix.tree
-    c.Expr[String](q"$jsonUtil.toJson[$t]($value).pretty(io.circe.Printer.noSpaces)")
+    c.Expr[String](q"profig.JsonUtil.toJson[$t]($value).pretty(io.circe.Printer.noSpaces)")
   }
 
   def toJson[T](c: blackbox.Context)

@@ -23,6 +23,7 @@ developers in ThisBuild := List(
 )
 
 val circeVersion = "0.9.1"
+val circeYamlVersion = "0.7.0"
 val scalatestVersion = "3.0.4"
 
 lazy val root = project.in(file("."))
@@ -60,6 +61,7 @@ lazy val core = crossProject(JSPlatform, JVMPlatform)
     ).map(_ % circeVersion),
     libraryDependencies ++= Seq(
       "io.circe" %% "circe-jawn" % circeVersion,
+      "io.circe" %% "circe-yaml" % circeYamlVersion,
       "org.scala-lang" % "scala-reflect" % scalaVersion.value,
       "org.scalatest" %%% "scalatest" % scalatestVersion % "test"
     )

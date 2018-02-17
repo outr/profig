@@ -8,19 +8,6 @@ import scala.language.experimental.macros
 import scala.reflect.macros.blackbox
 
 object PlatformMacros {
-  private[profig] val paths = List(
-    "config.json",
-    "config.conf",
-    "configuration.json",
-    "configuration.conf",
-    "application.conf",
-    "application.json"
-  )
-  private[profig] val defaults = List(
-    "defaults.json",
-    "defaults.conf"
-  )
-
   def init(c: blackbox.Context)(instance: c.Tree): c.Expr[Unit] = {
     import c.universe._
 
