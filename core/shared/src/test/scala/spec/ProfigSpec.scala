@@ -5,6 +5,9 @@ import profig.Profig
 
 class ProfigSpec extends WordSpec with Matchers {
   "Profig" should {
+    "verify classloading" in {
+      Profig("test.classloading").as[Option[String]] should be(Some("yes"))
+    }
     "merge arguments" in {
       Profig.merge(List("-this.is.an.argument", "Wahoo!"))
     }
