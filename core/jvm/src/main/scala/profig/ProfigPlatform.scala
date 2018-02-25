@@ -1,13 +1,9 @@
 package profig
 
-import java.util.concurrent.atomic.AtomicBoolean
-
 /**
   * Platform-specific initialization for JVM
   */
 object ProfigPlatform {
-  val initialized: AtomicBoolean = new AtomicBoolean(false)
-
   /**
     * Called upon initialization of Profig at first use. Attempts to load the following from the classloader and then
     * from the local filesystem:
@@ -27,5 +23,12 @@ object ProfigPlatform {
     * These files will never overwrite existing settings and is a great way to define defaults for your application
     * while avoiding replacing user-defined values.
     */
-  def init(instance: Profig): Unit = ProfigJVM.init(instance)
+  def init(instance: Profig): Unit = {
+    ConfigurationPath.toJsonStrings().foreach {
+      case (cp, json) => cp.load match {
+        case LoadType.Defaults => instance.defaults(json)
+        case LoadType.Merge => instance.merge(json)
+      }
+    }
+  }
 }

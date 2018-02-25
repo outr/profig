@@ -1,13 +1,9 @@
 package profig
 
-import java.util.concurrent.atomic.AtomicBoolean
-
 import scala.language.experimental.macros
 import scala.reflect.macros.blackbox
 
 object Macros {
-  val inlined: AtomicBoolean = new AtomicBoolean(false)
-
   def fromJsonString[T](c: blackbox.Context)
                        (jsonString: c.Expr[String])
                        (implicit t: c.WeakTypeTag[T]): c.Expr[T] = {
@@ -55,7 +51,6 @@ object Macros {
                (implicit t: c.WeakTypeTag[T]): c.Tree = {
     import c.universe._
 
-    val jsonUtil = c.prefix.tree
     q"""
        import io.circe._
        import io.circe.generic.extras.Configuration
@@ -81,32 +76,6 @@ object Macros {
     c.Expr[Unit](q"$configPath.merge(profig.JsonUtil.toJson[$t]($value))")
   }
 
-  def init(c: blackbox.Context)(): c.Expr[Unit] = {
-    import c.universe._
-
-    val instance = c.prefix.tree
-    c.Expr[Unit](
-      q"""
-         if (profig.ProfigPlatform.initialized.compareAndSet(false, true)) {
-           profig.ProfigPlatform.init($instance)
-         }
-       """)
-  }
-
-  def initMacro(c: blackbox.Context)(args: c.Expr[Seq[String]]): c.Expr[Unit] = {
-    import c.universe._
-
-    profig.Macros.inlined.set(true)
-    val instance = c.prefix.tree
-    c.Expr[Unit](
-      q"""
-         if (profig.ProfigPlatform.initialized.compareAndSet(false, true)) {
-           profig.ProfigPlatform.init($instance)
-         }
-         profig.Profig.merge($args)
-       """)
-  }
-
   def start(c: blackbox.Context)(args: c.Expr[Seq[String]]): c.Expr[Unit] = {
     import c.universe._
 
@@ -116,5 +85,17 @@ object Macros {
          profig.Profig.init($args)
          $mainClass.run()
        """)
+  }
+
+  def injection(c: blackbox.Context)(instance: c.Tree): c.Tree = {
+    import c.universe._
+
+    val config = ConfigurationPath.toJsonStrings().map {
+      case (cp, json) => cp.load match {
+        case LoadType.Defaults => q"$instance.defaults($json)"
+        case LoadType.Merge => q"$instance.merge($json)"
+      }
+    }
+    q"..$config"
   }
 }

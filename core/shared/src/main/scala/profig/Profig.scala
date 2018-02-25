@@ -33,18 +33,7 @@ class Profig(val parent: Option[Profig] = Some(Profig)) extends ProfigPath {
 
   init()
 
-  private def init(): Unit = macro Macros.init
-
-  /**
-    * Specialized version of init when being used to load configuration for use with a Macro at compile-time. This is a
-    * work-around for parser limitations in Scala.js when running on the JVM.
-    *
-    * Warning: this should only be used when being invoked from another Macro like the following:
-    *   `context.eval(reify(profig.Profig.initMacro(Nil)))`
-    *
-    * @param args the command-line arguments to merge into the configuration, if any
-    */
-  def initMacro(args: Seq[String]): Unit = macro Macros.initMacro
+  private def init(): Unit = ProfigPlatform.init(this)
 
   def loadEnvironmentVariables(asDefault: Boolean = true): Unit = {
     val envMap = System.getenv().asScala.toMap
