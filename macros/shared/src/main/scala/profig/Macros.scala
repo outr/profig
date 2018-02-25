@@ -76,17 +76,6 @@ object Macros {
     c.Expr[Unit](q"$configPath.merge(profig.JsonUtil.toJson[$t]($value))")
   }
 
-  def start(c: blackbox.Context)(args: c.Expr[Seq[String]]): c.Expr[Unit] = {
-    import c.universe._
-
-    val mainClass = c.prefix.tree
-    c.Expr[Unit](
-      q"""
-         profig.Profig.init($args)
-         $mainClass.run()
-       """)
-  }
-
   def injection(c: blackbox.Context)(instance: c.Tree): c.Tree = {
     import c.universe._
 
