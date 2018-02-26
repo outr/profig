@@ -8,7 +8,7 @@ import scala.io.Source
 case class ConfigurationPath(path: String, `type`: ConfigurationFileType, load: LoadType)
 
 object ConfigurationPath {
-  var entries: List[ConfigurationPath] = List(
+  var defaults: List[ConfigurationPath] = List(
     ConfigurationPath("config.json", ConfigurationFileType.Json, LoadType.Merge),
     ConfigurationPath("config.conf", ConfigurationFileType.Auto, LoadType.Merge),
     ConfigurationPath("config.properties", ConfigurationFileType.Properties, LoadType.Merge),
@@ -34,7 +34,7 @@ object ConfigurationPath {
     ConfigurationPath("defaults.yaml", ConfigurationFileType.Yaml, LoadType.Defaults)
   )
 
-  def toJsonStrings(entries: List[ConfigurationPath] = entries): List[(ConfigurationPath, String)] = if (entries.isEmpty) {
+  def toJsonStrings(entries: List[ConfigurationPath] = defaults): List[(ConfigurationPath, String)] = if (entries.isEmpty) {
     Nil
   } else {
     val entry = entries.head

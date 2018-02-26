@@ -5,6 +5,12 @@ import profig.Profig
 
 class ProfigSpec extends WordSpec with Matchers {
   "Profig" should {
+    "verify classloading not set" in {
+      Profig("test.classloading").as[Option[String]] should be(None)
+    }
+    "load configuration files" in {
+      Profig.loadFiles()
+    }
     "verify classloading" in {
       Profig("test.classloading").as[Option[String]] should be(Some("yes"))
     }

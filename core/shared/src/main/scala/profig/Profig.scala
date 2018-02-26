@@ -31,9 +31,9 @@ class Profig(val parent: Option[Profig] = Some(Profig)) extends ProfigPath {
   override def instance: Profig = this
   override def path: List[String] = Nil
 
-  init()
-
-  private def init(): Unit = ProfigPlatform.init(this)
+  def loadFiles(entries: List[ConfigurationPath] = ConfigurationPath.defaults): Unit = {
+    ProfigPlatform.loadFiles(this, entries)
+  }
 
   def loadEnvironmentVariables(asDefault: Boolean = true): Unit = {
     val envMap = System.getenv().asScala.toMap

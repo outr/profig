@@ -76,10 +76,14 @@ object Macros {
     c.Expr[Unit](q"$configPath.merge(profig.JsonUtil.toJson[$t]($value))")
   }
 
-  def injection(c: blackbox.Context)(instance: c.Tree): c.Tree = {
+  def injection(c: blackbox.Context)(instance: c.Tree, entries: c.Expr[List[ConfigurationPath]]): c.Tree = {
     import c.universe._
 
-    val config = ConfigurationPath.toJsonStrings().map {
+    val entriesValue = entries match {
+      case Expr(Literal(Constant(value: List[ConfigurationPath]))) => value
+    }
+
+    val config = ConfigurationPath.toJsonStrings(entriesValue).map {
       case (cp, json) => cp.load match {
         case LoadType.Defaults => q"$instance.defaults($json)"
         case LoadType.Merge => q"$instance.merge($json)"
