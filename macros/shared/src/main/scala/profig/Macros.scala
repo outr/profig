@@ -76,19 +76,34 @@ object Macros {
     c.Expr[Unit](q"$configPath.merge(profig.JsonUtil.toJson[$t]($value))")
   }
 
-  def injection(c: blackbox.Context)(instance: c.Tree, entries: c.Expr[List[ConfigurationPath]]): c.Tree = {
+  def loadFiles(c: blackbox.Context)(entries: c.Expr[ConfigurationPath]*): c.Tree = {
     import c.universe._
 
-    val entriesValue = entries match {
-      case Expr(Literal(Constant(value: List[ConfigurationPath]))) => value
-    }
+    val instance = c.prefix.tree
+    if (profig.ProfigPlatform.isJS) {
+      // TODO: support non-defaults in Scala.js
+//      val entriesValue = entries match {
+//        case Expr(Literal(Constant(value: Seq[ConfigurationPath]))) => value.toList
+//      }
 
-    val config = ConfigurationPath.toJsonStrings(entriesValue).map {
-      case (cp, json) => cp.load match {
-        case LoadType.Defaults => q"$instance.defaults($json)"
-        case LoadType.Merge => q"$instance.merge($json)"
+      val config = ConfigurationPath.toJsonStrings(ConfigurationPath.defaults).map {
+        case (cp, json) => cp.load match {
+          case LoadType.Defaults => q"$instance.defaults($json)"
+          case LoadType.Merge => q"$instance.merge($json)"
+        }
       }
+      q"..$config"
+    } else {
+      q"""
+         import profig._
+
+         ConfigurationPath.toJsonStrings(List(..$entries)).foreach {
+           case (cp, json) => cp.load match {
+             case LoadType.Defaults => $instance.defaults(json)
+             case LoadType.Merge => $instance.merge(json)
+           }
+         }
+       """
     }
-    q"..$config"
   }
 }

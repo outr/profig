@@ -1,7 +1,7 @@
 package spec
 
 import org.scalatest.{Matchers, WordSpec}
-import profig.Profig
+import profig.{ConfigurationPath, Profig}
 
 class ProfigSpec extends WordSpec with Matchers {
   "Profig" should {
@@ -9,7 +9,7 @@ class ProfigSpec extends WordSpec with Matchers {
       Profig("test.classloading").as[Option[String]] should be(None)
     }
     "load configuration files" in {
-      Profig.loadFiles()
+      Profig.loadFiles(ConfigurationPath.defaults: _*)
     }
     "verify classloading" in {
       Profig("test.classloading").as[Option[String]] should be(Some("yes"))
