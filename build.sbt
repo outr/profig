@@ -40,6 +40,14 @@ lazy val macros = crossProject(JSPlatform, JVMPlatform)
   .settings(
     name := "profig-macros",
     libraryDependencies ++= Seq(
+      "io.circe" %%% "circe-core",
+      "io.circe" %%% "circe-generic",
+      "io.circe" %%% "circe-parser",
+      "io.circe" %%% "circe-generic-extras"
+    ).map(_ % circeVersion),
+    libraryDependencies ++= Seq(
+      "io.circe" %% "circe-jawn" % circeVersion,
+      "io.circe" %% "circe-yaml" % circeYamlVersion,
       "org.scala-lang" % "scala-reflect" % scalaVersion.value
     )
   )
@@ -54,15 +62,6 @@ lazy val core = crossProject(JSPlatform, JVMPlatform)
   .settings(
     name := "profig",
     libraryDependencies ++= Seq(
-      "io.circe" %%% "circe-core",
-      "io.circe" %%% "circe-generic",
-      "io.circe" %%% "circe-parser",
-      "io.circe" %%% "circe-generic-extras"
-    ).map(_ % circeVersion),
-    libraryDependencies ++= Seq(
-      "io.circe" %% "circe-jawn" % circeVersion,
-      "io.circe" %% "circe-yaml" % circeYamlVersion,
-      "org.scala-lang" % "scala-reflect" % scalaVersion.value,
       "org.scalatest" %%% "scalatest" % scalatestVersion % "test"
     )
   )

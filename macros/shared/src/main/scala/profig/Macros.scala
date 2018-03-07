@@ -79,8 +79,13 @@ object Macros {
   def loadFiles(c: blackbox.Context)(entries: c.Expr[ConfigurationPath]*): c.Tree = {
     import c.universe._
 
+    implicit val cftLift: c.universe.Liftable[ConfigurationFileType] = Liftable[ConfigurationFileType] { cft =>
+      q"_root_.profig.ConfigurationFileType.${TermName(cft.getClass.getSimpleName.replaceAllLiterally("$", ""))}"
+    }
+
     val instance = c.prefix.tree
     if (profig.ProfigPlatform.isJS) {
+      ConfigurationPath.yamlConversion = Some(ConfigurationPath.yamlString2Json)
       // TODO: support non-defaults in Scala.js
 //      val entriesValue = entries match {
 //        case Expr(Literal(Constant(value: Seq[ConfigurationPath]))) => value.toList
@@ -88,8 +93,8 @@ object Macros {
 
       val config = ConfigurationPath.toJsonStrings(ConfigurationPath.defaults).map {
         case (cp, json) => cp.load match {
-          case LoadType.Defaults => q"$instance.defaults($json)"
-          case LoadType.Merge => q"$instance.merge($json)"
+          case LoadType.Defaults => q"$instance.defaults($json, ${cp.`type`})"
+          case LoadType.Merge => q"$instance.merge($json, ${cp.`type`})"
         }
       }
       q"..$config"
@@ -99,8 +104,8 @@ object Macros {
 
          ConfigurationPath.toJsonStrings(List(..$entries)).foreach {
            case (cp, json) => cp.load match {
-             case LoadType.Defaults => $instance.defaults(json)
-             case LoadType.Merge => $instance.merge(json)
+             case LoadType.Defaults => $instance.defaults(json, cp.`type`)
+             case LoadType.Merge => $instance.merge(json, cp.`type`)
            }
          }
        """

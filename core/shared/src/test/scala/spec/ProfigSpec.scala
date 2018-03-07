@@ -1,7 +1,7 @@
 package spec
 
 import org.scalatest.{Matchers, WordSpec}
-import profig.{ConfigurationPath, Profig}
+import profig.{ConfigurationFileType, ConfigurationPath, Profig}
 
 class ProfigSpec extends WordSpec with Matchers {
   "Profig" should {
@@ -27,7 +27,7 @@ class ProfigSpec extends WordSpec with Matchers {
       Profig("this.is.an.argument").as[String] should be("Wahoo!")
     }
     "load JSON arguments" in {
-      Profig.merge("{ \"this.is.another.argument\" : \"Hola!\" }")
+      Profig.merge("{ \"this.is.another.argument\" : \"Hola!\" }", ConfigurationFileType.Json)
     }
     "load JVM information from properties" in {
       val info = Profig("java").as[JVMInfo]
@@ -86,6 +86,9 @@ class ProfigSpec extends WordSpec with Matchers {
     "see no spill-over in orphaned Profig" in {
       val orphan = Profig(None)
       orphan("people.john.age").as[Option[Int]] should be(None)
+    }
+    "verify YAML support works" in {
+      Profig("test.yaml").as[Option[String]] should be(Some("yes"))
     }
   }
 
