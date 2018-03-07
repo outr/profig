@@ -8,11 +8,17 @@ class ProfigSpec extends WordSpec with Matchers {
     "verify classloading not set" in {
       Profig("test.classloading").as[Option[String]] should be(None)
     }
+    "verify files not set" in {
+      Profig("test.files").as[Option[String]] should be(None)
+    }
     "load configuration files" in {
       Profig.loadFiles(ConfigurationPath.defaults: _*)
     }
     "verify classloading" in {
       Profig("test.classloading").as[Option[String]] should be(Some("yes"))
+    }
+    "verify files" in {
+      Profig("test.files").as[Option[String]] should be(Some("yes"))
     }
     "merge arguments" in {
       Profig.merge(List("-this.is.an.argument", "Wahoo!"))

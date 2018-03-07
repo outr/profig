@@ -1,5 +1,6 @@
 {
   "test": {
+    "files": "yes",
     "value": true
   }
 }
