@@ -7,6 +7,7 @@ import java.util.Properties
 import io.circe.{Json, yaml}
 
 import scala.io.Source
+import scala.collection.JavaConverters._
 
 case class ConfigurationPath(path: String, `type`: ConfigurationFileType, load: LoadType)
 
@@ -41,7 +42,9 @@ object ConfigurationPath {
     Nil
   } else {
     val entry = entries.head
-    val strings = List(fromURL(getClass.getClassLoader.getResource(entry.path)), fromFile(new File(entry.path))).flatten
+    val classLoaderStrings = getClass.getClassLoader.getResources(entry.path).asScala.toList.map(fromURL)
+    val fileStrings = fromFile(new File(entry.path)).toList
+    val strings = classLoaderStrings.flatten ::: fileStrings
     val list = strings.map(entry -> _)
     list ::: toStrings(entries.tail)
   }
