@@ -12,7 +12,7 @@ class ProfigSpec extends WordSpec with Matchers {
       Profig("test.files").as[Option[String]] should be(None)
     }
     "load configuration files" in {
-      Profig.loadFiles(ConfigurationPath.defaults: _*)
+      Profig.loadDefaults()
     }
     "verify classloading" in {
       Profig("test.classloading").as[Option[String]] should be(Some("yes"))

@@ -76,7 +76,13 @@ object Macros {
     c.Expr[Unit](q"$configPath.merge(profig.JsonUtil.toJson[$t]($value))")
   }
 
-  def loadFiles(c: blackbox.Context)(entries: c.Expr[ConfigurationPath]*): c.Tree = {
+  def loadDefaults(c: blackbox.Context)(): c.Tree = {
+    import c.universe._
+
+    load(c)(reify(ConfigurationPath.defaults))
+  }
+
+  def load(c: blackbox.Context)(entries: c.Expr[List[ConfigurationPath]]): c.Tree = {
     import c.universe._
 
     implicit val cftLift: c.universe.Liftable[ConfigurationFileType] = Liftable[ConfigurationFileType] { cft =>
@@ -91,7 +97,7 @@ object Macros {
 //        case Expr(Literal(Constant(value: Seq[ConfigurationPath]))) => value.toList
 //      }
 
-      val config = ConfigurationPath.toJsonStrings(ConfigurationPath.defaults).map {
+      val config = ConfigurationPath.toJsonStrings().map {
         case (cp, json) => cp.load match {
           case LoadType.Defaults => q"$instance.defaults($json, ${cp.`type`})"
           case LoadType.Merge => q"$instance.merge($json, ${cp.`type`})"
@@ -102,7 +108,7 @@ object Macros {
       q"""
          import profig._
 
-         ConfigurationPath.toJsonStrings(List(..$entries)).foreach {
+         ConfigurationPath.toJsonStrings($entries).foreach {
            case (cp, json) => cp.load match {
              case LoadType.Defaults => $instance.defaults(json, cp.`type`)
              case LoadType.Merge => $instance.merge(json, cp.`type`)

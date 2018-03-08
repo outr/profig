@@ -31,7 +31,9 @@ class Profig(val parent: Option[Profig] = Some(Profig)) extends ProfigPath {
   override def instance: Profig = this
   override def path: List[String] = Nil
 
-  def loadFiles(entries: ConfigurationPath*): Unit = macro Macros.loadFiles
+  def loadDefaults(): Unit = macro Macros.loadDefaults
+
+  def load(entries: List[ConfigurationPath]): Unit = macro Macros.load
 
   def loadEnvironmentVariables(asDefault: Boolean = true): Unit = {
     val envMap = System.getenv().asScala.toMap
@@ -62,6 +64,10 @@ class Profig(val parent: Option[Profig] = Some(Profig)) extends ProfigPath {
       case None => _global = _local
     }
   }
+
+  override def remove(): Unit = modify(_ => Json.obj())
+
+  def clear(): Unit = remove()
 }
 
 /**
