@@ -31,8 +31,8 @@ and overriding configuration in your application.
 Profig is published to Sonatype OSS and synchronized to Maven Central supporting JVM and Scala.js on 2.11 and 2.12:
 
 ```
-libraryDependencies += "com.outr" %% "profig" % "2.0.0"   // Scala
-libraryDependencies += "com.outr" %%% "profig" % "2.0.0"  // Scala.js / Cross-Build
+libraryDependencies += "com.outr" %% "profig" % "2.1.1"   // Scala
+libraryDependencies += "com.outr" %%% "profig" % "2.1.1"  // Scala.js / Cross-Build
 ```
 
 ## Getting Started
@@ -102,14 +102,17 @@ ScalaDocs and the specs: https://github.com/outr/profig/blob/master/core/shared/
 
 # Roadmap
 
-## 2.1.0 (In-Progress)
+## 2.2.0 (In-Progress)
 
 * [ ] Better README documentation
-* [ ] Override loading support
-    * [ ] Modify paths to auto-load
-    * [ ] Allow disabling of loading environment variables
-* [ ] Yaml support (use circe-yaml)
 * [ ] HOCON support (integrate https://github.com/unicredit/shocon)
+
+## 2.1.0 (Released 03.08.2018)
+
+* [X] Override loading support
+    * [X] Modify paths to auto-load
+    * [X] Allow disabling of loading environment variables
+* [X] Yaml support (use circe-yaml)
 
 ## 2.0.0 (Released 01.26.2018)
 
