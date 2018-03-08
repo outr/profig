@@ -80,8 +80,8 @@ object ConfigurationPath {
     None
   }
 
-  def jsonString2Json(string: String): Json = io.circe.parser.parse(string) match {
-    case Left(failure) => throw new RuntimeException(s"Unable to parse $string to JSON.", failure)
+  def jsonString2Json(string: String): Json = JsonParser.parse(string) match {
+    case Left(failure) => throw new RuntimeException(s"Unable to parse $string to JSON.", failure)    // TODO: deal with implementation missing
     case Right(value) => value
   }
 

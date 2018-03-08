@@ -11,7 +11,7 @@ object Macros {
 
     c.Expr[T](
       q"""
-         io.circe.parser.parse($jsonString) match {
+         profig.JsonParser.parse($jsonString) match {
            case Left(t) => throw t
            case Right(json) => profig.JsonUtil.fromJson[$t](json)
          }

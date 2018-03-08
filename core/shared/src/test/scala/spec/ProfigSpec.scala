@@ -90,6 +90,13 @@ class ProfigSpec extends WordSpec with Matchers {
     "verify YAML support works" in {
       Profig("test.yaml").as[Option[String]] should be(Some("yes"))
     }
+    "compile-time Json parsing" in {
+      val parsed = MacroTest.format("""{"name": "John Doe", "age": 1234}""")
+      parsed should be("""{
+                         |  "name" : "John Doe",
+                         |  "age" : 1234
+                         |}""".stripMargin)
+    }
   }
 
   case class Person(name: String, age: Int = 21)

@@ -58,7 +58,7 @@ lazy val macrosJVM = macros.jvm
 lazy val core = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Full)
   .in(file("core"))
-  .dependsOn(macros)
+  .dependsOn(macros % "compile->compile;test->test")
   .settings(
     name := "profig",
     libraryDependencies ++= Seq(
