@@ -1,24 +1,19 @@
 package profig
 
-import java.util.concurrent.atomic.AtomicBoolean
-
 import scala.language.experimental.macros
 import scala.reflect.macros.blackbox
 
 object Macros {
-  val inlined: AtomicBoolean = new AtomicBoolean(false)
-
   def fromJsonString[T](c: blackbox.Context)
                        (jsonString: c.Expr[String])
                        (implicit t: c.WeakTypeTag[T]): c.Expr[T] = {
     import c.universe._
 
-    val jsonUtil = c.prefix.tree
     c.Expr[T](
       q"""
-         io.circe.parser.parse($jsonString) match {
+         profig.JsonParser.parse($jsonString) match {
            case Left(t) => throw t
-           case Right(json) => $jsonUtil.fromJson[$t](json)
+           case Right(json) => profig.JsonUtil.fromJson[$t](json)
          }
        """)
   }
@@ -28,7 +23,6 @@ object Macros {
                  (implicit t: c.WeakTypeTag[T]): c.Expr[T] = {
     import c.universe._
 
-    val jsonUtil = c.prefix.tree
     c.Expr[T](
       q"""
          import io.circe._
@@ -49,8 +43,7 @@ object Macros {
                      (implicit t: c.WeakTypeTag[T]): c.Expr[String] = {
     import c.universe._
 
-    val jsonUtil = c.prefix.tree
-    c.Expr[String](q"$jsonUtil.toJson[$t]($value).pretty(io.circe.Printer.noSpaces)")
+    c.Expr[String](q"profig.JsonUtil.toJson[$t]($value).pretty(io.circe.Printer.noSpaces)")
   }
 
   def toJson[T](c: blackbox.Context)
@@ -58,7 +51,6 @@ object Macros {
                (implicit t: c.WeakTypeTag[T]): c.Tree = {
     import c.universe._
 
-    val jsonUtil = c.prefix.tree
     q"""
        import io.circe._
        import io.circe.generic.extras.Configuration
@@ -84,40 +76,45 @@ object Macros {
     c.Expr[Unit](q"$configPath.merge(profig.JsonUtil.toJson[$t]($value))")
   }
 
-  def init(c: blackbox.Context)(): c.Expr[Unit] = {
+  def loadDefaults(c: blackbox.Context)(): c.Tree = {
     import c.universe._
 
-    val instance = c.prefix.tree
-    c.Expr[Unit](
-      q"""
-         if (profig.ProfigPlatform.initialized.compareAndSet(false, true)) {
-           profig.ProfigPlatform.init($instance)
-         }
-       """)
+    load(c)(reify(ConfigurationPath.defaults))
   }
 
-  def initMacro(c: blackbox.Context)(args: c.Expr[Seq[String]]): c.Expr[Unit] = {
+  def load(c: blackbox.Context)(entries: c.Expr[List[ConfigurationPath]]): c.Tree = {
     import c.universe._
 
-    profig.Macros.inlined.set(true)
+    implicit val cftLift: c.universe.Liftable[ConfigurationFileType] = Liftable[ConfigurationFileType] { cft =>
+      q"_root_.profig.ConfigurationFileType.${TermName(cft.getClass.getSimpleName.replaceAllLiterally("$", ""))}"
+    }
+
     val instance = c.prefix.tree
-    c.Expr[Unit](
+    if (profig.ProfigPlatform.isJS) {
+      ConfigurationPath.yamlConversion = Some(ConfigurationPath.yamlString2Json)
+      // TODO: support non-defaults in Scala.js
+//      val entriesValue = entries match {
+//        case Expr(Literal(Constant(value: Seq[ConfigurationPath]))) => value.toList
+//      }
+
+      val config = ConfigurationPath.toJsonStrings().map {
+        case (cp, json) => cp.load match {
+          case LoadType.Defaults => q"$instance.defaults($json, ${cp.`type`})"
+          case LoadType.Merge => q"$instance.merge($json, ${cp.`type`})"
+        }
+      }
+      q"..$config"
+    } else {
       q"""
-         if (profig.ProfigPlatform.initialized.compareAndSet(false, true)) {
-           profig.ProfigPlatform.init($instance)
+         import profig._
+
+         ConfigurationPath.toJsonStrings($entries).foreach {
+           case (cp, json) => cp.load match {
+             case LoadType.Defaults => $instance.defaults(json, cp.`type`)
+             case LoadType.Merge => $instance.merge(json, cp.`type`)
+           }
          }
-         profig.Profig.merge($args)
-       """)
-  }
-
-  def start(c: blackbox.Context)(args: c.Expr[Seq[String]]): c.Expr[Unit] = {
-    import c.universe._
-
-    val mainClass = c.prefix.tree
-    c.Expr[Unit](
-      q"""
-         profig.Profig.init($args)
-         $mainClass.run()
-       """)
+       """
+    }
   }
 }

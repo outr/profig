@@ -1,7 +1,7 @@
 import sbtcrossproject.{CrossType, crossProject}
 
 organization in ThisBuild := "com.outr"
-version in ThisBuild := "2.0.1"
+version in ThisBuild := "2.1.0"
 scalaVersion in ThisBuild := "2.12.4"
 crossScalaVersions in ThisBuild := List("2.12.4", "2.11.12")
 scalacOptions in ThisBuild ++= Seq("-unchecked", "-deprecation")
@@ -23,6 +23,7 @@ developers in ThisBuild := List(
 )
 
 val circeVersion = "0.9.1"
+val circeYamlVersion = "0.7.0"
 val scalatestVersion = "3.0.4"
 
 lazy val root = project.in(file("."))
@@ -39,6 +40,14 @@ lazy val macros = crossProject(JSPlatform, JVMPlatform)
   .settings(
     name := "profig-macros",
     libraryDependencies ++= Seq(
+      "io.circe" %%% "circe-core",
+      "io.circe" %%% "circe-generic",
+      "io.circe" %%% "circe-parser",
+      "io.circe" %%% "circe-generic-extras"
+    ).map(_ % circeVersion),
+    libraryDependencies ++= Seq(
+      "io.circe" %% "circe-jawn" % circeVersion,
+      "io.circe" %% "circe-yaml" % circeYamlVersion,
       "org.scala-lang" % "scala-reflect" % scalaVersion.value
     )
   )
@@ -49,18 +58,10 @@ lazy val macrosJVM = macros.jvm
 lazy val core = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Full)
   .in(file("core"))
-  .dependsOn(macros)
+  .dependsOn(macros % "compile->compile;test->test")
   .settings(
     name := "profig",
     libraryDependencies ++= Seq(
-      "io.circe" %%% "circe-core",
-      "io.circe" %%% "circe-generic",
-      "io.circe" %%% "circe-parser",
-      "io.circe" %%% "circe-generic-extras"
-    ).map(_ % circeVersion),
-    libraryDependencies ++= Seq(
-      "io.circe" %% "circe-jawn" % circeVersion,
-      "org.scala-lang" % "scala-reflect" % scalaVersion.value,
       "org.scalatest" %%% "scalatest" % scalatestVersion % "test"
     )
   )

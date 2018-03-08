@@ -1,10 +1,25 @@
 package spec
 
 import org.scalatest.{Matchers, WordSpec}
-import profig.Profig
+import profig.{ConfigurationFileType, ConfigurationPath, Profig}
 
 class ProfigSpec extends WordSpec with Matchers {
   "Profig" should {
+    "verify classloading not set" in {
+      Profig("test.classloading").as[Option[String]] should be(None)
+    }
+    "verify files not set" in {
+      Profig("test.files").as[Option[String]] should be(None)
+    }
+    "load configuration files" in {
+      Profig.loadDefaults()
+    }
+    "verify classloading" in {
+      Profig("test.classloading").as[Option[String]] should be(Some("yes"))
+    }
+    "verify files" in {
+      Profig("test.files").as[Option[String]] should be(Some("yes"))
+    }
     "merge arguments" in {
       Profig.merge(List("-this.is.an.argument", "Wahoo!"))
     }
@@ -12,7 +27,7 @@ class ProfigSpec extends WordSpec with Matchers {
       Profig("this.is.an.argument").as[String] should be("Wahoo!")
     }
     "load JSON arguments" in {
-      Profig.merge("{ \"this.is.another.argument\" : \"Hola!\" }")
+      Profig.merge("{ \"this.is.another.argument\" : \"Hola!\" }", ConfigurationFileType.Json)
     }
     "load JVM information from properties" in {
       val info = Profig("java").as[JVMInfo]
@@ -71,6 +86,16 @@ class ProfigSpec extends WordSpec with Matchers {
     "see no spill-over in orphaned Profig" in {
       val orphan = Profig(None)
       orphan("people.john.age").as[Option[Int]] should be(None)
+    }
+    "verify YAML support works" in {
+      Profig("test.yaml").as[Option[String]] should be(Some("yes"))
+    }
+    "compile-time Json parsing" in {
+      val parsed = MacroTest.format("""{"name": "John Doe", "age": 1234}""")
+      parsed should be("""{
+                         |  "name" : "John Doe",
+                         |  "age" : 1234
+                         |}""".stripMargin)
     }
   }
 

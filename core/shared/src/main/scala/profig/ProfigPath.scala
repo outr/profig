@@ -2,7 +2,7 @@ package profig
 
 import java.util.Properties
 
-import io.circe.{ACursor, Json}
+import io.circe._
 
 import scala.language.experimental.macros
 
@@ -92,14 +92,14 @@ trait ProfigPath {
   def defaults(args: Seq[String]): Unit = combine(args, defaults = true)
 
   /**
-    * Merges a string of content auto-detected to JSON.
+    * Merges a string of content from the specified type.
     */
-  def merge(string: String): Unit = combine(string, defaults = false)
+  def merge(string: String, `type`: ConfigurationFileType): Unit = combine(string, `type`, defaults = false)
 
   /**
-    * Loads defaults for a string of content auto-detected to JSON.
+    * Loads defaults for a string of the specified type.
     */
-  def defaults(string: String): Unit = combine(string, defaults = true)
+  def defaults(string: String, `type`: ConfigurationFileType): Unit = combine(string, `type`, defaults = true)
 
   /**
     * Merges a Json object to this path.
@@ -124,14 +124,9 @@ trait ProfigPath {
   /**
     * Combines a string of content auto-detected to JSON.
     */
-  def combine(string: String, defaults: Boolean): Unit = {
-    if (string.trim.startsWith("{")) {      // JSON detected
-      val json = io.circe.parser.parse(string) match {
-        case Left(failure) => throw new RuntimeException(s"Unable to parse $string to JSON.", failure)
-        case Right(value) => value
-      }
-      combine(json, defaults)
-    }
+  def combine(string: String, `type`: ConfigurationFileType, defaults: Boolean): Unit = {
+    val json = ConfigurationPath.toJson(string, `type`)
+    combine(json, defaults)
   }
 
   /**
