@@ -11,8 +11,6 @@ object MacroTest {
   def compileTimeFormat(c: blackbox.Context)(jsonString: c.Expr[String]): c.Expr[String] = {
     import c.universe._
 
-    JsonParser.compileTime()
-
     val jsonStringValue = jsonString match {
       case Expr(Literal(Constant(value: String))) => value
     }

@@ -1,7 +1,7 @@
 import sbtcrossproject.{CrossType, crossProject}
 
 organization in ThisBuild := "com.outr"
-version in ThisBuild := "2.1.1"
+version in ThisBuild := "2.1.2-SNAPSHOT"
 scalaVersion in ThisBuild := "2.12.4"
 crossScalaVersions in ThisBuild := List("2.12.4", "2.11.12")
 scalacOptions in ThisBuild ++= Seq("-unchecked", "-deprecation")
@@ -27,11 +27,17 @@ val circeYamlVersion = "0.7.0"
 val scalatestVersion = "3.0.4"
 
 lazy val root = project.in(file("."))
-  .aggregate(macrosJS, macrosJVM, coreJS, coreJVM)
+  .aggregate(irPatch, macrosJS, macrosJVM, coreJS, coreJVM)
   .settings(
     name := "profig",
     publish := {},
     publishLocal := {}
+  )
+
+lazy val irPatch = project.in(file("irpatch"))
+  .enablePlugins(ScalaJSPlugin)
+  .settings(
+    libraryDependencies += "io.circe" %%% "circe-parser" % circeVersion
   )
 
 lazy val macros = crossProject(JSPlatform, JVMPlatform)
@@ -50,6 +56,25 @@ lazy val macros = crossProject(JSPlatform, JVMPlatform)
       "io.circe" %% "circe-yaml" % circeYamlVersion,
       "org.scala-lang" % "scala-reflect" % scalaVersion.value
     )
+  )
+  .jsSettings(
+    manipulateBytecode in Compile := {
+      val result = (manipulateBytecode in Compile).value
+
+      val classDir = (classDirectory in Compile).value
+      val irPatchesDirs = (products in (irPatch, Compile)).value
+
+      def recursiveCopy(file: File, dir: File): Unit = if (file.isFile && file.getName.endsWith(".sjsir")) {
+        dir.mkdirs()
+        val output = dir / file.getName
+        IO.copyFile(file, output)
+      } else if (file.isDirectory) {
+        file.listFiles().foreach(recursiveCopy(_, dir / file.getName))
+      }
+      irPatchesDirs.foreach(recursiveCopy(_, classDir))
+
+      result
+    }
   )
 
 lazy val macrosJS = macros.js
