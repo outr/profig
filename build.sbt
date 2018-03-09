@@ -1,7 +1,7 @@
 import sbtcrossproject.{CrossType, crossProject}
 
 organization in ThisBuild := "com.outr"
-version in ThisBuild := "2.1.2-SNAPSHOT"
+version in ThisBuild := "2.2.0-SNAPSHOT"
 scalaVersion in ThisBuild := "2.12.4"
 crossScalaVersions in ThisBuild := List("2.12.4", "2.11.12")
 scalacOptions in ThisBuild ++= Seq("-unchecked", "-deprecation")
@@ -24,6 +24,8 @@ developers in ThisBuild := List(
 
 val circeVersion = "0.9.1"
 val circeYamlVersion = "0.7.0"
+val shoconVersion = "0.2.0"
+val scalaXMLVersion = "1.1.0"
 val scalatestVersion = "3.0.4"
 
 lazy val root = project.in(file("."))
@@ -52,13 +54,15 @@ lazy val macros = crossProject(JSPlatform, JVMPlatform)
       "io.circe" %%% "circe-generic-extras"
     ).map(_ % circeVersion),
     libraryDependencies ++= Seq(
+      "org.akka-js" %%% "shocon" % shoconVersion,
+      "org.scala-lang.modules" %%% "scala-xml" % scalaXMLVersion,
       "io.circe" %% "circe-jawn" % circeVersion,
       "io.circe" %% "circe-yaml" % circeYamlVersion,
       "org.scala-lang" % "scala-reflect" % scalaVersion.value
     )
   )
   .jsSettings(
-    manipulateBytecode in Compile := {
+    manipulateBytecode in Compile := {    // Allows access to Json parsing at compile-time (for use with Macros)
       val result = (manipulateBytecode in Compile).value
 
       val classDir = (classDirectory in Compile).value

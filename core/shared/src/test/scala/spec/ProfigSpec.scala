@@ -90,6 +90,12 @@ class ProfigSpec extends WordSpec with Matchers {
     "verify YAML support works" in {
       Profig("test.yaml").as[Option[String]] should be(Some("yes"))
     }
+    "verify HOCON support works" in {
+      Profig("test.hocon").as[Option[String]] should be(Some("yes"))
+    }
+    "verify XML support works" in {
+      Profig("test.xml").as[Option[String]] should be(Some("yes"))
+    }
     "compile-time Json parsing" in {
       val parsed = MacroTest.format("""{"name": "John Doe", "age": 1234}""")
       parsed should be("""{
