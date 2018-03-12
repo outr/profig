@@ -132,7 +132,7 @@ ScalaDocs and the specs: https://github.com/outr/profig/blob/master/core/shared/
 
 # Roadmap
 
-## 2.2.0 (In-Progress)
+## 2.2.0 (Released 03.12.2018)
 
 * [X] Better README documentation
 * [X] HOCON support (integrate https://github.com/akka-js/shocon)

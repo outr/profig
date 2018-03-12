@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-sbt +clean +test +macrosJS/publishSigned +macrosJVM/publishSigned +coreJS/publishSigned +coreJVM/publishSigned sonatypeRelease
+sbt +clean +test +irPatch/publishSigned +macrosJS/publishSigned +macrosJVM/publishSigned +coreJS/publishSigned +coreJVM/publishSigned sonatypeRelease
