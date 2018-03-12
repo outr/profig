@@ -1,7 +1,7 @@
 package spec
 
 import org.scalatest.{Matchers, WordSpec}
-import profig.{ConfigurationFileType, ConfigurationPath, Profig}
+import profig.{ConfigType, ConfigurationPath, Profig}
 
 class ProfigSpec extends WordSpec with Matchers {
   "Profig" should {
@@ -27,7 +27,7 @@ class ProfigSpec extends WordSpec with Matchers {
       Profig("this.is.an.argument").as[String] should be("Wahoo!")
     }
     "load JSON arguments" in {
-      Profig.merge("{ \"this.is.another.argument\" : \"Hola!\" }", ConfigurationFileType.Json)
+      Profig.merge("{ \"this.is.another.argument\" : \"Hola!\" }", ConfigType.Json)
     }
     "load JVM information from properties" in {
       val info = Profig("java").as[JVMInfo]
@@ -89,6 +89,12 @@ class ProfigSpec extends WordSpec with Matchers {
     }
     "verify YAML support works" in {
       Profig("test.yaml").as[Option[String]] should be(Some("yes"))
+    }
+    "verify HOCON support works" in {
+      Profig("test.hocon").as[Option[String]] should be(Some("yes"))
+    }
+    "verify XML support works" in {
+      Profig("test.xml").as[Option[String]] should be(Some("yes"))
     }
     "compile-time Json parsing" in {
       val parsed = MacroTest.format("""{"name": "John Doe", "age": 1234}""")

@@ -24,6 +24,14 @@ developer and let them get their job done. To this end we support a unified conf
 environment variables, system properties, and configuration files to provide maximum flexibility of defining, defaulting,
 and overriding configuration in your application.
 
+# File Formats
+
+* JSON (automatically picked up from config.json, configuration.json, app.json, application.json, and defaults.json)
+* Properties (automatically picked up from config.properties, configuration.properties, app.properties, application.properties, and defaults.properties)
+* YAML (automatically picked up from config.yml, config.yaml, configuration.yml, configuration.yaml, app.yml, app.yaml, application.yml, application.yaml, defaults.yml, defaults.yaml)
+* HOCON (automatically picked up from config.hocon, configuration.hocon, app.hocon, application.hocon, and defaults.hocon)
+* XML (automatically picked up from config.xml, configuration.xml, app.xml, application.xml, and defaults.xml)
+
 # Setup
 
 ## SBT Configuration
@@ -31,8 +39,8 @@ and overriding configuration in your application.
 Profig is published to Sonatype OSS and synchronized to Maven Central supporting JVM and Scala.js on 2.11 and 2.12:
 
 ```
-libraryDependencies += "com.outr" %% "profig" % "2.1.1"   // Scala
-libraryDependencies += "com.outr" %%% "profig" % "2.1.1"  // Scala.js / Cross-Build
+libraryDependencies += "com.outr" %% "profig" % "2.2.0"   // Scala
+libraryDependencies += "com.outr" %%% "profig" % "2.2.0"  // Scala.js / Cross-Build
 ```
 
 ## Getting Started
@@ -48,7 +56,29 @@ only class you really need be concerned with is `Profig`.
 
 When your application starts it is reasonable to want to allow execution of the application to override existing
 configuration via the command-line. In order to effectively do this we can simply invoke `Profig.merge(args)` within our
-main method.
+main method. This will merge all command-line arguments into Profig.
+
+### Loading Files
+
+Profig supports many configuration formats and can look in the classpath as well as the filesystem to find configuration
+to load. To load a file simply call:
+
+`Profig.load(ConfigurationPath("config.json"), ConfigType.Json, LoadType.Merge)`
+
+This will look for `config.json` on the classpath and filesystem, load it as JSON (if found), and merge it into the configuration.
+
+However, if your application doesn't need very explicit files to be loaded you can load defaults instead:
+
+`Profig.loadDefaults()`
+
+This will look for any standardized configuration file in the classpath and filesystem and load it into the system.
+
+### Merge or Defaults
+
+When loading configuration into Profig, you'll notice two styles of loading: "merge" and "defaults". The difference between
+these two has to do with overwriting existing configuration. In the case of "merge", any duplicate values will be overwritten
+by the new configuration. In the case of "defaults", only new information is integrated, so any existing values are left
+alone.
 
 ### Accessing values
 
@@ -104,8 +134,10 @@ ScalaDocs and the specs: https://github.com/outr/profig/blob/master/core/shared/
 
 ## 2.2.0 (In-Progress)
 
-* [ ] Better README documentation
-* [ ] HOCON support (integrate https://github.com/unicredit/shocon)
+* [X] Better README documentation
+* [X] HOCON support (integrate https://github.com/akka-js/shocon)
+* [X] XML support
+* [X] Resolve explicit work-arounds for use in Macros
 
 ## 2.1.0 (Released 03.08.2018)
 
