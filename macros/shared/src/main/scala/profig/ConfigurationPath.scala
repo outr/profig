@@ -12,47 +12,33 @@ import scala.collection.JavaConverters._
 case class ConfigurationPath(path: String, `type`: ConfigType, load: LoadType)
 
 object ConfigurationPath {
-  var defaults: List[ConfigurationPath] = List(
-    ConfigurationPath("config.json", ConfigType.Json, LoadType.Merge),
-    ConfigurationPath("config.conf", ConfigType.Auto, LoadType.Merge),
-    ConfigurationPath("config.properties", ConfigType.Properties, LoadType.Merge),
-    ConfigurationPath("config.yml", ConfigType.Yaml, LoadType.Merge),
-    ConfigurationPath("config.yaml", ConfigType.Yaml, LoadType.Merge),
-    ConfigurationPath("config.hocon", ConfigType.Hocon, LoadType.Merge),
-    ConfigurationPath("config.xml", ConfigType.XML, LoadType.Merge),
-
-    ConfigurationPath("configuration.json", ConfigType.Json, LoadType.Merge),
-    ConfigurationPath("configuration.conf", ConfigType.Auto, LoadType.Merge),
-    ConfigurationPath("configuration.properties", ConfigType.Properties, LoadType.Merge),
-    ConfigurationPath("configuration.yml", ConfigType.Yaml, LoadType.Merge),
-    ConfigurationPath("configuration.yaml", ConfigType.Yaml, LoadType.Merge),
-    ConfigurationPath("configuration.hocon", ConfigType.Hocon, LoadType.Merge),
-    ConfigurationPath("configuration.xml", ConfigType.XML, LoadType.Merge),
-
-    ConfigurationPath("app.json", ConfigType.Json, LoadType.Merge),
-    ConfigurationPath("app.conf", ConfigType.Auto, LoadType.Merge),
-    ConfigurationPath("app.properties", ConfigType.Properties, LoadType.Merge),
-    ConfigurationPath("app.yml", ConfigType.Yaml, LoadType.Merge),
-    ConfigurationPath("app.yaml", ConfigType.Yaml, LoadType.Merge),
-    ConfigurationPath("app.hocon", ConfigType.Hocon, LoadType.Merge),
-    ConfigurationPath("app.xml", ConfigType.XML, LoadType.Merge),
-
-    ConfigurationPath("application.json", ConfigType.Json, LoadType.Merge),
-    ConfigurationPath("application.conf", ConfigType.Auto, LoadType.Merge),
-    ConfigurationPath("application.properties", ConfigType.Properties, LoadType.Merge),
-    ConfigurationPath("application.yml", ConfigType.Yaml, LoadType.Merge),
-    ConfigurationPath("application.yaml", ConfigType.Yaml, LoadType.Merge),
-    ConfigurationPath("application.hocon", ConfigType.Hocon, LoadType.Merge),
-    ConfigurationPath("application.xml", ConfigType.XML, LoadType.Merge),
-
-    ConfigurationPath("defaults.json", ConfigType.Json, LoadType.Defaults),
-    ConfigurationPath("defaults.conf", ConfigType.Auto, LoadType.Defaults),
-    ConfigurationPath("defaults.properties", ConfigType.Properties, LoadType.Defaults),
-    ConfigurationPath("defaults.yml", ConfigType.Yaml, LoadType.Defaults),
-    ConfigurationPath("defaults.yaml", ConfigType.Yaml, LoadType.Defaults),
-    ConfigurationPath("defaults.hocon", ConfigType.Hocon, LoadType.Defaults),
-    ConfigurationPath("defaults.xml", ConfigType.XML, LoadType.Defaults)
+  var extensions: Map[String, ConfigType] = Map(
+    "json" -> ConfigType.Json,
+    "properties" -> ConfigType.Properties,
+    "yml" -> ConfigType.Yaml,
+    "yaml" -> ConfigType.Yaml,
+    "hocon" -> ConfigType.Hocon,
+    "xml" -> ConfigType.XML,
+    "conf" -> ConfigType.Auto,
+    "config" -> ConfigType.Auto
   )
+
+  var mergePaths: List[String] = List("config", "configuration", "app", "application")
+  var defaultPaths: List[String] = List("defaults")
+
+  def paths(mergePaths: List[String] = mergePaths,
+            defaultPaths: List[String] = defaultPaths,
+            extensions: Map[String, ConfigType] = extensions): List[ConfigurationPath] = {
+    val merge = mergePaths.flatMap(p => extensions.map {
+      case (ext, configType) => ConfigurationPath(s"$p.$ext", configType, LoadType.Merge)
+    })
+    val defaults = defaultPaths.flatMap(p => extensions.map {
+      case (ext, configType) => ConfigurationPath(s"$p.$ext", configType, LoadType.Defaults)
+    })
+    merge ::: defaults
+  }
+
+  def defaults: List[ConfigurationPath] = paths()
 
   def toStrings(entries: List[ConfigurationPath] = defaults): List[(ConfigurationPath, String)] = if (entries.isEmpty) {
     Nil
