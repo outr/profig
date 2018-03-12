@@ -9,49 +9,49 @@ import io.circe.{Json, yaml}
 import scala.io.Source
 import scala.collection.JavaConverters._
 
-case class ConfigurationPath(path: String, `type`: ConfigurationFileType, load: LoadType)
+case class ConfigurationPath(path: String, `type`: ConfigType, load: LoadType)
 
 object ConfigurationPath {
   var defaults: List[ConfigurationPath] = List(
-    ConfigurationPath("config.json", ConfigurationFileType.Json, LoadType.Merge),
-    ConfigurationPath("config.conf", ConfigurationFileType.Auto, LoadType.Merge),
-    ConfigurationPath("config.properties", ConfigurationFileType.Properties, LoadType.Merge),
-    ConfigurationPath("config.yml", ConfigurationFileType.Yaml, LoadType.Merge),
-    ConfigurationPath("config.yaml", ConfigurationFileType.Yaml, LoadType.Merge),
-    ConfigurationPath("config.hocon", ConfigurationFileType.Hocon, LoadType.Merge),
-    ConfigurationPath("config.xml", ConfigurationFileType.XML, LoadType.Merge),
+    ConfigurationPath("config.json", ConfigType.Json, LoadType.Merge),
+    ConfigurationPath("config.conf", ConfigType.Auto, LoadType.Merge),
+    ConfigurationPath("config.properties", ConfigType.Properties, LoadType.Merge),
+    ConfigurationPath("config.yml", ConfigType.Yaml, LoadType.Merge),
+    ConfigurationPath("config.yaml", ConfigType.Yaml, LoadType.Merge),
+    ConfigurationPath("config.hocon", ConfigType.Hocon, LoadType.Merge),
+    ConfigurationPath("config.xml", ConfigType.XML, LoadType.Merge),
 
-    ConfigurationPath("configuration.json", ConfigurationFileType.Json, LoadType.Merge),
-    ConfigurationPath("configuration.conf", ConfigurationFileType.Auto, LoadType.Merge),
-    ConfigurationPath("configuration.properties", ConfigurationFileType.Properties, LoadType.Merge),
-    ConfigurationPath("configuration.yml", ConfigurationFileType.Yaml, LoadType.Merge),
-    ConfigurationPath("configuration.yaml", ConfigurationFileType.Yaml, LoadType.Merge),
-    ConfigurationPath("configuration.hocon", ConfigurationFileType.Hocon, LoadType.Merge),
-    ConfigurationPath("configuration.xml", ConfigurationFileType.XML, LoadType.Merge),
+    ConfigurationPath("configuration.json", ConfigType.Json, LoadType.Merge),
+    ConfigurationPath("configuration.conf", ConfigType.Auto, LoadType.Merge),
+    ConfigurationPath("configuration.properties", ConfigType.Properties, LoadType.Merge),
+    ConfigurationPath("configuration.yml", ConfigType.Yaml, LoadType.Merge),
+    ConfigurationPath("configuration.yaml", ConfigType.Yaml, LoadType.Merge),
+    ConfigurationPath("configuration.hocon", ConfigType.Hocon, LoadType.Merge),
+    ConfigurationPath("configuration.xml", ConfigType.XML, LoadType.Merge),
 
-    ConfigurationPath("app.json", ConfigurationFileType.Json, LoadType.Merge),
-    ConfigurationPath("app.conf", ConfigurationFileType.Auto, LoadType.Merge),
-    ConfigurationPath("app.properties", ConfigurationFileType.Properties, LoadType.Merge),
-    ConfigurationPath("app.yml", ConfigurationFileType.Yaml, LoadType.Merge),
-    ConfigurationPath("app.yaml", ConfigurationFileType.Yaml, LoadType.Merge),
-    ConfigurationPath("app.hocon", ConfigurationFileType.Hocon, LoadType.Merge),
-    ConfigurationPath("app.xml", ConfigurationFileType.XML, LoadType.Merge),
+    ConfigurationPath("app.json", ConfigType.Json, LoadType.Merge),
+    ConfigurationPath("app.conf", ConfigType.Auto, LoadType.Merge),
+    ConfigurationPath("app.properties", ConfigType.Properties, LoadType.Merge),
+    ConfigurationPath("app.yml", ConfigType.Yaml, LoadType.Merge),
+    ConfigurationPath("app.yaml", ConfigType.Yaml, LoadType.Merge),
+    ConfigurationPath("app.hocon", ConfigType.Hocon, LoadType.Merge),
+    ConfigurationPath("app.xml", ConfigType.XML, LoadType.Merge),
 
-    ConfigurationPath("application.json", ConfigurationFileType.Json, LoadType.Merge),
-    ConfigurationPath("application.conf", ConfigurationFileType.Auto, LoadType.Merge),
-    ConfigurationPath("application.properties", ConfigurationFileType.Properties, LoadType.Merge),
-    ConfigurationPath("application.yml", ConfigurationFileType.Yaml, LoadType.Merge),
-    ConfigurationPath("application.yaml", ConfigurationFileType.Yaml, LoadType.Merge),
-    ConfigurationPath("application.hocon", ConfigurationFileType.Hocon, LoadType.Merge),
-    ConfigurationPath("application.xml", ConfigurationFileType.XML, LoadType.Merge),
+    ConfigurationPath("application.json", ConfigType.Json, LoadType.Merge),
+    ConfigurationPath("application.conf", ConfigType.Auto, LoadType.Merge),
+    ConfigurationPath("application.properties", ConfigType.Properties, LoadType.Merge),
+    ConfigurationPath("application.yml", ConfigType.Yaml, LoadType.Merge),
+    ConfigurationPath("application.yaml", ConfigType.Yaml, LoadType.Merge),
+    ConfigurationPath("application.hocon", ConfigType.Hocon, LoadType.Merge),
+    ConfigurationPath("application.xml", ConfigType.XML, LoadType.Merge),
 
-    ConfigurationPath("defaults.json", ConfigurationFileType.Json, LoadType.Defaults),
-    ConfigurationPath("defaults.conf", ConfigurationFileType.Auto, LoadType.Defaults),
-    ConfigurationPath("defaults.properties", ConfigurationFileType.Properties, LoadType.Defaults),
-    ConfigurationPath("defaults.yml", ConfigurationFileType.Yaml, LoadType.Defaults),
-    ConfigurationPath("defaults.yaml", ConfigurationFileType.Yaml, LoadType.Defaults),
-    ConfigurationPath("defaults.hocon", ConfigurationFileType.Hocon, LoadType.Defaults),
-    ConfigurationPath("defaults.xml", ConfigurationFileType.XML, LoadType.Defaults)
+    ConfigurationPath("defaults.json", ConfigType.Json, LoadType.Defaults),
+    ConfigurationPath("defaults.conf", ConfigType.Auto, LoadType.Defaults),
+    ConfigurationPath("defaults.properties", ConfigType.Properties, LoadType.Defaults),
+    ConfigurationPath("defaults.yml", ConfigType.Yaml, LoadType.Defaults),
+    ConfigurationPath("defaults.yaml", ConfigType.Yaml, LoadType.Defaults),
+    ConfigurationPath("defaults.hocon", ConfigType.Hocon, LoadType.Defaults),
+    ConfigurationPath("defaults.xml", ConfigType.XML, LoadType.Defaults)
   )
 
   def toStrings(entries: List[ConfigurationPath] = defaults): List[(ConfigurationPath, String)] = if (entries.isEmpty) {
@@ -68,10 +68,10 @@ object ConfigurationPath {
   def toJsonStrings(entries: List[ConfigurationPath] = defaults): List[(ConfigurationPath, String)] = {
     toStrings(entries).map {
       case (cp, string) => {
-        if (cp.`type` == ConfigurationFileType.Json) {
+        if (cp.`type` == ConfigType.Json) {
           cp -> string
         } else {
-          cp.copy(`type` = ConfigurationFileType.Json) -> toJson(string, cp.`type`).spaces2
+          cp.copy(`type` = ConfigType.Json) -> toJson(string, cp.`type`).spaces2
         }
       }
     }
@@ -189,13 +189,13 @@ object ConfigurationPath {
     Json.obj(root.label -> toJson(root).getOrElse(Json.Null))
   }
 
-  def toJson(string: String, `type`: ConfigurationFileType): Json = `type` match {
-    case ConfigurationFileType.Json => jsonString2Json(string)
-    case ConfigurationFileType.Properties => propertiesString2Json(string)
-    case ConfigurationFileType.Yaml => yamlConversion.map(c => c(string)).getOrElse(throw new RuntimeException(s"YAML conversion not supported."))
-    case ConfigurationFileType.Hocon => hoconString2Json(string)
-    case ConfigurationFileType.XML => xmlString2Json(string)
-    case ConfigurationFileType.Auto => if (string.trim.startsWith("{")) {
+  def toJson(string: String, `type`: ConfigType): Json = `type` match {
+    case ConfigType.Json => jsonString2Json(string)
+    case ConfigType.Properties => propertiesString2Json(string)
+    case ConfigType.Yaml => yamlConversion.map(c => c(string)).getOrElse(throw new RuntimeException(s"YAML conversion not supported."))
+    case ConfigType.Hocon => hoconString2Json(string)
+    case ConfigType.XML => xmlString2Json(string)
+    case ConfigType.Auto => if (string.trim.startsWith("{")) {
       jsonString2Json(string)
     } else {
       propertiesString2Json(string)

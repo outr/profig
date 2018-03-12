@@ -79,14 +79,14 @@ object Macros {
   def loadDefaults(c: blackbox.Context)(): c.Tree = {
     import c.universe._
 
-    load(c)(reify(ConfigurationPath.defaults))
+    load(c)(reify(ConfigurationPath.defaults: _*))
   }
 
-  def load(c: blackbox.Context)(entries: c.Expr[List[ConfigurationPath]]): c.Tree = {
+  def load(c: blackbox.Context)(entries: c.Expr[ConfigurationPath]*): c.Tree = {
     import c.universe._
 
-    implicit val cftLift: c.universe.Liftable[ConfigurationFileType] = Liftable[ConfigurationFileType] { cft =>
-      q"_root_.profig.ConfigurationFileType.${TermName(cft.getClass.getSimpleName.replaceAllLiterally("$", ""))}"
+    implicit val cftLift: c.universe.Liftable[ConfigType] = Liftable[ConfigType] { cft =>
+      q"_root_.profig.ConfigType.${TermName(cft.getClass.getSimpleName.replaceAllLiterally("$", ""))}"
     }
 
     val instance = c.prefix.tree
@@ -108,7 +108,7 @@ object Macros {
       q"""
          import profig._
 
-         ConfigurationPath.toJsonStrings($entries).foreach {
+         ConfigurationPath.toJsonStrings(List(..$entries)).foreach {
            case (cp, json) => cp.load match {
              case LoadType.Defaults => $instance.defaults(json, cp.`type`)
              case LoadType.Merge => $instance.merge(json, cp.`type`)

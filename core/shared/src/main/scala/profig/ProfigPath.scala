@@ -94,12 +94,12 @@ trait ProfigPath {
   /**
     * Merges a string of content from the specified type.
     */
-  def merge(string: String, `type`: ConfigurationFileType): Unit = combine(string, `type`, defaults = false)
+  def merge(string: String, `type`: ConfigType): Unit = combine(string, `type`, defaults = false)
 
   /**
     * Loads defaults for a string of the specified type.
     */
-  def defaults(string: String, `type`: ConfigurationFileType): Unit = combine(string, `type`, defaults = true)
+  def defaults(string: String, `type`: ConfigType): Unit = combine(string, `type`, defaults = true)
 
   /**
     * Merges a Json object to this path.
@@ -124,7 +124,7 @@ trait ProfigPath {
   /**
     * Combines a string of content auto-detected to JSON.
     */
-  def combine(string: String, `type`: ConfigurationFileType, defaults: Boolean): Unit = {
+  def combine(string: String, `type`: ConfigType, defaults: Boolean): Unit = {
     val json = ConfigurationPath.toJson(string, `type`)
     combine(json, defaults)
   }

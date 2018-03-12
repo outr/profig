@@ -56,7 +56,29 @@ only class you really need be concerned with is `Profig`.
 
 When your application starts it is reasonable to want to allow execution of the application to override existing
 configuration via the command-line. In order to effectively do this we can simply invoke `Profig.merge(args)` within our
-main method.
+main method. This will merge all command-line arguments into Profig.
+
+### Loading Files
+
+Profig supports many configuration formats and can look in the classpath as well as the filesystem to find configuration
+to load. To load a file simply call:
+
+`Profig.load(ConfigurationPath("config.json"), ConfigType.Json, LoadType.Merge)`
+
+This will look for `config.json` on the classpath and filesystem, load it as JSON (if found), and merge it into the configuration.
+
+However, if your application doesn't need very explicit files to be loaded you can load defaults instead:
+
+`Profig.loadDefaults()`
+
+This will look for any standardized configuration file in the classpath and filesystem and load it into the system.
+
+### Merge or Defaults
+
+When loading configuration into Profig, you'll notice two styles of loading: "merge" and "defaults". The difference between
+these two has to do with overwriting existing configuration. In the case of "merge", any duplicate values will be overwritten
+by the new configuration. In the case of "defaults", only new information is integrated, so any existing values are left
+alone.
 
 ### Accessing values
 
@@ -112,9 +134,9 @@ ScalaDocs and the specs: https://github.com/outr/profig/blob/master/core/shared/
 
 ## 2.2.0 (In-Progress)
 
-* [ ] Better README documentation
+* [X] Better README documentation
 * [X] HOCON support (integrate https://github.com/akka-js/shocon)
-* [ ] XML support
+* [X] XML support
 * [X] Resolve explicit work-arounds for use in Macros
 
 ## 2.1.0 (Released 03.08.2018)
