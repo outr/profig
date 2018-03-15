@@ -22,11 +22,11 @@ developers in ThisBuild := List(
   Developer(id="darkfrog", name="Matt Hicks", email="matt@matthicks.", url=url("http://matthicks.com"))
 )
 
-val circeVersion = "0.9.1"
+val circeVersion = "0.9.2"
 val circeYamlVersion = "0.7.0"
-val shoconVersion = "0.2.0"
+val shoconVersion = "0.2.1"
 val scalaXMLVersion = "1.1.0"
-val scalatestVersion = "3.0.4"
+val scalatestVersion = "3.0.5"
 
 lazy val root = project.in(file("."))
   .aggregate(irPatch, macrosJS, macrosJVM, coreJS, coreJVM)
@@ -54,7 +54,7 @@ lazy val macros = crossProject(JSPlatform, JVMPlatform)
       "io.circe" %%% "circe-generic-extras"
     ).map(_ % circeVersion),
     libraryDependencies ++= Seq(
-      "org.akka-js" %%% "shocon" % shoconVersion,
+      "org.akka-js" %%% "shocon-parser" % shoconVersion,
       "org.scala-lang.modules" %%% "scala-xml" % scalaXMLVersion,
       "io.circe" %% "circe-jawn" % circeVersion,
       "io.circe" %% "circe-yaml" % circeYamlVersion,
