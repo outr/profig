@@ -32,10 +32,10 @@ object Macros {
     c.Expr[T](
       q"""
          import io.circe._
-         import io.circe.generic.extras.Configuration
+         import io.circe.generic.extras
          import io.circe.generic.extras.auto._
          $imprt
-         implicit val customConfig: Configuration = Configuration.default.withDefaults
+         implicit val customConfig: extras.Configuration = extras.Configuration.default.withDefaults
 
          implicit val decoder = implicitly[Decoder[$t]]
          decoder.decodeJson($json) match {
@@ -66,10 +66,10 @@ object Macros {
     }
     q"""
        import io.circe._
-       import io.circe.generic.extras.Configuration
+       import io.circe.generic.extras
        import io.circe.generic.extras.auto._
        $imprt
-       implicit val customConfig: Configuration = Configuration.default.withDefaults
+       implicit val customConfig: extras.Configuration = extras.Configuration.default.withDefaults
 
        val encoder = implicitly[Encoder[$t]]
        encoder($value)
