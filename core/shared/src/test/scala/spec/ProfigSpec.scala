@@ -1,5 +1,9 @@
 package spec
 
+import java.io.File
+
+import io.circe.Decoder.Result
+import io.circe._
 import org.scalatest.{Matchers, WordSpec}
 import profig.{ConfigType, ConfigurationPath, Profig}
 
@@ -103,6 +107,19 @@ class ProfigSpec extends WordSpec with Matchers {
                          |  "age" : 1234
                          |}""".stripMargin)
     }
+    "merge a special type" in {
+      import Special.fileDecoder        // For the as[File]
+
+      val location = new File(System.getProperty("user.home"))
+      Profig("special").store(Special("testing", location))
+      Profig("special.title").as[String] should be("testing")
+      Profig("special.location").as[File] should be(location)
+    }
+    "load a special type" in {
+      val special = Profig("special").as[Special]
+      special.title should be("testing")
+      special.location should be(new File(System.getProperty("user.home")))
+    }
   }
 
   case class Person(name: String, age: Int = 21)
@@ -110,4 +127,18 @@ class ProfigSpec extends WordSpec with Matchers {
   case class JVMInfo(version: String, specification: Specification)
 
   case class Specification(vendor: String, name: String, version: String)
+}
+
+case class Special(title: String, location: File)
+
+object Special {
+  implicit val fileEncoder: Encoder[File] = new Encoder[File] {
+    override def apply(a: File): Json = Json.fromString(a.getAbsolutePath)
+  }
+  implicit val fileDecoder: Decoder[File] = new Decoder[File] {
+    override def apply(c: HCursor): Result[File] = c.value.asString match {
+      case Some(s) => Right(new File(s))
+      case None => Left(DecodingFailure("Cannot decode a File from null", c.history))
+    }
+  }
 }

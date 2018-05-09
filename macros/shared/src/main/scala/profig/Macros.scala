@@ -23,11 +23,18 @@ object Macros {
                  (implicit t: c.WeakTypeTag[T]): c.Expr[T] = {
     import c.universe._
 
+    val companion = symbolOf[T].companion
+    val imprt = if (companion.isStatic) {
+      q"import $companion._"
+    } else {
+      q""
+    }
     c.Expr[T](
       q"""
          import io.circe._
          import io.circe.generic.extras.Configuration
          import io.circe.generic.extras.auto._
+         $imprt
          implicit val customConfig: Configuration = Configuration.default.withDefaults
 
          implicit val decoder = implicitly[Decoder[$t]]
@@ -51,10 +58,17 @@ object Macros {
                (implicit t: c.WeakTypeTag[T]): c.Tree = {
     import c.universe._
 
+    val companion = symbolOf[T].companion
+    val imprt = if (companion.isStatic) {
+      q"import $companion._"
+    } else {
+      q""
+    }
     q"""
        import io.circe._
        import io.circe.generic.extras.Configuration
        import io.circe.generic.extras.auto._
+       $imprt
        implicit val customConfig: Configuration = Configuration.default.withDefaults
 
        val encoder = implicitly[Encoder[$t]]
