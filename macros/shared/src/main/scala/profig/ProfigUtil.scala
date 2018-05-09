@@ -10,7 +10,7 @@ import scala.collection.JavaConverters._
 /**
   * Primarily intended for internal use.
   */
-object ConfigUtil {
+object ProfigUtil {
   /**
     * Converts a `Map[String, String]` into a Json object with dot-separation.
     */

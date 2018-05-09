@@ -9,18 +9,18 @@ import io.circe.{Json, yaml}
 import scala.io.Source
 import scala.collection.JavaConverters._
 
-case class ConfigurationPath(path: String, `type`: ConfigType, load: LoadType)
+case class ProfigLookupPath(path: String, `type`: FileType, load: LoadType)
 
-object ConfigurationPath {
-  var extensions: Map[String, ConfigType] = Map(
-    "json" -> ConfigType.Json,
-    "properties" -> ConfigType.Properties,
-    "yml" -> ConfigType.Yaml,
-    "yaml" -> ConfigType.Yaml,
-    "hocon" -> ConfigType.Hocon,
-    "xml" -> ConfigType.XML,
-    "conf" -> ConfigType.Auto,
-    "config" -> ConfigType.Auto
+object ProfigLookupPath {
+  var extensions: Map[String, FileType] = Map(
+    "json" -> FileType.Json,
+    "properties" -> FileType.Properties,
+    "yml" -> FileType.Yaml,
+    "yaml" -> FileType.Yaml,
+    "hocon" -> FileType.Hocon,
+    "xml" -> FileType.XML,
+    "conf" -> FileType.Auto,
+    "config" -> FileType.Auto
   )
 
   var mergePaths: List[String] = List("config", "configuration", "app", "application")
@@ -28,19 +28,19 @@ object ConfigurationPath {
 
   def paths(mergePaths: List[String] = mergePaths,
             defaultPaths: List[String] = defaultPaths,
-            extensions: Map[String, ConfigType] = extensions): List[ConfigurationPath] = {
+            extensions: Map[String, FileType] = extensions): List[ProfigLookupPath] = {
     val merge = mergePaths.flatMap(p => extensions.map {
-      case (ext, configType) => ConfigurationPath(s"$p.$ext", configType, LoadType.Merge)
+      case (ext, configType) => ProfigLookupPath(s"$p.$ext", configType, LoadType.Merge)
     })
     val defaults = defaultPaths.flatMap(p => extensions.map {
-      case (ext, configType) => ConfigurationPath(s"$p.$ext", configType, LoadType.Defaults)
+      case (ext, configType) => ProfigLookupPath(s"$p.$ext", configType, LoadType.Defaults)
     })
     merge ::: defaults
   }
 
-  def defaults: List[ConfigurationPath] = paths()
+  def defaults: List[ProfigLookupPath] = paths()
 
-  def toStrings(entries: List[ConfigurationPath] = defaults): List[(ConfigurationPath, String)] = if (entries.isEmpty) {
+  def toStrings(entries: List[ProfigLookupPath] = defaults): List[(ProfigLookupPath, String)] = if (entries.isEmpty) {
     Nil
   } else {
     val entry = entries.head
@@ -51,13 +51,13 @@ object ConfigurationPath {
     list ::: toStrings(entries.tail)
   }
 
-  def toJsonStrings(entries: List[ConfigurationPath] = defaults): List[(ConfigurationPath, String)] = {
+  def toJsonStrings(entries: List[ProfigLookupPath] = defaults): List[(ProfigLookupPath, String)] = {
     toStrings(entries).map {
       case (cp, string) => {
-        if (cp.`type` == ConfigType.Json) {
+        if (cp.`type` == FileType.Json) {
           cp -> string
         } else {
-          cp.copy(`type` = ConfigType.Json) -> toJson(string, cp.`type`).spaces2
+          cp.copy(`type` = FileType.Json) -> toJson(string, cp.`type`).spaces2
         }
       }
     }
@@ -120,7 +120,7 @@ object ConfigurationPath {
         }
       }
     }
-    ConfigUtil.properties2Json(properties)
+    ProfigUtil.properties2Json(properties)
   }
 
   var yamlConversion: Option[String => Json] = ProfigPlatform.yamlConversion
@@ -175,13 +175,13 @@ object ConfigurationPath {
     Json.obj(root.label -> toJson(root).getOrElse(Json.Null))
   }
 
-  def toJson(string: String, `type`: ConfigType): Json = `type` match {
-    case ConfigType.Json => jsonString2Json(string)
-    case ConfigType.Properties => propertiesString2Json(string)
-    case ConfigType.Yaml => yamlConversion.map(c => c(string)).getOrElse(throw new RuntimeException(s"YAML conversion not supported."))
-    case ConfigType.Hocon => hoconString2Json(string)
-    case ConfigType.XML => xmlString2Json(string)
-    case ConfigType.Auto => if (string.trim.startsWith("{")) {
+  def toJson(string: String, `type`: FileType): Json = `type` match {
+    case FileType.Json => jsonString2Json(string)
+    case FileType.Properties => propertiesString2Json(string)
+    case FileType.Yaml => yamlConversion.map(c => c(string)).getOrElse(throw new RuntimeException(s"YAML conversion not supported."))
+    case FileType.Hocon => hoconString2Json(string)
+    case FileType.XML => xmlString2Json(string)
+    case FileType.Auto => if (string.trim.startsWith("{")) {
       jsonString2Json(string)
     } else {
       propertiesString2Json(string)

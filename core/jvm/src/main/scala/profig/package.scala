@@ -11,7 +11,7 @@ package object profig {
       * @param source the source to load
       * @param defaults if true, will not overwrite existing values
       */
-    def combine(source: Source, `type`: ConfigType, defaults: Boolean): Unit = {
+    def combine(source: Source, `type`: FileType, defaults: Boolean): Unit = {
       val string = try {
         source.mkString
       } finally {
@@ -23,31 +23,31 @@ package object profig {
     /**
       * Merges (overwriting) existing values at this path from the `Source`.
       */
-    def merge(source: Source, `type`: ConfigType): Unit = combine(source, `type`, defaults = false)
+    def merge(source: Source, `type`: FileType): Unit = combine(source, `type`, defaults = false)
 
     /**
       * Merges (overwriting) existing values at this path from the `File`.
       */
-    def merge(file: File, `type`: ConfigType): Unit = merge(Source.fromFile(file), `type`)
+    def merge(file: File, `type`: FileType): Unit = merge(Source.fromFile(file), `type`)
 
     /**
       * Merges (overwriting) existing values at this path from the `URL`.
       */
-    def merge(url: URL, `type`: ConfigType): Unit = merge(Source.fromURL(url), `type`)
+    def merge(url: URL, `type`: FileType): Unit = merge(Source.fromURL(url), `type`)
 
     /**
       * Loads defaults (does not overwrite) merging to current values in path from `Source`.
       */
-    def defaults(source: Source, `type`: ConfigType): Unit = combine(source, `type`, defaults = true)
+    def defaults(source: Source, `type`: FileType): Unit = combine(source, `type`, defaults = true)
 
     /**
       * Loads defaults (does not overwrite) merging to current values in path from `File`.
       */
-    def defaults(file: File, `type`: ConfigType): Unit = defaults(Source.fromFile(file), `type`)
+    def defaults(file: File, `type`: FileType): Unit = defaults(Source.fromFile(file), `type`)
 
     /**
       * Loads defaults (does not overwrite) merging to current values in path from `URL`.
       */
-    def defaults(url: URL, `type`: ConfigType): Unit = defaults(Source.fromURL(url), `type`)
+    def defaults(url: URL, `type`: FileType): Unit = defaults(Source.fromURL(url), `type`)
   }
 }

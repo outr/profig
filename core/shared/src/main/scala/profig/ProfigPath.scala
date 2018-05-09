@@ -94,12 +94,12 @@ trait ProfigPath {
   /**
     * Merges a string of content from the specified type.
     */
-  def merge(string: String, `type`: ConfigType): Unit = combine(string, `type`, defaults = false)
+  def merge(string: String, `type`: FileType): Unit = combine(string, `type`, defaults = false)
 
   /**
     * Loads defaults for a string of the specified type.
     */
-  def defaults(string: String, `type`: ConfigType): Unit = combine(string, `type`, defaults = true)
+  def defaults(string: String, `type`: FileType): Unit = combine(string, `type`, defaults = true)
 
   /**
     * Merges a Json object to this path.
@@ -124,8 +124,8 @@ trait ProfigPath {
   /**
     * Combines a string of content auto-detected to JSON.
     */
-  def combine(string: String, `type`: ConfigType, defaults: Boolean): Unit = {
-    val json = ConfigurationPath.toJson(string, `type`)
+  def combine(string: String, `type`: FileType, defaults: Boolean): Unit = {
+    val json = ProfigLookupPath.toJson(string, `type`)
     combine(json, defaults)
   }
 
@@ -133,7 +133,7 @@ trait ProfigPath {
     * Combines a sequence of args at this path.
     */
   def combine(args: Seq[String], defaults: Boolean): Unit = {
-    val json = ConfigUtil.args2Json(args)
+    val json = ProfigUtil.args2Json(args)
     combine(json, defaults)
   }
 
@@ -141,7 +141,7 @@ trait ProfigPath {
     * Combines a properties object at this path.
     */
   def combine(properties: Properties, defaults: Boolean): Unit = {
-    combine(ConfigUtil.properties2Json(properties), defaults)
+    combine(ProfigUtil.properties2Json(properties), defaults)
   }
 
   /**
@@ -149,7 +149,7 @@ trait ProfigPath {
     */
   def combine(json: Json, defaults: Boolean): Unit = synchronized {
     if (path.nonEmpty) {
-      val updated = ConfigUtil.createJson(path.mkString("."), json)
+      val updated = ProfigUtil.createJson(path.mkString("."), json)
       if (defaults) {
         instance.modify(updated.deepMerge)
       } else {

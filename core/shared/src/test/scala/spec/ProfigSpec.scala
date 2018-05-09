@@ -1,9 +1,7 @@
 package spec
 
-import java.io.File
-
 import org.scalatest.{Matchers, WordSpec}
-import profig.{ConfigType, Profig}
+import profig.{FileType, Profig}
 
 class ProfigSpec extends WordSpec with Matchers {
   "Profig" should {
@@ -29,7 +27,7 @@ class ProfigSpec extends WordSpec with Matchers {
       Profig("this.is.an.argument").as[String] should be("Wahoo!")
     }
     "load JSON arguments" in {
-      Profig.merge("{ \"this.is.another.argument\" : \"Hola!\" }", ConfigType.Json)
+      Profig.merge("{ \"this.is.another.argument\" : \"Hola!\" }", FileType.Json)
     }
     "load JVM information from properties" in {
       val info = Profig("java").as[JVMInfo]

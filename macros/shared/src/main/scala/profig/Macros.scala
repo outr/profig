@@ -93,21 +93,21 @@ object Macros {
   def loadDefaults(c: blackbox.Context)(): c.Tree = {
     import c.universe._
 
-    load(c)(reify(ConfigurationPath.defaults: _*))
+    load(c)(reify(ProfigLookupPath.defaults: _*))
   }
 
-  def load(c: blackbox.Context)(entries: c.Expr[ConfigurationPath]*): c.Tree = {
+  def load(c: blackbox.Context)(entries: c.Expr[ProfigLookupPath]*): c.Tree = {
     import c.universe._
 
-    implicit val cftLift: c.universe.Liftable[ConfigType] = Liftable[ConfigType] { cft =>
-      q"_root_.profig.ConfigType.${TermName(cft.getClass.getSimpleName.replaceAllLiterally("$", ""))}"
+    implicit val cftLift: c.universe.Liftable[FileType] = Liftable[FileType] { cft =>
+      q"_root_.profig.FileType.${TermName(cft.getClass.getSimpleName.replaceAllLiterally("$", ""))}"
     }
 
     val instance = c.prefix.tree
     if (profig.ProfigPlatform.isJS) {
-      ConfigurationPath.yamlConversion = Some(ConfigurationPath.yamlString2Json)
+      ProfigLookupPath.yamlConversion = Some(ProfigLookupPath.yamlString2Json)
 
-      val config = ConfigurationPath.toJsonStrings().map {
+      val config = ProfigLookupPath.toJsonStrings().map {
         case (cp, json) => cp.load match {
           case LoadType.Defaults => q"$instance.defaults($json, ${cp.`type`})"
           case LoadType.Merge => q"$instance.merge($json, ${cp.`type`})"
@@ -118,7 +118,7 @@ object Macros {
       q"""
          import profig._
 
-         ConfigurationPath.toJsonStrings(List(..$entries)).foreach {
+         ProfigLookupPath.toJsonStrings(List(..$entries)).foreach {
            case (cp, json) => cp.load match {
              case LoadType.Defaults => $instance.defaults(json, cp.`type`)
              case LoadType.Merge => $instance.merge(json, cp.`type`)
