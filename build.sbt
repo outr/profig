@@ -1,16 +1,16 @@
 import sbtcrossproject.{CrossType, crossProject}
 
 organization in ThisBuild := "com.outr"
-version in ThisBuild := "2.2.1"
-scalaVersion in ThisBuild := "2.12.4"
-crossScalaVersions in ThisBuild := List("2.12.4", "2.11.12")
+version in ThisBuild := "2.2.2-SNAPSHOT"
+scalaVersion in ThisBuild := "2.12.6"
+crossScalaVersions in ThisBuild := List("2.12.6", "2.11.12")
 scalacOptions in ThisBuild ++= Seq("-unchecked", "-deprecation")
 
 publishTo in ThisBuild := sonatypePublishTo.value
 sonatypeProfileName in ThisBuild := "com.outr"
 publishMavenStyle in ThisBuild := true
 licenses in ThisBuild := Seq("MIT" -> url("https://github.com/outr/profig/blob/master/LICENSE"))
-sonatypeProjectHosting in ThisBuild := Some(xerial.sbt.Sonatype.GithubHosting("outr", "profig", "matt@outr.com"))
+sonatypeProjectHosting in ThisBuild := Some(xerial.sbt.Sonatype.GitHubHosting("outr", "profig", "matt@outr.com"))
 homepage in ThisBuild := Some(url("https://github.com/outr/profig"))
 scmInfo in ThisBuild := Some(
   ScmInfo(
@@ -22,8 +22,8 @@ developers in ThisBuild := List(
   Developer(id="darkfrog", name="Matt Hicks", email="matt@matthicks.", url=url("http://matthicks.com"))
 )
 
-val circeVersion = "0.9.2"
-val circeYamlVersion = "0.7.0"
+val circeVersion = "0.9.3"
+val circeYamlVersion = "0.8.0"
 val shoconVersion = "0.2.1"
 val scalaXMLVersion = "1.1.0"
 val scalatestVersion = "3.0.5"

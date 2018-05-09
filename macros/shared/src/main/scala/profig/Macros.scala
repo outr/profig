@@ -92,10 +92,6 @@ object Macros {
     val instance = c.prefix.tree
     if (profig.ProfigPlatform.isJS) {
       ConfigurationPath.yamlConversion = Some(ConfigurationPath.yamlString2Json)
-      // TODO: support non-defaults in Scala.js
-//      val entriesValue = entries match {
-//        case Expr(Literal(Constant(value: Seq[ConfigurationPath]))) => value.toList
-//      }
 
       val config = ConfigurationPath.toJsonStrings().map {
         case (cp, json) => cp.load match {
