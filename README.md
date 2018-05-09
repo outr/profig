@@ -39,8 +39,8 @@ and overriding configuration in your application.
 Profig is published to Sonatype OSS and synchronized to Maven Central supporting JVM and Scala.js on 2.11 and 2.12:
 
 ```
-libraryDependencies += "com.outr" %% "profig" % "2.2.1"   // Scala
-libraryDependencies += "com.outr" %%% "profig" % "2.2.1"  // Scala.js / Cross-Build
+libraryDependencies += "com.outr" %% "profig" % "2.3.0"   // Scala
+libraryDependencies += "com.outr" %%% "profig" % "2.3.0"  // Scala.js / Cross-Build
 ```
 
 ## Getting Started
@@ -63,7 +63,7 @@ main method. This will merge all command-line arguments into Profig.
 Profig supports many configuration formats and can look in the classpath as well as the filesystem to find configuration
 to load. To load a file simply call:
 
-`Profig.load(ConfigurationPath("config.json"), ConfigType.Json, LoadType.Merge)`
+`Profig.load(ProfigLookupPath("config.json", ConfigType.Json, LoadType.Merge))`
 
 This will look for `config.json` on the classpath and filesystem, load it as JSON (if found), and merge it into the configuration.
 
@@ -72,6 +72,12 @@ However, if your application doesn't need very explicit files to be loaded you c
 `Profig.loadDefaults()`
 
 This will look for any standardized configuration file in the classpath and filesystem and load it into the system.
+
+Finally, if you want to look for variations on a name:
+
+`Profig.load(ProfigLookupPath.paths(mergePaths = List("config")): _*)`
+
+This will look for all variations of `config` in all known file extensions (`json`, `properties`, `yml`, `config`, etc.)
 
 ### Merge or Defaults
 
@@ -131,6 +137,12 @@ This only scratches the surface of the features and functionality Profig provide
 ScalaDocs and the specs: https://github.com/outr/profig/blob/master/core/shared/src/test/scala/spec/ProfigSpec.scala
 
 # Roadmap
+
+## 2.3.0 (Released 05.09.2018)
+
+* [X] Better naming conventions internally
+* [X] Fix namespace collisions with common names like `Configuration`
+* [X] Better support for custom encoder / decoder via companion object auto import
 
 ## 2.2.0 (Released 03.12.2018)
 
