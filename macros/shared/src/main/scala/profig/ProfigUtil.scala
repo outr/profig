@@ -32,39 +32,45 @@ object ProfigUtil {
     map2Json(map)
   }
 
+  private val NamedKeyValue = """-{1,}(.+)=(.+)""".r
+  private val NamedFlag = """-{1,}(.+)""".r
+
   /**
     * Converts a sequence of args into a Json object with dot-separation.
     */
-  @tailrec
-  final def args2Json(args: Seq[String], json: Json = Json.obj(), index: Int = 1): Json = if (args.isEmpty) {
-    json
-  } else {
-    var seq = args
-    val first = seq.head
-    seq = seq.tail
-    var i = index
-
-    val j: Json = if (first.startsWith("-")) {
-      val n = if (first.startsWith("--")) {
-        first.substring(2)
-      } else {
-        first.substring(1)
+  def args2Json(args: Seq[String]): Json = {
+    var anonymous = List.empty[Json]
+    var named = Map.empty[String, Json]
+    var flag = Option.empty[String]
+    args.foreach {
+      case NamedKeyValue(key, value) => named += key -> string2JSON(value)
+      case NamedFlag(key) => {
+        flag.foreach { f =>
+          named += f -> Json.True
+        }
+        flag = Option(key)
       }
-      val equalsIndex = n.indexOf('=')
-      if (equalsIndex > 0) {
-        createJson(n.substring(0, equalsIndex), string2JSON(n.substring(equalsIndex + 1)))
-      } else if (seq.isEmpty) {
-        createJson(n, Json.True)
-      } else {
-        val second = seq.head
-        seq = seq.tail
-        createJson(n, string2JSON(second))
+      case arg => flag match {
+        case Some(key) => {
+          named += key -> string2JSON(arg)
+          flag = None
+        }
+        case None => anonymous = string2JSON(arg) :: anonymous
       }
-    } else {
-      i += 1
-      Json.obj(s"arg$index" -> string2JSON(first))
     }
-    args2Json(seq, json.deepMerge(j), i)
+    anonymous = anonymous.reverse
+
+    val argsNamed = anonymous.zipWithIndex.map {
+      case (json, index) => s"arg${index + 1}" -> json
+    }
+    val argsList = List("args" -> Json.arr(anonymous: _*))
+    var obj = Json.obj(argsNamed ::: argsList: _*)
+    named.toList.map {
+      case (key, value) => createJson(key, value)
+    }.foreach { json =>
+      obj = json.deepMerge(obj)
+    }
+    obj
   }
 
   /**
