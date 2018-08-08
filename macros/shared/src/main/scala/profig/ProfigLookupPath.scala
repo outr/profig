@@ -131,7 +131,7 @@ object ProfigLookupPath {
   }
 
   def hoconString2Json(string: String): Json = {
-    import eu.unicredit.shocon._
+    import org.akkajs.shocon._
 
     def toJson(value: Config.Value): Json = value match {
       case Config.Array(elements) => Json.arr(elements.map(toJson): _*)

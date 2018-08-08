@@ -24,12 +24,12 @@ developers in ThisBuild := List(
 
 val circeVersion = "0.9.3"
 val circeYamlVersion = "0.8.0"
-val shoconVersion = "0.2.1"
+val shoconVersion = "0.3.1"
 val scalaXMLVersion = "1.1.0"
 val scalatestVersion = "3.0.5"
 
 lazy val root = project.in(file("."))
-  .aggregate(irPatch, macrosJS, macrosJVM, coreJS, coreJVM)
+  .aggregate(irPatch, macrosJS, macrosJVM, coreJS, coreJVM, inputJS, inputJVM)
   .settings(
     name := "profig",
     publish := {},
@@ -97,3 +97,18 @@ lazy val core = crossProject(JSPlatform, JVMPlatform)
 
 lazy val coreJS = core.js
 lazy val coreJVM = core.jvm
+
+lazy val input = crossProject(JSPlatform, JVMPlatform)
+  .crossType(CrossType.Full)
+  .in(file("input"))
+  .dependsOn(core)
+  .settings(
+    name := "profig-input",
+    libraryDependencies ++= Seq(
+      "org.scala-lang" % "scala-reflect" % scalaVersion.value,
+      "org.scalatest" %%% "scalatest" % scalatestVersion % "test"
+    )
+  )
+
+lazy val inputJS = input.js
+lazy val inputJVM = input.jvm
