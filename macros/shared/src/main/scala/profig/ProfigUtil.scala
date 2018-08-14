@@ -64,7 +64,8 @@ object ProfigUtil {
       case (json, index) => s"arg${index + 1}" -> json
     }
     val argsList = List("args" -> Json.arr(anonymous: _*))
-    var obj = Json.obj(argsNamed ::: argsList: _*)
+    val allArgsList = List("allArgs" -> Json.arr(args.map(string2JSON): _*))
+    var obj = Json.obj(argsNamed ::: argsList ::: allArgsList: _*)
     named.toList.map {
       case (key, value) => createJson(key, value)
     }.foreach { json =>
