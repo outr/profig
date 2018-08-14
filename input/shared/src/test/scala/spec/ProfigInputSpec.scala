@@ -1,6 +1,6 @@
 package spec
 
-import org.scalatest.{AsyncWordSpec, Matchers, WordSpec}
+import org.scalatest.{AsyncWordSpec, Matchers}
 import profig.input.{ProfigInput, ProvidedProfigInput}
 
 class ProfigInputSpec extends AsyncWordSpec with Matchers {

@@ -24,7 +24,7 @@ object InputMacros {
         } else {
           q"None"
         }
-        args += q"profig.input.InputArgument[$result]($name, implicitly[String => Option[$result]], $default)"
+        args += q"profig.input.InputArgument[$result]($name, implicitly[String => Option[$result]], $default, ${result.toString})"
         conversion += q"v($index).asInstanceOf[$result]"
       }
     }
@@ -33,7 +33,7 @@ object InputMacros {
       q"""
          import profig.input.ProfigInput._
 
-         profig.input.InputData[$t](List(..$args), (v: Vector[_]) => $moduleSymbol(..$conversion))
+         profig.input.InputData[$t](List(..$args), (v: Vector[_]) => $moduleSymbol(..$conversion), ${classSymbol.toString})
        """
     c.Expr[InputData[T]](inputData)
   }
