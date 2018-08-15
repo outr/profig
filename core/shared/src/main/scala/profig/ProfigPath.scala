@@ -33,6 +33,23 @@ trait ProfigPath {
   def as[T]: T = macro Macros.as[T]
 
   /**
+    * Loads this path out as the defined type `T`. If no value is set for this path, the default will be used.
+    *
+    * @param default the default to be used if this path is empty
+    * @tparam T the type to represent the current path
+    * @return T
+    */
+  def as[T](default: => T): T = macro Macros.asWithDefault[T]
+
+  /**
+    * Convenience functionality similar to `as` but returns an option if set.
+    *
+    * @tparam T the type to represent the current path
+    * @return T
+    */
+  def opt[T]: Option[T] = macro Macros.opt[T]
+
+  /**
     * Stores the supplied value into this path.
     *
     * @param value the value to store

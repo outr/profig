@@ -20,6 +20,13 @@ class ProfigSpec extends WordSpec with Matchers {
     "verify files" in {
       Profig("test.files").as[Option[String]] should be(Some("yes"))
     }
+    "verify `opt` usage" in {
+      Profig("test.files").opt[String] should be(Some("yes"))
+    }
+    "verify `as` with default" in {
+      Profig("test.files").as[String]("no") should be("yes")
+      Profig("test.other").as[String]("no") should be("no")
+    }
     "merge arguments" in {
       Profig.merge(List("-this.is.an.argument", "Wahoo!"))
     }

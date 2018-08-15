@@ -83,6 +83,20 @@ object Macros {
     c.Expr[T](q"profig.JsonUtil.fromJson[$t]($configPath())")
   }
 
+  def asWithDefault[T](c: blackbox.Context)(default: c.Tree)(implicit t: c.WeakTypeTag[T]): c.Expr[T] = {
+    import c.universe._
+
+    val configPath = c.prefix.tree
+    c.Expr[T](q"$configPath.get().map(json => profig.JsonUtil.fromJson[$t](json)).getOrElse($default)")
+  }
+
+  def opt[T](c: blackbox.Context)(implicit t: c.WeakTypeTag[T]): c.Expr[Option[T]] = {
+    import c.universe._
+
+    val configPath = c.prefix.tree
+    c.Expr[Option[T]](q"$configPath.get().map(json => profig.JsonUtil.fromJson[$t](json))")
+  }
+
   def store[T](c: blackbox.Context)(value: c.Expr[T])(implicit t: c.WeakTypeTag[T]): c.Expr[Unit] = {
     import c.universe._
 
