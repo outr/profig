@@ -80,6 +80,9 @@ object Macros {
     import c.universe._
 
     val configPath = c.prefix.tree
+    if (t.tpe <:< typeOf[Option[_]]) {
+      c.warning(c.enclosingPosition, "Use 'opt' instead of 'as' for cleaner code with Option")
+    }
     c.Expr[T](q"profig.JsonUtil.fromJson[$t]($configPath())")
   }
 
