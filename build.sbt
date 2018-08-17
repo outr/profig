@@ -1,12 +1,13 @@
 import sbtcrossproject.{CrossType, crossProject}
 
 organization in ThisBuild := "com.outr"
-version in ThisBuild := "2.3.1-SNAPSHOT"
+version in ThisBuild := "2.3.1"
 scalaVersion in ThisBuild := "2.12.6"
 crossScalaVersions in ThisBuild := List("2.12.6", "2.11.12")
 scalacOptions in ThisBuild ++= Seq("-unchecked", "-deprecation")
 
 publishTo in ThisBuild := sonatypePublishTo.value
+publishConfiguration in ThisBuild := publishConfiguration.value.withOverwrite(true)
 sonatypeProfileName in ThisBuild := "com.outr"
 publishMavenStyle in ThisBuild := true
 licenses in ThisBuild := Seq("MIT" -> url("https://github.com/outr/profig/blob/master/LICENSE"))
