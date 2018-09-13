@@ -96,7 +96,7 @@ object ProfigLookupPath {
   def propertiesString2Json(string: String): Json = {
     val properties = new Properties
     var continuing: Option[(String, String)] = None
-    string.split('\n').foreach {
+    string.split('\n').filter(_.nonEmpty).foreach {
       case line if line.startsWith("#") || line.startsWith("!") =>   // Ignore
       case line => {
         continuing match {
