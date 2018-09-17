@@ -1,5 +1,6 @@
 package spec
 
+import io.circe.Json
 import org.scalatest.{Matchers, WordSpec}
 import profig.{FileType, Profig}
 
@@ -109,6 +110,10 @@ class ProfigSpec extends WordSpec with Matchers {
                          |  "name" : "John Doe",
                          |  "age" : 1234
                          |}""".stripMargin)
+    }
+    "validate loading a String value of true as Boolean" in {
+      Profig("test.boolean").merge(Json.fromString("true"))
+      Profig("test.boolean").as[Boolean] should be(true)
     }
   }
 

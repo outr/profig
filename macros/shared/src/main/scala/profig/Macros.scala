@@ -36,6 +36,7 @@ object Macros {
          import io.circe.generic.extras.auto._
          $imprt
          implicit val customConfig: extras.Configuration = extras.Configuration.default.withDefaults
+         import profig.Conversions._
 
          implicit val decoder = implicitly[Decoder[$t]]
          decoder.decodeJson($json) match {
