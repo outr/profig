@@ -23,13 +23,26 @@ object Macros {
                  (implicit t: c.WeakTypeTag[T]): c.Expr[T] = {
     import c.universe._
 
+    val d = decoder[T](c)(t)
+    c.Expr[T](q"""
+         implicit val decoder = $d
+         decoder.decodeJson($json) match {
+           case Left(failure) => throw new RuntimeException("Failed to decode from " + $json, failure)
+           case Right(value) => value
+         }
+      """)
+  }
+
+  def decoder[T](c: blackbox.Context)(implicit t: c.WeakTypeTag[T]): c.Expr[io.circe.Decoder[T]] = {
+    import c.universe._
+
     val companion = symbolOf[T].companion
     val imprt = if (companion.isStatic) {
       q"import $companion._"
     } else {
       q""
     }
-    c.Expr[T](
+    c.Expr[io.circe.Decoder[T]](
       q"""
          import io.circe._
          import io.circe.generic.extras
@@ -38,11 +51,18 @@ object Macros {
          implicit val customConfig: extras.Configuration = extras.Configuration.default.withDefaults
          import profig.Conversions._
 
-         implicit val decoder = implicitly[Decoder[$t]]
-         decoder.decodeJson($json) match {
-           case Left(failure) => throw new RuntimeException("Failed to decode from " + $json, failure)
-           case Right(value) => value
-         }
+         implicitly[Decoder[$t]]
+       """)
+  }
+
+  def exportedDecoder[T](c: blackbox.Context)
+                        (implicit t: c.WeakTypeTag[T]): c.Expr[io.circe.export.Exported[io.circe.Decoder[T]]] = {
+    import c.universe._
+
+    val d = decoder[T](c)(t)
+    c.Expr[io.circe.export.Exported[io.circe.Decoder[T]]](
+      q"""
+         io.circe.export.Exported($d)
        """)
   }
 
@@ -59,22 +79,42 @@ object Macros {
                (implicit t: c.WeakTypeTag[T]): c.Tree = {
     import c.universe._
 
+    val e = encoder[T](c)(t)
+    q"""
+       val encoder = $e
+       encoder($value)
+     """
+  }
+
+  def encoder[T](c: blackbox.Context)(implicit t: c.WeakTypeTag[T]): c.Expr[io.circe.Encoder[T]] = {
+    import c.universe._
+
     val companion = symbolOf[T].companion
     val imprt = if (companion.isStatic) {
       q"import $companion._"
     } else {
       q""
     }
-    q"""
+    c.Expr[io.circe.Encoder[T]](q"""
        import io.circe._
        import io.circe.generic.extras
        import io.circe.generic.extras.auto._
        $imprt
        implicit val customConfig: extras.Configuration = extras.Configuration.default.withDefaults
 
-       val encoder = implicitly[Encoder[$t]]
-       encoder($value)
-     """
+       implicitly[Encoder[$t]]
+     """)
+  }
+
+  def exportedEncoder[T](c: blackbox.Context)
+                        (implicit t: c.WeakTypeTag[T]): c.Expr[io.circe.export.Exported[io.circe.Encoder[T]]] = {
+    import c.universe._
+
+    val e = encoder[T](c)(t)
+    c.Expr[io.circe.export.Exported[io.circe.Encoder[T]]](
+      q"""
+         io.circe.export.Exported($e)
+       """)
   }
 
   def as[T](c: blackbox.Context)(implicit t: c.WeakTypeTag[T]): c.Expr[T] = {

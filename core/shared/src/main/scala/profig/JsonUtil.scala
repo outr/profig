@@ -10,4 +10,11 @@ object JsonUtil {
 
   def fromJsonString[T](jsonString: String): T = macro Macros.fromJsonString[T]
   def toJsonString[T](value: T): String = macro Macros.toJsonString[T]
+
+  def decoder[T]: io.circe.Decoder[T] = macro Macros.decoder[T]
+  def encoder[T]: io.circe.Encoder[T] = macro Macros.encoder[T]
+
+  // TODO: fix this
+  implicit def exportedDecoder[T]: io.circe.export.Exported[io.circe.Decoder[T]] = macro Macros.exportedDecoder[T]
+  implicit def exportedEncoder[T]: io.circe.export.Exported[io.circe.Encoder[T]] = macro Macros.exportedEncoder[T]
 }

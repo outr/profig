@@ -23,8 +23,8 @@ developers in ThisBuild := List(
   Developer(id="darkfrog", name="Matt Hicks", email="matt@matthicks.", url=url("http://matthicks.com"))
 )
 
-val circeVersion = "0.9.3"
-val circeYamlVersion = "0.8.0"
+val circeVersion = "0.10.1"
+val circeYamlVersion = "0.9.0"
 val shoconVersion = "0.3.1"
 val scalaXMLVersion = "1.1.0"
 val scalatestVersion = "3.0.5"
