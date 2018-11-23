@@ -90,8 +90,8 @@ object ProfigLookupPath {
     case Right(value) => value
   }
 
-  private val EqualsProperty = """(.+)=(.+)""".r
-  private val ColonProperty = """(.+)[:](.+)""".r
+  private val EqualsProperty = """(.+?)=(.+)""".r
+  private val ColonProperty = """(.+?)[:](.+)""".r
 
   def propertiesString2Json(string: String): Json = {
     val properties = new Properties
