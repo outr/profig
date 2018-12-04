@@ -154,7 +154,19 @@ object Macros {
     load(c)(reify(ProfigLookupPath.defaults: _*))
   }
 
-  def load(c: blackbox.Context)(entries: c.Expr[ProfigLookupPath]*): c.Tree = {
+  def loadDefaultsMacro(c: blackbox.Context)(): c.Tree = {
+    import c.universe._
+
+    loadJVM(c)(reify(ProfigLookupPath.defaults: _*))
+  }
+
+  def load(c: blackbox.Context)(entries: c.Expr[ProfigLookupPath]*): c.Tree = if (profig.ProfigPlatform.isJS) {
+    loadJS(c)(entries: _*)
+  } else {
+    loadJVM(c)(entries: _*)
+  }
+
+  def loadJS(c: blackbox.Context)(entries: c.Expr[ProfigLookupPath]*): c.Tree = {
     import c.universe._
 
     implicit val cftLift: c.universe.Liftable[FileType] = Liftable[FileType] { cft =>
@@ -162,27 +174,34 @@ object Macros {
     }
 
     val instance = c.prefix.tree
-    if (profig.ProfigPlatform.isJS) {
-      ProfigLookupPath.yamlConversion = Some(ProfigLookupPath.yamlString2Json)
+    ProfigLookupPath.yamlConversion = Some(ProfigLookupPath.yamlString2Json)
 
-      val config = ProfigLookupPath.toJsonStrings().map {
-        case (cp, json) => cp.load match {
-          case LoadType.Defaults => q"$instance.defaults($json, ${cp.`type`})"
-          case LoadType.Merge => q"$instance.merge($json, ${cp.`type`})"
-        }
+    val config = ProfigLookupPath.toJsonStrings().map {
+      case (cp, json) => cp.load match {
+        case LoadType.Defaults => q"$instance.defaults($json, ${cp.`type`})"
+        case LoadType.Merge => q"$instance.merge($json, ${cp.`type`})"
       }
-      q"..$config"
-    } else {
-      q"""
-         import profig._
-
-         ProfigLookupPath.toJsonStrings(List(..$entries)).foreach {
-           case (cp, json) => cp.load match {
-             case LoadType.Defaults => $instance.defaults(json, cp.`type`)
-             case LoadType.Merge => $instance.merge(json, cp.`type`)
-           }
-         }
-       """
     }
+    q"..$config"
+  }
+
+  def loadJVM(c: blackbox.Context)(entries: c.Expr[ProfigLookupPath]*): c.Tree = {
+    import c.universe._
+
+    implicit val cftLift: c.universe.Liftable[FileType] = Liftable[FileType] { cft =>
+      q"_root_.profig.FileType.${TermName(cft.getClass.getSimpleName.replaceAllLiterally("$", ""))}"
+    }
+
+    val instance = c.prefix.tree
+    q"""
+       import profig._
+
+       ProfigLookupPath.toJsonStrings(List(..$entries)).foreach {
+         case (cp, json) => cp.load match {
+           case LoadType.Defaults => $instance.defaults(json, cp.`type`)
+           case LoadType.Merge => $instance.merge(json, cp.`type`)
+         }
+       }
+     """
   }
 }

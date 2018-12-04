@@ -33,7 +33,17 @@ class Profig(val parent: Option[Profig] = Some(Profig)) extends ProfigPath {
 
   def loadDefaults(): Unit = macro Macros.loadDefaults
 
+  /**
+    * Works like loadDefaults, but intended for use within Macros
+    */
+  def loadDefaultsMacro(): Unit = macro Macros.loadDefaultsMacro
+
   def load(entries: ProfigLookupPath*): Unit = macro Macros.load
+
+  /**
+    * Works like load, but intended for use within Macros
+    */
+  def loadMacro(entries: ProfigLookupPath*): Unit = macro Macros.loadJVM
 
   def loadEnvironmentVariables(asDefault: Boolean = true): Unit = {
     val envMap = System.getenv().asScala.toMap
