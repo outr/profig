@@ -1,9 +1,9 @@
 import sbtcrossproject.{CrossType, crossProject}
 
 organization in ThisBuild := "com.outr"
-version in ThisBuild := "2.3.4"
-scalaVersion in ThisBuild := "2.12.6"
-crossScalaVersions in ThisBuild := List("2.12.6", "2.11.12")
+version in ThisBuild := "2.3.5-SNAPSHOT"
+scalaVersion in ThisBuild := "2.12.8"
+crossScalaVersions in ThisBuild := List("2.12.8", "2.11.12")
 scalacOptions in ThisBuild ++= Seq("-unchecked", "-deprecation")
 
 publishTo in ThisBuild := sonatypePublishTo.value
@@ -23,10 +23,10 @@ developers in ThisBuild := List(
   Developer(id="darkfrog", name="Matt Hicks", email="matt@matthicks.", url=url("http://matthicks.com"))
 )
 
-val circeVersion = "0.10.1"
+val circeVersion = "0.11.1"
 val circeYamlVersion = "0.9.0"
-val shoconVersion = "0.3.1"
-val scalaXMLVersion = "1.1.0"
+val shoconVersion = "0.4.1"
+val scalaXMLVersion = "1.1.1"
 val scalatestVersion = "3.0.5"
 
 lazy val root = project.in(file("."))
