@@ -17,7 +17,7 @@ object ProfigLookupPath {
     "properties" -> FileType.Properties,
     "yml" -> FileType.Yaml,
     "yaml" -> FileType.Yaml,
-    "hocon" -> FileType.Hocon,
+//    "hocon" -> FileType.Hocon,
     "xml" -> FileType.XML,
     "conf" -> FileType.Auto,
     "config" -> FileType.Auto
@@ -130,7 +130,7 @@ object ProfigLookupPath {
     case Right(value) => value
   }
 
-  def hoconString2Json(string: String): Json = {
+  /*def hoconString2Json(string: String): Json = {
     import org.akkajs.shocon._
 
     def toJson(value: Config.Value): Json = value match {
@@ -146,7 +146,7 @@ object ProfigLookupPath {
     }
 
     toJson(Config(string))
-  }
+  }*/
 
   def xmlString2Json(string: String): Json = {
     import scala.xml._
@@ -179,7 +179,7 @@ object ProfigLookupPath {
     case FileType.Json => jsonString2Json(string)
     case FileType.Properties => propertiesString2Json(string)
     case FileType.Yaml => yamlConversion.map(c => c(string)).getOrElse(throw new RuntimeException(s"YAML conversion not supported."))
-    case FileType.Hocon => hoconString2Json(string)
+//    case FileType.Hocon => hoconString2Json(string)
     case FileType.XML => xmlString2Json(string)
     case FileType.Auto => if (string.trim.startsWith("{")) {
       jsonString2Json(string)

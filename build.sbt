@@ -1,9 +1,10 @@
-import sbtcrossproject.{CrossType, crossProject}
+import sbtcrossproject.CrossPlugin.autoImport.crossProject
+import sbtcrossproject.CrossType
 
 organization in ThisBuild := "com.outr"
-version in ThisBuild := "2.3.5"
-scalaVersion in ThisBuild := "2.12.8"
-crossScalaVersions in ThisBuild := List("2.12.8", "2.11.12")
+version in ThisBuild := "2.3.6-SNAPSHOT"
+scalaVersion in ThisBuild := "2.13.0"
+crossScalaVersions in ThisBuild := List("2.13.0", "2.12.8", "2.11.12")
 scalacOptions in ThisBuild ++= Seq("-unchecked", "-deprecation")
 
 publishTo in ThisBuild := sonatypePublishTo.value
@@ -23,11 +24,11 @@ developers in ThisBuild := List(
   Developer(id="darkfrog", name="Matt Hicks", email="matt@matthicks.", url=url("http://matthicks.com"))
 )
 
-val circeVersion = "0.11.1"
-val circeYamlVersion = "0.9.0"
-val shoconVersion = "0.4.1"
-val scalaXMLVersion = "1.1.1"
-val scalatestVersion = "3.0.5"
+val circeVersion = "0.12.0-M3"
+val circeYamlVersion = "0.11.0-M1"
+val circeTime = "0.2.0"
+val scalaXMLVersion = "1.2.0"
+val scalatestVersion = "3.1.0-SNAP13"
 
 lazy val root = project.in(file("."))
   .aggregate(irPatch, macrosJS, macrosJVM, coreJS, coreJVM, inputJS, inputJVM)
@@ -55,7 +56,6 @@ lazy val macros = crossProject(JSPlatform, JVMPlatform)
       "io.circe" %%% "circe-generic-extras"
     ).map(_ % circeVersion),
     libraryDependencies ++= Seq(
-      "org.akka-js" %%% "shocon-parser" % shoconVersion,
       "org.scala-lang.modules" %%% "scala-xml" % scalaXMLVersion,
       "io.circe" %% "circe-jawn" % circeVersion,
       "io.circe" %% "circe-yaml" % circeYamlVersion,
@@ -63,6 +63,7 @@ lazy val macros = crossProject(JSPlatform, JVMPlatform)
     )
   )
   .jsSettings(
+    libraryDependencies += "io.circe" %%% "not-java-time" % circeTime,
     manipulateBytecode in Compile := {    // Allows access to Json parsing at compile-time (for use with Macros)
       val result = (manipulateBytecode in Compile).value
 
