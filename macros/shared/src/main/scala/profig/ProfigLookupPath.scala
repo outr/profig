@@ -116,6 +116,7 @@ object ProfigLookupPath {
             } else {
               properties.put(key.trim, value.trim)
             }
+            case _ => // Not supported
           }
         }
       }

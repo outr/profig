@@ -2,7 +2,7 @@ import sbtcrossproject.CrossPlugin.autoImport.crossProject
 import sbtcrossproject.CrossType
 
 organization in ThisBuild := "com.outr"
-version in ThisBuild := "2.3.6"
+version in ThisBuild := "2.3.7-SNAPSHOT"
 scalaVersion in ThisBuild := "2.13.0"
 crossScalaVersions in ThisBuild := List("2.13.0", "2.12.8", "2.11.12")
 scalacOptions in ThisBuild ++= Seq("-unchecked", "-deprecation")
@@ -24,8 +24,8 @@ developers in ThisBuild := List(
   Developer(id="darkfrog", name="Matt Hicks", email="matt@matthicks.", url=url("http://matthicks.com"))
 )
 
-val circeVersion = "0.12.0-M3"
-val circeYamlVersion = "0.11.0-M1"
+val circeVersion = "0.12.2"
+val circeYamlVersion = "0.12.0"
 val circeTime = "0.2.0"
 val scalaXMLVersion = "1.2.0"
 val scalatestVersion = "3.1.0-SNAP13"
