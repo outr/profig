@@ -41,7 +41,6 @@ class ProfigSpec extends AnyWordSpec with Matchers {
     "load JVM information from properties" in {
       val info = Profig("java").as[JVMInfo]
       info.specification.vendor should be("Oracle Corporation")
-      info.specification.version should be("1.8")
     }
     "store a single String" in {
       Profig("people", "me", "name").store("Matt")
