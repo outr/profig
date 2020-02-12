@@ -71,7 +71,7 @@ object Macros {
                      (implicit t: c.WeakTypeTag[T]): c.Expr[String] = {
     import c.universe._
 
-    c.Expr[String](q"profig.JsonUtil.toJson[$t]($value).pretty(io.circe.Printer.noSpaces)")
+    c.Expr[String](q"profig.JsonUtil.toJson[$t]($value).printWith(io.circe.Printer.noSpaces)")
   }
 
   def toJson[T](c: blackbox.Context)

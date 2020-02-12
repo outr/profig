@@ -12,6 +12,9 @@ import scala.collection.JavaConverters._
 case class ProfigLookupPath(path: String, `type`: FileType, load: LoadType)
 
 object ProfigLookupPath {
+  lazy val baseDirectoryOverride: Option[String] = sys.props.get("baseDirectory")
+  lazy val baseDirectory: File = new File(baseDirectoryOverride.getOrElse("."))
+
   var extensions: Map[String, FileType] = Map(
     "json" -> FileType.Json,
     "properties" -> FileType.Properties,
@@ -45,7 +48,7 @@ object ProfigLookupPath {
   } else {
     val entry = entries.head
     val classLoaderStrings = getClass.getClassLoader.getResources(entry.path).asScala.toList.map(fromURL)
-    val fileStrings = fromFile(new File(entry.path)).toList
+    val fileStrings = fromFile(new File(baseDirectory, entry.path)).toList
     val strings = classLoaderStrings.flatten ::: fileStrings
     val list = strings.map(entry -> _)
     list ::: toStrings(entries.tail)

@@ -5,7 +5,7 @@ organization in ThisBuild := "com.outr"
 version in ThisBuild := "2.3.8-SNAPSHOT"
 scalaVersion in ThisBuild := "2.13.1"
 crossScalaVersions in ThisBuild := List("2.13.1", "2.12.10", "2.11.12")
-scalacOptions in ThisBuild ++= Seq("-unchecked", "-deprecation")
+scalacOptions in ThisBuild ++= Seq("-unchecked", "-deprecation", "-feature")
 
 publishTo in ThisBuild := sonatypePublishTo.value
 publishConfiguration in ThisBuild := publishConfiguration.value.withOverwrite(true)
