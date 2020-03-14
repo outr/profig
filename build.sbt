@@ -2,9 +2,9 @@ import sbtcrossproject.CrossPlugin.autoImport.crossProject
 import sbtcrossproject.CrossType
 
 organization in ThisBuild := "com.outr"
-version in ThisBuild := "2.3.8-SNAPSHOT"
+version in ThisBuild := "2.3.8"
 scalaVersion in ThisBuild := "2.13.1"
-crossScalaVersions in ThisBuild := List("2.13.1", "2.12.10", "2.11.12")
+crossScalaVersions in ThisBuild := List("2.13.1", "2.12.10")
 scalacOptions in ThisBuild ++= Seq("-unchecked", "-deprecation")
 
 publishTo in ThisBuild := sonatypePublishTo.value
