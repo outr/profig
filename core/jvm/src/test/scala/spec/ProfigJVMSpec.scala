@@ -4,10 +4,11 @@ import java.io.File
 
 import io.circe.Decoder.Result
 import io.circe._
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import profig.Profig
 
-class ProfigJVMSpec extends WordSpec with Matchers {
+class ProfigJVMSpec extends AnyWordSpec with Matchers {
   "Profig JVM" should {
     "merge a special type" in {
       import Special.fileDecoder        // For the as[File]
