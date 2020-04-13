@@ -11,4 +11,6 @@ object ProfigPlatform {
   val yamlConversion: Option[String => Json] = None
   def isJS: Boolean = true
   def isJVM: Boolean = false
+
+  def xmlString2Json(string: String): Json = Json.obj()
 }

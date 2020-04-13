@@ -2,9 +2,9 @@ import sbtcrossproject.CrossPlugin.autoImport.crossProject
 import sbtcrossproject.CrossType
 
 organization in ThisBuild := "com.outr"
-version in ThisBuild := "2.3.8-SNAPSHOT"
+version in ThisBuild := "2.3.8"
 scalaVersion in ThisBuild := "2.13.1"
-crossScalaVersions in ThisBuild := List("2.13.1", "2.12.10", "2.11.12")
+crossScalaVersions in ThisBuild := List("2.13.1", "2.12.10")
 scalacOptions in ThisBuild ++= Seq("-unchecked", "-deprecation", "-feature")
 
 publishTo in ThisBuild := sonatypePublishTo.value
@@ -26,9 +26,8 @@ developers in ThisBuild := List(
 
 val circeVersion = "0.13.0"
 val circeYamlVersion = "0.12.0"
-val circeTime = "0.2.0"
 val scalaXMLVersion = "2.0.0-M1"
-val scalatestVersion = "3.1.0-SNAP13"
+val scalatestVersion = "3.2.0-M3"
 
 lazy val root = project.in(file("."))
   .aggregate(irPatch, macrosJS, macrosJVM, coreJS, coreJVM, inputJS, inputJVM)
@@ -63,7 +62,6 @@ lazy val macros = crossProject(JSPlatform, JVMPlatform)
     )
   )
   .jsSettings(
-    libraryDependencies += "io.circe" %%% "not-java-time" % circeTime,
     manipulateBytecode in Compile := {    // Allows access to Json parsing at compile-time (for use with Macros)
       val result = (manipulateBytecode in Compile).value
 
