@@ -2,9 +2,9 @@ import sbtcrossproject.CrossPlugin.autoImport.crossProject
 import sbtcrossproject.CrossType
 
 organization in ThisBuild := "com.outr"
-version in ThisBuild := "2.3.8"
-scalaVersion in ThisBuild := "2.13.1"
-crossScalaVersions in ThisBuild := List("2.13.1", "2.12.10")
+version in ThisBuild := "3.0.0-SNAPSHOT"
+scalaVersion in ThisBuild := "2.13.3"
+crossScalaVersions in ThisBuild := List("2.13.3", "2.12.12")
 scalacOptions in ThisBuild ++= Seq("-unchecked", "-deprecation", "-feature")
 
 publishTo in ThisBuild := sonatypePublishTo.value
@@ -25,23 +25,24 @@ developers in ThisBuild := List(
 )
 
 val circeVersion = "0.13.0"
-val circeYamlVersion = "0.12.0"
+val circeYamlVersion = "0.13.1"
+val collectionCompat = "2.1.6"
 val scalaXMLVersion = "2.0.0-M1"
 val scalatestVersion = "3.2.0-M3"
 
 lazy val root = project.in(file("."))
-  .aggregate(irPatch, macrosJS, macrosJVM, coreJS, coreJVM, inputJS, inputJVM)
+  .aggregate(macrosJS, macrosJVM, coreJS, coreJVM, inputJS, inputJVM)
   .settings(
     name := "profig",
     publish := {},
     publishLocal := {}
   )
 
-lazy val irPatch = project.in(file("irpatch"))
-  .enablePlugins(ScalaJSPlugin)
-  .settings(
-    libraryDependencies += "io.circe" %%% "circe-parser" % circeVersion
-  )
+//lazy val irPatch = project.in(file("irpatch"))
+//  .enablePlugins(ScalaJSPlugin)
+//  .settings(
+//    libraryDependencies += "io.circe" %%% "circe-parser" % circeVersion
+//  )
 
 lazy val macros = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Full)
@@ -55,14 +56,15 @@ lazy val macros = crossProject(JSPlatform, JVMPlatform)
       "io.circe" %%% "circe-generic-extras"
     ).map(_ % circeVersion),
     libraryDependencies ++= Seq(
-      "org.scala-lang.modules" %%% "scala-xml" % scalaXMLVersion,
+//      "org.scala-lang.modules" %%% "scala-xml" % scalaXMLVersion,
       "io.circe" %% "circe-jawn" % circeVersion,
-      "io.circe" %% "circe-yaml" % circeYamlVersion,
+//      "io.circe" %% "circe-yaml" % circeYamlVersion,
+      "org.scala-lang.modules" %%% "scala-collection-compat" % collectionCompat,
       "org.scala-lang" % "scala-reflect" % scalaVersion.value
     )
   )
   .jsSettings(
-    manipulateBytecode in Compile := {    // Allows access to Json parsing at compile-time (for use with Macros)
+    /*manipulateBytecode in Compile := {    // Allows access to Json parsing at compile-time (for use with Macros)
       val result = (manipulateBytecode in Compile).value
 
       val classDir = (classDirectory in Compile).value
@@ -78,7 +80,7 @@ lazy val macros = crossProject(JSPlatform, JVMPlatform)
       irPatchesDirs.foreach(recursiveCopy(_, classDir))
 
       result
-    }
+    }*/
   )
 
 lazy val macrosJS = macros.js
@@ -89,7 +91,7 @@ lazy val core = crossProject(JSPlatform, JVMPlatform)
   .in(file("core"))
   .dependsOn(macros % "compile->compile;test->test")
   .settings(
-    name := "profig",
+    name := "profig-core",
     libraryDependencies ++= Seq(
       "org.scalatest" %%% "scalatest" % scalatestVersion % "test"
     )
@@ -97,6 +99,17 @@ lazy val core = crossProject(JSPlatform, JVMPlatform)
 
 lazy val coreJS = core.js
 lazy val coreJVM = core.jvm
+
+lazy val main = crossProject(JSPlatform, JVMPlatform)
+  .crossType(CrossType.Full)
+  .in(file("main"))
+  .dependsOn(core)
+  .settings(
+    name := "profig",
+    libraryDependencies ++= Seq(
+      "org.scalatest" %%% "scalatest" % scalatestVersion % "test"
+    )
+  )
 
 lazy val input = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Full)

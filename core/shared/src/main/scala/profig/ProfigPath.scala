@@ -109,16 +109,6 @@ trait ProfigPath {
   def defaults(args: Seq[String]): Unit = combine(args, defaults = true)
 
   /**
-    * Merges a string of content from the specified type.
-    */
-  def merge(string: String, `type`: FileType): Unit = combine(string, `type`, defaults = false)
-
-  /**
-    * Loads defaults for a string of the specified type.
-    */
-  def defaults(string: String, `type`: FileType): Unit = combine(string, `type`, defaults = true)
-
-  /**
     * Merges a Json object to this path.
     */
   def merge(json: Json): Unit = combine(json, defaults = false)
@@ -137,14 +127,6 @@ trait ProfigPath {
     * Loads defaults from this Properties object at this path.
     */
   def defaults(properties: Properties): Unit = combine(properties, defaults = true)
-
-  /**
-    * Combines a string of content auto-detected to JSON.
-    */
-  def combine(string: String, `type`: FileType, defaults: Boolean): Unit = {
-    val json = ProfigLookupPath.toJson(string, `type`)
-    combine(json, defaults)
-  }
 
   /**
     * Combines a sequence of args at this path.
