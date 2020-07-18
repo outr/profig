@@ -1,9 +1,8 @@
 package profig
 
-import java.util.Properties
-
 import io.circe._
 
+import scala.annotation.tailrec
 import scala.language.experimental.macros
 
 /**
@@ -63,6 +62,7 @@ trait ProfigPath {
     * @return Option[Json]
     */
   def get(): Option[Json] = {
+    @tailrec
     def find(path: List[String], cursor: ACursor): Option[Json] = if (path.tail.isEmpty) {
       cursor.get[Json](path.head) match {
         case Left(_) => None
@@ -99,16 +99,6 @@ trait ProfigPath {
   def exists(): Boolean = get().nonEmpty
 
   /**
-    * Merges a sequence of args. This is primarily useful for merging command-line arguments.
-    */
-  def merge(args: Seq[String]): Unit = combine(args, defaults = false)
-
-  /**
-    * Loads defaults for a sequence of args. This is primarily useful for loading command-line arguments.
-    */
-  def defaults(args: Seq[String]): Unit = combine(args, defaults = true)
-
-  /**
     * Merges a Json object to this path.
     */
   def merge(json: Json): Unit = combine(json, defaults = false)
@@ -117,31 +107,6 @@ trait ProfigPath {
     * Loads defaults from this Json object at this path.
     */
   def defaults(json: Json): Unit = combine(json, defaults = true)
-
-  /**
-    * Merges a Properties object to this path.
-    */
-  def merge(properties: Properties): Unit = combine(properties, defaults = false)
-
-  /**
-    * Loads defaults from this Properties object at this path.
-    */
-  def defaults(properties: Properties): Unit = combine(properties, defaults = true)
-
-  /**
-    * Combines a sequence of args at this path.
-    */
-  def combine(args: Seq[String], defaults: Boolean): Unit = {
-    val json = ProfigUtil.args2Json(args)
-    combine(json, defaults)
-  }
-
-  /**
-    * Combines a properties object at this path.
-    */
-  def combine(properties: Properties, defaults: Boolean): Unit = {
-    combine(ProfigUtil.properties2Json(properties), defaults)
-  }
 
   /**
     * Combines a Json instance at this path.
@@ -170,6 +135,7 @@ trait ProfigPath {
     */
   def remove(field: String): Unit = synchronized {
     if (path.nonEmpty) {
+      @tailrec
       def recurse(path: List[String], cursor: ACursor): Json = if (path.isEmpty) {
         cursor.downField(field).delete.top.get
       } else {

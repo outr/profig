@@ -30,6 +30,9 @@ val collectionCompat = "2.1.6"
 val scalaXMLVersion = "2.0.0-M1"
 val scalatestVersion = "3.2.0-M3"
 
+// Used for HOCON support
+val typesafeConfig = "1.4.0"
+
 lazy val root = project.in(file("."))
   .aggregate(macrosJS, macrosJVM, coreJS, coreJVM, inputJS, inputJVM)
   .settings(
@@ -56,9 +59,9 @@ lazy val macros = crossProject(JSPlatform, JVMPlatform)
       "io.circe" %%% "circe-generic-extras"
     ).map(_ % circeVersion),
     libraryDependencies ++= Seq(
-//      "org.scala-lang.modules" %%% "scala-xml" % scalaXMLVersion,
+      "org.scala-lang.modules" %%% "scala-xml" % scalaXMLVersion,
       "io.circe" %% "circe-jawn" % circeVersion,
-//      "io.circe" %% "circe-yaml" % circeYamlVersion,
+      "io.circe" %% "circe-yaml" % circeYamlVersion,
       "org.scala-lang.modules" %%% "scala-collection-compat" % collectionCompat,
       "org.scala-lang" % "scala-reflect" % scalaVersion.value
     )
@@ -91,25 +94,19 @@ lazy val core = crossProject(JSPlatform, JVMPlatform)
   .in(file("core"))
   .dependsOn(macros % "compile->compile;test->test")
   .settings(
-    name := "profig-core",
-    libraryDependencies ++= Seq(
-      "org.scalatest" %%% "scalatest" % scalatestVersion % "test"
-    )
-  )
-
-lazy val coreJS = core.js
-lazy val coreJVM = core.jvm
-
-lazy val main = crossProject(JSPlatform, JVMPlatform)
-  .crossType(CrossType.Full)
-  .in(file("main"))
-  .dependsOn(core)
-  .settings(
     name := "profig",
     libraryDependencies ++= Seq(
       "org.scalatest" %%% "scalatest" % scalatestVersion % "test"
     )
   )
+  .jvmSettings(
+    libraryDependencies ++= Seq(
+      "com.typesafe" % "config" % typesafeConfig
+    )
+  )
+
+lazy val coreJS = core.js
+lazy val coreJVM = core.jvm
 
 lazy val input = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Full)

@@ -3,7 +3,7 @@ package spec
 import io.circe.Json
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import profig.Profig
+import profig._
 
 class ProfigSpec extends AnyWordSpec with Matchers {
   "Profig" should {
