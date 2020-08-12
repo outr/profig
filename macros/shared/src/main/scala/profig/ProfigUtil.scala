@@ -4,8 +4,7 @@ import java.util.Properties
 
 import io.circe._
 
-import scala.annotation.tailrec
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 /**
   * Primarily intended for internal use.

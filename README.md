@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/outr/profig.svg?branch=master)](https://travis-ci.org/outr/profig)
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/outr/profig)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.outr/profig_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.outr/profig_2.12)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.outr/profig_2.13/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.outr/profig_2.12)
 [![Latest version](https://index.scala-lang.org/outr/profig/profig/latest.svg)](https://index.scala-lang.org/outr/profig)
 
 Powerful configuration management for Scala (JSON, properties, command-line arguments, and environment variables)
@@ -10,12 +10,14 @@ Powerful configuration management for Scala (JSON, properties, command-line argu
 # Justification
 
 In any case where there are existing libraries that accomplish a task it is worthwhile to document the justification for
-creating yet another library. This is beneficial both for users to understand how it is differentiated as well as for
-the developers to clarify there is valid purpose in the endeavor.
+creating yet another library. This is beneficial both for users to understand how it is differentiated and for the
+developers to clarify if there is valid purpose in the endeavor.
 
 In the Scala configuration arena the most popular offering is that of Typesafe Config (https://github.com/typesafehub/config).
 While this is a powerful and useful library it is more complicated to work with and less flexible than we'd like. One of
-the very specific problems with it is the lack of support for Scala.js.
+the very specific problems with it is the lack of support for Scala.js, but the larger issue is the distinction that
+arises from considering configuration coming from files vs environment variables vs command-line arguments vs any other
+origin of configuration that any modern application may want to utilize.
 
 # Features
 
@@ -26,11 +28,11 @@ and overriding configuration in your application.
 
 # File Formats
 
-* JSON (automatically picked up from config.json, configuration.json, app.json, application.json, and defaults.json)
-* Properties (automatically picked up from config.properties, configuration.properties, app.properties, application.properties, and defaults.properties)
-* YAML (automatically picked up from config.yml, config.yaml, configuration.yml, configuration.yaml, app.yml, app.yaml, application.yml, application.yaml, defaults.yml, defaults.yaml)
-* HOCON (automatically picked up from config.hocon, configuration.hocon, app.hocon, application.hocon, and defaults.hocon)
-* XML (automatically picked up from config.xml, configuration.xml, app.xml, application.xml, and defaults.xml)
+* JSON (supported in `profig-core`)
+* Properties (support in `profig-core`)
+* YAML (supported in `profig-yaml`)
+* HOCON (supported in `profig-hocon`)
+* XML (supported in `profig-xml`)
 
 # Setup
 
@@ -39,8 +41,14 @@ and overriding configuration in your application.
 Profig is published to Sonatype OSS and synchronized to Maven Central supporting JVM and Scala.js on 2.11 and 2.12:
 
 ```
-libraryDependencies += "com.outr" %% "profig" % "2.3.0"   // Scala
-libraryDependencies += "com.outr" %%% "profig" % "2.3.0"  // Scala.js / Cross-Build
+libraryDependencies += "com.outr" %% "profig" % "3.0.0"   // Scala
+libraryDependencies += "com.outr" %%% "profig" % "3.0.0"  // Scala.js / Cross-Build
+```
+
+On the JVM, if you wish to get access to all file formats and extension features of Profig, you can utilize `profig-all`:
+
+```
+libraryDependencies += "com.outr" %% "profig-all" % "3.0.0"
 ```
 
 ## Getting Started
@@ -52,39 +60,39 @@ Whether you are using this in JVM or JS you need one import to access everything
 This brings some implicits on specific platforms (for example, loading URLs, Files, Sources, etc. in the JVM) but the
 only class you really need be concerned with is `Profig`.
 
+### Initializing
+
+As of version 3.0, you now need to initialize Profig in order to fully utilize it:
+
+`Profig.init()`
+
+This returns a `Future[Unit]` that makes the system fully available when it completes.
+
 ### Loading Command-Line arguments
 
 When your application starts it is reasonable to want to allow execution of the application to override existing
 configuration via the command-line. In order to effectively do this we can simply invoke `Profig.merge(args)` within our
 main method. This will merge all command-line arguments into Profig.
 
+Note that the signature of `merge` is `def merge(json: Json, ``type``: MergeType = MergeType.Overwrite): Unit`. If you
+set the type to `MergeType.Add`, existing configuration will not be overwritten. This is useful for default configuration
+loading.
+
 ### Loading Files
 
 Profig supports many configuration formats and can look in the classpath as well as the filesystem to find configuration
-to load. To load a file simply call:
+to load. Of course, this is only supported on the JVM, but to load a file simply call:
 
-`Profig.load(ProfigLookupPath("config.json", ConfigType.Json, LoadType.Merge))`
+`Profig.loadFile(new File("config.json"))`
 
-This will look for `config.json` on the classpath and filesystem, load it as JSON (if found), and merge it into the configuration.
+This will look for `config.json` on the filesystem, load it as JSON, and merge it into the configuration. The signature
+of `loadFile` is: `Profig.loadFile(file: File, mergeType: MergeType = MergeType.Overwrite, errorHandler: Option[Throwable => Unit] = None)`
 
 However, if your application doesn't need very explicit files to be loaded you can load defaults instead:
 
-`Profig.loadDefaults()`
+`Profig.loadConfiguration()`
 
 This will look for any standardized configuration file in the classpath and filesystem and load it into the system.
-
-Finally, if you want to look for variations on a name:
-
-`Profig.load(ProfigLookupPath.paths(mergePaths = List("config")): _*)`
-
-This will look for all variations of `config` in all known file extensions (`json`, `properties`, `yml`, `config`, etc.)
-
-### Merge or Defaults
-
-When loading configuration into Profig, you'll notice two styles of loading: "merge" and "defaults". The difference between
-these two has to do with overwriting existing configuration. In the case of "merge", any duplicate values will be overwritten
-by the new configuration. In the case of "defaults", only new information is integrated, so any existing values are left
-alone.
 
 ### Accessing values
 
@@ -128,67 +136,10 @@ Profig.merge(MyConfig(path = "/another/path"))
 If you would prefer to merge in an object without overwriting existing values you can use `defaults` instead of `merge`:
 
 ```scala
-Profig.defaults(MyConfig(path = "/another/path"))
+Profig.merge(MyConfig(path = "/another/path"), MergeType.Add)
 ```
 
 ### Next steps
 
 This only scratches the surface of the features and functionality Profig provides. For additional information read the
 ScalaDocs and the specs: https://github.com/outr/profig/blob/master/core/shared/src/test/scala/spec/ProfigSpec.scala
-
-# Roadmap
-
-## 2.3.0 (Released 05.09.2018)
-
-* [X] Better naming conventions internally
-* [X] Fix namespace collisions with common names like `Configuration`
-* [X] Better support for custom encoder / decoder via companion object auto import
-
-## 2.2.0 (Released 03.12.2018)
-
-* [X] Better README documentation
-* [X] HOCON support (integrate https://github.com/akka-js/shocon)
-* [X] XML support
-* [X] Resolve explicit work-arounds for use in Macros
-
-## 2.1.0 (Released 03.08.2018)
-
-* [X] Override loading support
-    * [X] Modify paths to auto-load
-    * [X] Allow disabling of loading environment variables
-* [X] Yaml support (use circe-yaml)
-
-## 2.0.0 (Released 01.26.2018)
-
-* [X] Auto-init support
-* [X] Support child `Profig` instances with hierarchical structure
-* [X] Remove field / path support
-* [X] Refactor `Config` to be named `Profig` better disambiguation
-
-## 1.1.0 (Released 08.03.2017)
-
-* [X] Compile-time integration of configuration into Scala.js projects
-* [X] Usability of Config within Macros at compile-time in Scala and Scala.js
-
-## 1.0.0 (Released 07.04.2017)
-
-* [X] Merge support
-    * [X] Defaults support (only apply if value doesn't already exist)
-* [X] Load command-line arguments
-* [X] Load environment variables
-* [X] Load properties
-* [X] Loading case classes
-* [X] Storing case classes
-* [X] Trait for application startup (JVM and Scala.js)
-* [X] Loading
-    * [X] JSON
-        * [X] Directly
-        * [X] From Disk (JVM-only)
-        * [X] From ClassLoader
-    * [X] Properties
-        * [X] Directly
-        * [X] From Disk (JVM-only)
-        * [X] From ClassLoader
-    * [X] Automatic lookup of default locations
-* [X] Document classes
-* [X] Document README

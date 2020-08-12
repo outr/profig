@@ -1,9 +1,8 @@
 package profig
 
-import java.util.Properties
-
 import io.circe._
 
+import scala.annotation.tailrec
 import scala.language.experimental.macros
 
 /**
@@ -63,6 +62,7 @@ trait ProfigPath {
     * @return Option[Json]
     */
   def get(): Option[Json] = {
+    @tailrec
     def find(path: List[String], cursor: ACursor): Option[Json] = if (path.tail.isEmpty) {
       cursor.get[Json](path.head) match {
         case Left(_) => None
@@ -99,84 +99,19 @@ trait ProfigPath {
   def exists(): Boolean = get().nonEmpty
 
   /**
-    * Merges a sequence of args. This is primarily useful for merging command-line arguments.
-    */
-  def merge(args: Seq[String]): Unit = combine(args, defaults = false)
-
-  /**
-    * Loads defaults for a sequence of args. This is primarily useful for loading command-line arguments.
-    */
-  def defaults(args: Seq[String]): Unit = combine(args, defaults = true)
-
-  /**
-    * Merges a string of content from the specified type.
-    */
-  def merge(string: String, `type`: FileType): Unit = combine(string, `type`, defaults = false)
-
-  /**
-    * Loads defaults for a string of the specified type.
-    */
-  def defaults(string: String, `type`: FileType): Unit = combine(string, `type`, defaults = true)
-
-  /**
     * Merges a Json object to this path.
     */
-  def merge(json: Json): Unit = combine(json, defaults = false)
-
-  /**
-    * Loads defaults from this Json object at this path.
-    */
-  def defaults(json: Json): Unit = combine(json, defaults = true)
-
-  /**
-    * Merges a Properties object to this path.
-    */
-  def merge(properties: Properties): Unit = combine(properties, defaults = false)
-
-  /**
-    * Loads defaults from this Properties object at this path.
-    */
-  def defaults(properties: Properties): Unit = combine(properties, defaults = true)
-
-  /**
-    * Combines a string of content auto-detected to JSON.
-    */
-  def combine(string: String, `type`: FileType, defaults: Boolean): Unit = {
-    val json = ProfigLookupPath.toJson(string, `type`)
-    combine(json, defaults)
-  }
-
-  /**
-    * Combines a sequence of args at this path.
-    */
-  def combine(args: Seq[String], defaults: Boolean): Unit = {
-    val json = ProfigUtil.args2Json(args)
-    combine(json, defaults)
-  }
-
-  /**
-    * Combines a properties object at this path.
-    */
-  def combine(properties: Properties, defaults: Boolean): Unit = {
-    combine(ProfigUtil.properties2Json(properties), defaults)
-  }
-
-  /**
-    * Combines a Json instance at this path.
-    */
-  def combine(json: Json, defaults: Boolean): Unit = synchronized {
+  def merge(json: Json, `type`: MergeType = MergeType.Overwrite): Unit = synchronized {
     if (path.nonEmpty) {
       val updated = ProfigUtil.createJson(path.mkString("."), json)
-      if (defaults) {
-        instance.modify(updated.deepMerge)
-      } else {
-        instance.modify(_.deepMerge(updated))
+      `type` match {
+        case MergeType.Overwrite => instance.modify(_.deepMerge(updated))
+        case MergeType.Add => instance.modify(updated.deepMerge)
       }
     } else {
-      if (defaults) {
-        instance.modify(json.deepMerge)
-      } else {
-        instance.modify(_.deepMerge(json))
+      `type` match {
+        case MergeType.Overwrite => instance.modify(_.deepMerge(json))
+        case MergeType.Add => instance.modify(json.deepMerge)
       }
     }
   }
@@ -188,6 +123,7 @@ trait ProfigPath {
     */
   def remove(field: String): Unit = synchronized {
     if (path.nonEmpty) {
+      @tailrec
       def recurse(path: List[String], cursor: ACursor): Json = if (path.isEmpty) {
         cursor.downField(field).delete.top.get
       } else {

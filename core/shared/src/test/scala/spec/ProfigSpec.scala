@@ -2,27 +2,22 @@ package spec
 
 import io.circe.Json
 import org.scalatest.matchers.should.Matchers
-import org.scalatest.wordspec.AnyWordSpec
-import profig.{FileType, Profig}
+import org.scalatest.wordspec.AsyncWordSpec
+import profig._
 
-class ProfigSpec extends AnyWordSpec with Matchers {
+class ProfigSpec extends AsyncWordSpec with Matchers {
   "Profig" should {
+    "init" in {
+      Profig.init().map(_ => succeed)
+    }
     "verify classloading not set" in {
       Profig("test.classloading").opt[String] should be(None)
     }
     "verify files not set" in {
       Profig("test.files").opt[String] should be(None)
     }
-    "load configuration files" in {
-      Profig.loadDefaults()
-    }
-    "verify classloading" in {
-      Profig("test.classloading").opt[String] should be(Some("yes"))
-    }
-    "verify files" in {
-      Profig("test.files").opt[String] should be(Some("yes"))
-    }
     "verify `opt` usage" in {
+      Profig("test.files").store("yes")
       Profig("test.files").opt[String] should be(Some("yes"))
     }
     "verify `as` with default" in {
@@ -31,12 +26,10 @@ class ProfigSpec extends AnyWordSpec with Matchers {
     }
     "merge arguments" in {
       Profig.merge(List("-this.is.an.argument", "Wahoo!"))
+      succeed
     }
     "load a String argument" in {
       Profig("this.is.an.argument").as[String] should be("Wahoo!")
-    }
-    "load JSON arguments" in {
-      Profig.merge("{ \"this.is.another.argument\" : \"Hola!\" }", FileType.Json)
     }
     "load JVM information from properties" in {
       val info = Profig("java").as[JVMInfo]
@@ -44,6 +37,7 @@ class ProfigSpec extends AnyWordSpec with Matchers {
     }
     "store a single String" in {
       Profig("people", "me", "name").store("Matt")
+      succeed
     }
     "load a case class from a path with default arguments" in {
       val person = Profig("people.me").as[Person]
@@ -51,6 +45,7 @@ class ProfigSpec extends AnyWordSpec with Matchers {
     }
     "storage a case class" in {
       Profig("people", "john").store(Person("John Doe", 123))
+      succeed
     }
     "load the stored case class from path" in {
       val person = Profig("people")("john").as[Person]
@@ -61,6 +56,7 @@ class ProfigSpec extends AnyWordSpec with Matchers {
       value should be(None)
     }
     "verify that test.value was loaded" in {
+      Profig("test.value").store(true)
       val value = Profig("test.value").opt[Boolean]
       value should be(Some(true))
     }
@@ -94,18 +90,6 @@ class ProfigSpec extends AnyWordSpec with Matchers {
     "see no spill-over in orphaned Profig" in {
       val orphan = Profig(None)
       orphan("people.john.age").opt[Int] should be(None)
-    }
-    "verify YAML support works" in {
-      Profig("test.yaml").opt[String] should be(Some("yes"))
-    }
-//    "verify HOCON support works" in {
-//      Profig("test.hocon").opt[String] should be(Some("yes"))
-//    }
-    "verify XML support works" in {
-      // TODO: re-enable support for JS XML
-      if (profig.ProfigPlatform.isJVM) {
-        Profig("test.xml").opt[String] should be(Some("yes"))
-      }
     }
     "compile-time Json parsing" in {
       val parsed = MacroTest.format("""{"name": "John Doe", "age": 1234}""")

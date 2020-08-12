@@ -2,7 +2,8 @@ package profig
 
 import io.circe.Json
 
-import scala.collection.JavaConverters._
+import scala.concurrent.{ExecutionContext, Future}
+import scala.jdk.CollectionConverters._
 import scala.language.experimental.macros
 
 class Profig(val parent: Option[Profig] = Some(Profig)) extends ProfigPath {
@@ -31,39 +32,17 @@ class Profig(val parent: Option[Profig] = Some(Profig)) extends ProfigPath {
   override def instance: Profig = this
   override def path: List[String] = Nil
 
-  def loadDefaults(): Unit = macro Macros.loadDefaults
-
-  /**
-    * Works like loadDefaults, but intended for use within Macros
-    */
-  def loadDefaultsMacro(): Unit = macro Macros.loadDefaultsMacro
-
-  def load(entries: ProfigLookupPath*): Unit = macro Macros.load
-
-  /**
-    * Works like load, but intended for use within Macros
-    */
-  def loadMacro(entries: ProfigLookupPath*): Unit = macro Macros.loadJVM
-
-  def loadEnvironmentVariables(asDefault: Boolean = true): Unit = {
+  def loadEnvironmentVariables(`type`: MergeType = MergeType.Add): Unit = {
     val envMap = System.getenv().asScala.toMap
     val envConverted = ProfigUtil.map2Json(envMap.map {
       case (key, value) => key.toLowerCase.replace('_', '.') -> value
     })
-    if (asDefault) {
-      defaults(envConverted)
-    } else {
-      merge(envConverted)
-    }
+    merge(envConverted, `type`)
   }
 
-  def loadProperties(asDefault: Boolean = true): Unit = {
+  def loadProperties(`type`: MergeType = MergeType.Add): Unit = {
     val props = ProfigUtil.properties2Json(System.getProperties)
-    if (asDefault) {
-      defaults(props)
-    } else {
-      merge(props)
-    }
+    merge(props, `type`)
   }
 
   def child(): Profig = new Profig(Some(this))
@@ -85,8 +64,35 @@ class Profig(val parent: Option[Profig] = Some(Profig)) extends ProfigPath {
   * powerful system. Uses JSON internally to provide merging and integration. Paths are dot-separated.
   */
 object Profig extends Profig(None) {
-  loadProperties()
-  loadEnvironmentVariables()
+  private var loaded = false
+
+  def isLoaded: Boolean = loaded
 
   def apply(parent: Option[Profig]): Profig = new Profig(parent)
+
+  /**
+    * Initializes Profig
+    *
+    * @param loadProperties whether to load system properties
+    * @param loadEnvironmentVariables whether to load environment variables
+    * @param loadModules whether to load external modules (ex. XML, Hocon, YAML support)
+    * @param ec the execution context to run this in
+    */
+  def init(loadProperties: Boolean = true,
+           loadEnvironmentVariables: Boolean = true,
+           loadModules: Boolean = true)
+          (implicit ec: ExecutionContext): Future[Unit] = synchronized {
+    if (loaded) {
+      Future.successful(())
+    } else {
+      loaded = true
+      if (loadProperties) {
+        this.loadProperties()
+      }
+      if (loadEnvironmentVariables) {
+        this.loadEnvironmentVariables()
+      }
+      initProfig(loadModules)
+    }
+  }
 }
