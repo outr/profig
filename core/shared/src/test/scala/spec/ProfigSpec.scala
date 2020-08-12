@@ -2,11 +2,14 @@ package spec
 
 import io.circe.Json
 import org.scalatest.matchers.should.Matchers
-import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.wordspec.AsyncWordSpec
 import profig._
 
-class ProfigSpec extends AnyWordSpec with Matchers {
+class ProfigSpec extends AsyncWordSpec with Matchers {
   "Profig" should {
+    "init" in {
+      Profig.init().map(_ => succeed)
+    }
     "verify classloading not set" in {
       Profig("test.classloading").opt[String] should be(None)
     }
@@ -23,6 +26,7 @@ class ProfigSpec extends AnyWordSpec with Matchers {
     }
     "merge arguments" in {
       Profig.merge(List("-this.is.an.argument", "Wahoo!"))
+      succeed
     }
     "load a String argument" in {
       Profig("this.is.an.argument").as[String] should be("Wahoo!")
@@ -33,6 +37,7 @@ class ProfigSpec extends AnyWordSpec with Matchers {
     }
     "store a single String" in {
       Profig("people", "me", "name").store("Matt")
+      succeed
     }
     "load a case class from a path with default arguments" in {
       val person = Profig("people.me").as[Person]
@@ -40,6 +45,7 @@ class ProfigSpec extends AnyWordSpec with Matchers {
     }
     "storage a case class" in {
       Profig("people", "john").store(Person("John Doe", 123))
+      succeed
     }
     "load the stored case class from path" in {
       val person = Profig("people")("john").as[Person]

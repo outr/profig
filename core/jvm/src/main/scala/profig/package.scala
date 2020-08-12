@@ -1,14 +1,18 @@
 import java.io.File
 import java.net.URL
-import java.util.Properties
+import java.nio.file.{Path, Paths}
 
-import com.typesafe.config.ConfigFactory
 import io.circe.Json
+import moduload.Moduload
 
+import scala.annotation.tailrec
+import scala.concurrent.{ExecutionContext, Future}
 import scala.io.Source
 import scala.language.implicitConversions
+import scala.jdk.CollectionConverters._
 
 package object profig extends SharedJSONConversions {
+  implicit def path2JSON(path: Path): Json = file2JSON(path.toFile)
   implicit def file2JSON(file: File): Json = source2Json(Source.fromFile(file), Some(file.getName))
   implicit def url2JSON(url: URL): Json = source2Json(Source.fromURL(url), Some(url.getFile))
   implicit def source2JSON(source: Source): Json = source2Json(source, None)
@@ -23,97 +27,118 @@ package object profig extends SharedJSONConversions {
       }
     }
     val s = source2String(source)
-    extension match {
-      case Some("json") => string2Json(s)
-      case Some("prop") => propertiesString2Json(s)
-      case Some("properties") => propertiesString2Json(s)
-      case Some("xml") => xmlString2Json(s)
-      case Some("yml") => yamlString2Json(s)
-      case Some("yaml") => yamlString2Json(s)
-      case _ => hocon2JSON(s)
-    }
-  }
-
-  private def hocon2JSON(s: String): Json = {
-    val conf = ConfigFactory.parseString(s).resolve()
-    val jsonString = conf.root().render()
-    string2Json(jsonString)
-  }
-
-  private val EqualsProperty = """(.+?)=(.+)""".r
-  private val ColonProperty = """(.+?)[:](.+)""".r
-
-  def propertiesString2Json(string: String): Json = {
-    val properties = new Properties
-    var continuing: Option[(String, String)] = None
-    string.split('\n').filter(_.nonEmpty).foreach {
-      case line if line.startsWith("#") || line.startsWith("!") =>   // Ignore
-      case line => {
-        continuing match {
-          case Some((key, value)) => if (line.endsWith("\\")) {       // Continued key/value pair
-            continuing = Some(key -> s"$value\n${line.substring(0, line.length - 1).trim}")
-          } else {
-            properties.put(key, s"$value\n${line.trim}")
-          }
-          case None => line match {                                  // New key/value pair
-            case EqualsProperty(key, value) => if (value.endsWith("\\")) {
-              continuing = Some(key.trim, value.substring(0, value.length - 1).trim)
-            } else {
-              properties.put(key.trim, value.trim)
-            }
-            case ColonProperty(key, value) => if (value.endsWith("\\")) {
-              continuing = Some(key.trim, value.substring(0, value.length - 1).trim)
-            } else {
-              properties.put(key.trim, value.trim)
-            }
-            case _ => // Not supported
-          }
-        }
-      }
-    }
-    ProfigUtil.properties2Json(properties)
-  }
-
-  def xmlString2Json(string: String): Json = {
-    import scala.xml._
-
-    def toJson(node: Node): Option[Json] = node match {
-      case elem: Elem => {
-        val attributes: List[(String, Json)] = elem.attributes.map(md => toJson(md.value.head).map(md.key -> _)).toList.flatten
-        val children = elem.child.toList.collect {
-          case child: Elem => toJson(child).map(child.label -> _)
-        }.flatten
-        val text = elem.text.trim
-        if (attributes.isEmpty && children.isEmpty) {
-          if (text.isEmpty) {
-            None
-          } else {
-            Some(Json.fromString(text))
-          }
-        } else {
-          Some(Json.obj(attributes ::: children: _*))
-        }
-      }
-      case _ => None
-    }
-
-    val root = XML.loadString(string)
-    Json.obj(root.label -> toJson(root).getOrElse(Json.Null))
-  }
-
-  private def yamlString2Json(string: String): Json = io.circe.yaml.parser.parse(string) match {
-    case Left(failure) => throw new RuntimeException(s"Unable to parse $string (YAML) to JSON.", failure)
-    case Right(value) => value
+    ProfigJson(s, `extension`)
   }
 
   private def source2String(source: Source): String = try {
-    source.mkString("\n")
+    source.mkString
   } finally {
     source.close()
   }
 
-  private def string2Json(s: String): Json = io.circe.parser.parse(s) match {
-    case Left(pf) => throw pf
-    case Right(json) => json
+  def initProfig(loadModules: Boolean)(implicit ec: ExecutionContext): Future[Unit] = {
+    if (loadModules) {
+      Moduload.load()
+    } else {
+      Future.successful(())
+    }
+  }
+
+  implicit class ProfigPathJVM(val profigPath: ProfigPath) extends AnyVal {
+    def loadConfiguration(startPath: Path = Paths.get("."),
+                          additionalPaths: List[Path] = Nil,
+                          recursiveParents: Boolean = true,
+                          includeClassPath: Boolean = true,
+                          fileNameMatcher: FileNameMatcher = FileNameMatcher.Default,
+                          errorHandler: Option[Throwable => Unit] = None): Unit = {
+      assert(Profig.isLoaded, "loadConfiguration cannot be executed without first initializing Profig (Profig.init())")
+
+      var files = List.empty[(String, Source, MergeType)]
+
+      @tailrec
+      def explorePath(directory: File, recursive: Boolean): Unit = {
+        files = files ::: directory.listFiles().toList.filter(_.isFile).flatMap { f =>
+          val fileName = f.getName.toLowerCase
+          val dot = fileName.indexOf('.')
+          val (prefix, extension) = if (dot == -1) {
+            (fileName, "")
+          } else {
+            (fileName.substring(0, dot), fileName.substring(dot + 1))
+          }
+          fileNameMatcher.matches(prefix, extension).map(t => (f.getName, Source.fromFile(f), t))
+        }
+        if (recursive) {
+          Option(directory.getParentFile) match {
+            case None => // Finished
+            case Some(parent) => explorePath(parent, recursive)
+          }
+        }
+      }
+
+      def tryLoad(fileName: String, source: Source, mergeType: MergeType): Unit = try {
+        val json = source2Json(source, Some(fileName))
+        profigPath.merge(json, mergeType)
+      } catch {
+        case t: Throwable => errorHandler.foreach { eh =>
+          eh(new RuntimeException(s"Failed to process: $fileName", t))
+        }
+      }
+
+      // Files
+      explorePath(startPath.toFile, recursiveParents)
+      additionalPaths.foreach(p => explorePath(p.toFile, recursive = false))
+
+      // ClassLoader
+      if (includeClassPath) {
+        val classLoader = getClass().getClassLoader
+        files = FileNameMatcher.OverwritePrefixes.toList.flatMap { prefix =>
+          FileNameMatcher.DefaultExtensions.toList.flatMap { extension =>
+            classLoader.getResources(s"$prefix.$extension").asScala.map { url =>
+              val fileName = Paths.get(url.toURI.getPath).getFileName.toString
+              (fileName, Source.fromURL(url), MergeType.Overwrite)
+            }
+          }
+        } ::: files
+        files = FileNameMatcher.AddPrefixes.toList.flatMap { prefix =>
+          FileNameMatcher.DefaultExtensions.toList.flatMap { extension =>
+            classLoader.getResources(s"$prefix.$extension").asScala.map { url =>
+              val fileName = Paths.get(url.toURI.getPath).getFileName.toString
+              (fileName, Source.fromURL(url), MergeType.Add)
+            }
+          }
+        } ::: files
+      }
+
+      // Process files
+      files.foreach {
+        case (fileName, source, mergeType) => tryLoad(fileName, source, mergeType)
+      }
+    }
+  }
+
+  trait FileNameMatcher {
+    def matches(prefix: String, extension: String): Option[MergeType]
+  }
+
+  object FileNameMatcher {
+    var OverwritePrefixes: Set[String] = Set("config", "configuration", "app", "application")
+    var AddPrefixes: Set[String] = Set("default", "defaults")
+    var DefaultExtensions: Set[String] = Set("json", "properties", "conf", "config")
+
+    case object Default extends FileNameMatcher {
+      override def matches(prefix: String, extension: String): Option[MergeType] = {
+        if (DefaultExtensions.contains(extension)) {
+          if (OverwritePrefixes.contains(prefix)) {
+            Some(MergeType.Overwrite)
+          } else if (AddPrefixes.contains(prefix)) {
+            Some(MergeType.Add)
+          } else {
+            None
+          }
+        } else {
+          None
+        }
+      }
+    }
   }
 }

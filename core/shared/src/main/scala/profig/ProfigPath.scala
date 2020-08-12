@@ -101,29 +101,17 @@ trait ProfigPath {
   /**
     * Merges a Json object to this path.
     */
-  def merge(json: Json): Unit = combine(json, defaults = false)
-
-  /**
-    * Loads defaults from this Json object at this path.
-    */
-  def defaults(json: Json): Unit = combine(json, defaults = true)
-
-  /**
-    * Combines a Json instance at this path.
-    */
-  def combine(json: Json, defaults: Boolean): Unit = synchronized {
+  def merge(json: Json, `type`: MergeType = MergeType.Overwrite): Unit = synchronized {
     if (path.nonEmpty) {
       val updated = ProfigUtil.createJson(path.mkString("."), json)
-      if (defaults) {
-        instance.modify(updated.deepMerge)
-      } else {
-        instance.modify(_.deepMerge(updated))
+      `type` match {
+        case MergeType.Overwrite => instance.modify(_.deepMerge(updated))
+        case MergeType.Add => instance.modify(updated.deepMerge)
       }
     } else {
-      if (defaults) {
-        instance.modify(json.deepMerge)
-      } else {
-        instance.modify(_.deepMerge(json))
+      `type` match {
+        case MergeType.Overwrite => instance.modify(_.deepMerge(json))
+        case MergeType.Add => instance.modify(json.deepMerge)
       }
     }
   }

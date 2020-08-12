@@ -21,12 +21,14 @@ scmInfo in ThisBuild := Some(
   )
 )
 developers in ThisBuild := List(
-  Developer(id="darkfrog", name="Matt Hicks", email="matt@matthicks.", url=url("http://matthicks.com"))
+  Developer(id="darkfrog", name="Matt Hicks", email="matt@matthicks.com", url=url("http://matthicks.com"))
 )
 
+val moduload = "1.0.0"
 val circeVersion = "0.13.0"
 val circeYamlVersion = "0.13.1"
 val collectionCompat = "2.1.6"
+val reactify = "4.0.0"
 val scalaXMLVersion = "2.0.0-M1"
 val scalatestVersion = "3.2.0-M3"
 
@@ -34,7 +36,7 @@ val scalatestVersion = "3.2.0-M3"
 val typesafeConfig = "1.4.0"
 
 lazy val root = project.in(file("."))
-  .aggregate(macrosJS, macrosJVM, coreJS, coreJVM, inputJS, inputJVM)
+  .aggregate(macrosJS, macrosJVM, coreJS, coreJVM, xml, hocon, yaml, inputJS, inputJVM, live, all)
   .settings(
     name := "profig",
     publish := {},
@@ -59,9 +61,7 @@ lazy val macros = crossProject(JSPlatform, JVMPlatform)
       "io.circe" %%% "circe-generic-extras"
     ).map(_ % circeVersion),
     libraryDependencies ++= Seq(
-      "org.scala-lang.modules" %%% "scala-xml" % scalaXMLVersion,
       "io.circe" %% "circe-jawn" % circeVersion,
-      "io.circe" %% "circe-yaml" % circeYamlVersion,
       "org.scala-lang.modules" %%% "scala-collection-compat" % collectionCompat,
       "org.scala-lang" % "scala-reflect" % scalaVersion.value
     )
@@ -101,12 +101,36 @@ lazy val core = crossProject(JSPlatform, JVMPlatform)
   )
   .jvmSettings(
     libraryDependencies ++= Seq(
-      "com.typesafe" % "config" % typesafeConfig
+      "com.outr" %% "moduload" % moduload
     )
   )
 
 lazy val coreJS = core.js
 lazy val coreJVM = core.jvm
+
+lazy val xml = project
+  .in(file("xml"))
+  .settings(
+    name := "profig-xml",
+    libraryDependencies += "org.scala-lang.modules" %%% "scala-xml" % scalaXMLVersion
+  )
+  .dependsOn(core.jvm)
+
+lazy val hocon = project
+  .in(file("hocon"))
+  .settings(
+    name := "profig-hocon",
+    libraryDependencies += "com.typesafe" % "config" % typesafeConfig
+  )
+  .dependsOn(core.jvm)
+
+lazy val yaml = project
+  .in(file("yaml"))
+  .settings(
+    name := "profig-yaml",
+    libraryDependencies += "io.circe" %% "circe-yaml" % circeYamlVersion
+  )
+  .dependsOn(core.jvm)
 
 lazy val input = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Full)
@@ -122,3 +146,24 @@ lazy val input = crossProject(JSPlatform, JVMPlatform)
 
 lazy val inputJS = input.js
 lazy val inputJVM = input.jvm
+
+lazy val live = project
+  .in(file("live"))
+  .dependsOn(coreJVM)
+  .settings(
+    name := "profig-live",
+    libraryDependencies ++= Seq(
+      "com.outr" %% "reactify" % reactify,
+      "org.scalatest" %% "scalatest" % scalatestVersion % "test"
+    )
+  )
+
+lazy val all = project
+  .in(file("all"))
+  .settings(
+    name := "profig-all",
+    libraryDependencies ++= Seq(
+      "org.scalatest" %%% "scalatest" % scalatestVersion % "test"
+    )
+  )
+  .dependsOn(coreJVM, xml, hocon, yaml, inputJVM)
