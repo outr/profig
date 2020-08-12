@@ -45,6 +45,24 @@ package object profig extends SharedJSONConversions {
   }
 
   implicit class ProfigPathJVM(val profigPath: ProfigPath) extends AnyVal {
+    def loadFile(file: File,
+                 mergeType: MergeType = MergeType.Overwrite,
+                 errorHandler: Option[Throwable => Unit] = None): Unit = {
+      load(file.getName, Source.fromFile(file), mergeType, errorHandler)
+    }
+
+    def load(fileName: String,
+             source: Source,
+             mergeType: MergeType = MergeType.Overwrite,
+             errorHandler: Option[Throwable => Unit] = None): Unit = try {
+      val json = source2Json(source, Some(fileName))
+      profigPath.merge(json, mergeType)
+    } catch {
+      case t: Throwable => errorHandler.foreach { eh =>
+        eh(new RuntimeException(s"Failed to process: $fileName", t))
+      }
+    }
+
     def loadConfiguration(startPath: Path = Paths.get("."),
                           additionalPaths: List[Path] = Nil,
                           recursiveParents: Boolean = true,
@@ -75,15 +93,6 @@ package object profig extends SharedJSONConversions {
         }
       }
 
-      def tryLoad(fileName: String, source: Source, mergeType: MergeType): Unit = try {
-        val json = source2Json(source, Some(fileName))
-        profigPath.merge(json, mergeType)
-      } catch {
-        case t: Throwable => errorHandler.foreach { eh =>
-          eh(new RuntimeException(s"Failed to process: $fileName", t))
-        }
-      }
-
       // Files
       explorePath(startPath.toFile, recursiveParents)
       additionalPaths.foreach(p => explorePath(p.toFile, recursive = false))
@@ -111,7 +120,7 @@ package object profig extends SharedJSONConversions {
 
       // Process files
       files.foreach {
-        case (fileName, source, mergeType) => tryLoad(fileName, source, mergeType)
+        case (fileName, source, mergeType) => load(fileName, source, mergeType, errorHandler)
       }
     }
   }

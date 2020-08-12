@@ -1,7 +1,5 @@
 package profig
 
-import java.util.concurrent.atomic.AtomicBoolean
-
 import io.circe.Json
 
 import scala.concurrent.{ExecutionContext, Future}
