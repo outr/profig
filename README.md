@@ -68,6 +68,12 @@ As of version 3.0, you now need to initialize Profig in order to fully utilize i
 
 This returns a `Future[Unit]` that makes the system fully available when it completes.
 
+Note: an implicit `ExecutionContext` is necessary for init to complete. Under most circumstances you can just use:
+
+`import scala.concurrent.ExecutionContext.Implicits.global`
+
+Or: `import scribe.Execution.global` if you're using Scribe (https://github.com/outr/scribe)
+
 ### Loading Command-Line arguments
 
 When your application starts it is reasonable to want to allow execution of the application to override existing
@@ -83,7 +89,7 @@ loading.
 Profig supports many configuration formats and can look in the classpath as well as the filesystem to find configuration
 to load. Of course, this is only supported on the JVM, but to load a file simply call:
 
-`Profig.loadFile(new File("config.json"))`
+`Profig.loadFile(new java.io.File("config.json"))`
 
 This will look for `config.json` on the filesystem, load it as JSON, and merge it into the configuration. The signature
 of `loadFile` is: `Profig.loadFile(file: File, mergeType: MergeType = MergeType.Overwrite, errorHandler: Option[Throwable => Unit] = None)`
