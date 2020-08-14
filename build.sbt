@@ -2,7 +2,7 @@ import sbtcrossproject.CrossPlugin.autoImport.crossProject
 import sbtcrossproject.CrossType
 
 organization in ThisBuild := "com.outr"
-version in ThisBuild := "3.0.1"
+version in ThisBuild := "3.0.2"
 scalaVersion in ThisBuild := "2.13.3"
 crossScalaVersions in ThisBuild := List("2.13.3", "2.12.12")
 scalacOptions in ThisBuild ++= Seq("-unchecked", "-deprecation", "-feature")
@@ -24,7 +24,7 @@ developers in ThisBuild := List(
   Developer(id="darkfrog", name="Matt Hicks", email="matt@matthicks.com", url=url("http://matthicks.com"))
 )
 
-val moduload = "1.0.0"
+val moduload = "1.0.1"
 val circeVersion = "0.13.0"
 val circeYamlVersion = "0.13.1"
 val collectionCompat = "2.1.6"
@@ -36,18 +36,18 @@ val scalatestVersion = "3.2.0-M3"
 val typesafeConfig = "1.4.0"
 
 lazy val root = project.in(file("."))
-  .aggregate(macrosJS, macrosJVM, coreJS, coreJVM, xml, hocon, yaml, inputJS, inputJVM, live, all)
+  .aggregate(irPatch, macrosJS, macrosJVM, coreJS, coreJVM, xml, hocon, yaml, inputJS, inputJVM, live, all)
   .settings(
     name := "profig",
     publish := {},
     publishLocal := {}
   )
 
-//lazy val irPatch = project.in(file("irpatch"))
-//  .enablePlugins(ScalaJSPlugin)
-//  .settings(
-//    libraryDependencies += "io.circe" %%% "circe-parser" % circeVersion
-//  )
+lazy val irPatch = project.in(file("irpatch"))
+  .enablePlugins(ScalaJSPlugin)
+  .settings(
+    libraryDependencies += "io.circe" %%% "circe-parser" % circeVersion
+  )
 
 lazy val macros = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Full)
@@ -67,7 +67,7 @@ lazy val macros = crossProject(JSPlatform, JVMPlatform)
     )
   )
   .jsSettings(
-    /*manipulateBytecode in Compile := {    // Allows access to Json parsing at compile-time (for use with Macros)
+    manipulateBytecode in Compile := {    // Allows access to Json parsing at compile-time (for use with Macros)
       val result = (manipulateBytecode in Compile).value
 
       val classDir = (classDirectory in Compile).value
@@ -83,7 +83,7 @@ lazy val macros = crossProject(JSPlatform, JVMPlatform)
       irPatchesDirs.foreach(recursiveCopy(_, classDir))
 
       result
-    }*/
+    }
   )
 
 lazy val macrosJS = macros.js
