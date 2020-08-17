@@ -68,6 +68,8 @@ object Profig extends Profig(None) {
 
   def isLoaded: Boolean = loaded
 
+  def empty: Profig = new Profig(None)
+
   def apply(parent: Option[Profig]): Profig = new Profig(parent)
 
   /**

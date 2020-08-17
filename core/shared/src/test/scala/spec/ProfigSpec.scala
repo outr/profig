@@ -102,6 +102,30 @@ class ProfigSpec extends AsyncWordSpec with Matchers {
       Profig("test.boolean").merge(Json.fromString("true"))
       Profig("test.boolean").as[Boolean] should be(true)
     }
+    "validate overwrite" in {
+      val profig = Profig.empty
+      profig.json should be(Json.obj())
+      profig.merge(Json.obj(
+        "test" -> Json.fromString("one")
+      ), MergeType.Overwrite)
+      profig.json should be(Json.obj("test" -> Json.fromString("one")))
+      profig.merge(Json.obj(
+        "test" -> Json.fromString("two")
+      ), MergeType.Overwrite)
+      profig.json should be(Json.obj("test" -> Json.fromString("two")))
+    }
+    "validate add" in {
+      val profig = Profig.empty
+      profig.json should be(Json.obj())
+      profig.merge(Json.obj(
+        "test" -> Json.fromString("one")
+      ), MergeType.Add)
+      profig.json should be(Json.obj("test" -> Json.fromString("one")))
+      profig.merge(Json.obj(
+        "test" -> Json.fromString("two")
+      ), MergeType.Add)
+      profig.json should be(Json.obj("test" -> Json.fromString("one")))
+    }
   }
 
   case class Person(name: String, age: Int = 21)
