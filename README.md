@@ -100,6 +100,10 @@ However, if your application doesn't need very explicit files to be loaded you c
 
 This will look for any standardized configuration file in the classpath and filesystem and load it into the system.
 
+You can also use `Profig.initConfiguration()` to initialize and load configuration in a single call.
+
+Finally, you can use `Profig.initConfigurationBlocking()` if you want initialization and loading to block before continuing with your application.
+
 ### Accessing values
 
 As stated above, system properties and environment variables are automatically loaded into the configuration. So if we
