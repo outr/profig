@@ -41,14 +41,14 @@ and overriding configuration in your application.
 Profig is published to Sonatype OSS and synchronized to Maven Central supporting JVM and Scala.js on 2.11 and 2.12:
 
 ```
-libraryDependencies += "com.outr" %% "profig" % "3.0.3"   // Scala
-libraryDependencies += "com.outr" %%% "profig" % "3.0.3"  // Scala.js / Cross-Build
+libraryDependencies += "com.outr" %% "profig" % "3.0.4"   // Scala
+libraryDependencies += "com.outr" %%% "profig" % "3.0.4"  // Scala.js / Cross-Build
 ```
 
 On the JVM, if you wish to get access to all file formats and extension features of Profig, you can utilize `profig-all`:
 
 ```
-libraryDependencies += "com.outr" %% "profig-all" % "3.0.3"
+libraryDependencies += "com.outr" %% "profig-all" % "3.0.4"
 ```
 
 ## Getting Started
