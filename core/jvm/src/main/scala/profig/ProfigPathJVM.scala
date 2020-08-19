@@ -20,7 +20,6 @@ class ProfigPathJVM(val profigPath: ProfigPath) extends AnyVal {
            source: Source,
            mergeType: MergeType = MergeType.Overwrite,
            errorHandler: Option[Throwable => Unit] = None): Unit = try {
-    println(s"Loading config: $fileName:${mergeType} ($source)...")
     val json = source2Json(source, Some(fileName))
     profigPath.merge(json, mergeType)
   } catch {
@@ -91,8 +90,8 @@ class ProfigPathJVM(val profigPath: ProfigPath) extends AnyVal {
       val classLoader = getClass().getClassLoader
       files = FileNameMatcher.OverwritePrefixes.toList.flatMap { prefix =>
         FileNameMatcher.DefaultExtensions.toList.flatMap { extension =>
-          classLoader.getResources(s"$prefix.$extension").asScala.map { url =>
-            val fileName = Paths.get(url.toURI.getPath).getFileName.toString
+          val fileName = s"$prefix.$extension"
+          classLoader.getResources(fileName).asScala.map { url =>
             (fileName, Source.fromURL(url), MergeType.Overwrite)
           }
         }
