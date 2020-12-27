@@ -4,13 +4,8 @@ import io.circe.Json
 import moduload.Moduload
 import io.circe.yaml.parser._
 
-import scala.concurrent.{ExecutionContext, Future}
-
 object ProfigYaml extends Moduload with ProfigJson {
-  override def load()(implicit ec: ExecutionContext): Future[Unit] = {
-    ProfigJson.register(this, "yaml", "yml")
-    Future.successful(())
-  }
+  override def load(): Unit = ProfigJson.register(this, "yaml", "yml")
 
   override def error(t: Throwable): Unit = throw t
 

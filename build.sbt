@@ -11,7 +11,7 @@ val compatScalaVersions = List(scala213, scala212)
 
 organization in ThisBuild := "com.outr"
 version in ThisBuild := "3.0.4-SNAPSHOT"
-scalaVersion in ThisBuild := scala213
+scalaVersion in ThisBuild := scala3
 scalacOptions in ThisBuild ++= Seq("-unchecked", "-deprecation", "-feature")
 
 publishTo in ThisBuild := sonatypePublishTo.value
@@ -31,7 +31,7 @@ developers in ThisBuild := List(
   Developer(id="darkfrog", name="Matt Hicks", email="matt@matthicks.com", url=url("http://matthicks.com"))
 )
 
-val moduload = "1.0.4"
+val moduload = "1.1.0"
 val circeVersion = "0.14.0-M2"
 val circeGenericExtrasVersion = "0.13.0"
 val circeYamlVersion = "0.13.1"

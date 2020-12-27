@@ -36,11 +36,9 @@ trait ProfigJVMSupport extends SharedJSONConversions {
     source.close()
   }
 
-  def initProfig(loadModules: Boolean)(implicit ec: ExecutionContext): Future[Unit] = {
+  def initProfig(loadModules: Boolean)(implicit ec: ExecutionContext): Future[Unit] = Future {
     if (loadModules) {
       Moduload.load()
-    } else {
-      Future.successful(())
     }
   }
 

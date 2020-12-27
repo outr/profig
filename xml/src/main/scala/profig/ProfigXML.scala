@@ -4,13 +4,8 @@ import io.circe.Json
 import scala.xml._
 import moduload.Moduload
 
-import scala.concurrent.{ExecutionContext, Future}
-
 object ProfigXML extends Moduload with ProfigJson {
-  override def load()(implicit ec: ExecutionContext): Future[Unit] = {
-    ProfigJson.register(this, "xml")
-    Future.successful(())
-  }
+  override def load(): Unit = ProfigJson.register(this, "xml")
 
   override def error(t: Throwable): Unit = throw t
 
