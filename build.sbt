@@ -33,6 +33,7 @@ developers in ThisBuild := List(
 
 val moduload = "1.0.4"
 val circeVersion = "0.14.0-M2"
+val circeGenericExtrasVersion = "0.13.0"
 val circeYamlVersion = "0.13.1"
 val collectionCompat = "2.3.2"
 val reactify = "4.0.3"
@@ -66,9 +67,9 @@ lazy val macros = crossProject(JSPlatform, JVMPlatform)
       "io.circe" %%% "circe-core",
       "io.circe" %%% "circe-generic",
       "io.circe" %%% "circe-parser",
-//      "io.circe" %%% "circe-generic-extras"
     ).map(_ % circeVersion),
     libraryDependencies ++= Seq(
+      "io.circe" %%% "circe-generic-extras" % circeGenericExtrasVersion,
       "io.circe" %% "circe-jawn" % circeVersion,
       "org.scala-lang.modules" %%% "scala-collection-compat" % collectionCompat,
       "org.scala-lang" % "scala-reflect" % scalaVersion.value
