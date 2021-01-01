@@ -2,8 +2,6 @@ package profig
 
 import java.util.Properties
 
-import io.circe.Json
-
 import scala.language.implicitConversions
 
 trait SharedJSONConversions {

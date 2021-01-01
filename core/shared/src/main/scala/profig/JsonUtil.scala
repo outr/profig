@@ -1,20 +1,11 @@
 package profig
 
-import io.circe.{Decoder, Encoder, Json, Printer}
-
-import scala.language.experimental.macros
+import upickle.default._
 
 object JsonUtil {
-  def fromJson[T](json: Json)(implicit decoder: Decoder[T]): T = decoder.decodeJson(json) match {
-    case Left(failure) => throw failure
-    case Right(t) => t
-  }
-  def toJson[T](value: T)(implicit encoder: Encoder[T]): Json = encoder(value)
+  def fromJson[T: Reader](json: Json): T = json.as[T]
+  def toJson[T: Writer](value: T): Json = Json(value)
 
-  def fromJsonString[T](jsonString: String)(implicit decoder: Decoder[T]): T = JsonParser.parse(jsonString) match {
-    case Left(failure) => throw failure
-    case Right(json) => fromJson[T](json)
-  }
-  def toJsonString[T](value: T, printer: Printer = Printer.noSpaces)
-                     (implicit encoder: Encoder[T]): String = toJson[T](value).printWith(printer)
+  def fromJsonString[T: Reader](jsonString: String): T = fromJson[T](Json(jsonString))
+  def toJsonString[T: Writer](value: T): String = toJson[T](value).toString
 }

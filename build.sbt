@@ -31,10 +31,8 @@ developers in ThisBuild := List(
   Developer(id="darkfrog", name="Matt Hicks", email="matt@matthicks.com", url=url("http://matthicks.com"))
 )
 
+val uPickle = "1.2.2"
 val moduload = "1.1.0"
-val circeVersion = "0.14.0-M2"
-val circeGenericExtrasVersion = "0.13.0"
-//val circeYamlVersion = "0.13.1"
 val collectionCompat = "2.3.2"
 val reactify = "4.0.3"
 val scalaXMLVersion = "2.0.0-M3"
@@ -44,72 +42,27 @@ val scalatestVersion = "3.2.3"
 val typesafeConfig = "1.4.1"
 
 lazy val root = project.in(file("."))
-  .aggregate(irPatch, coreJS, coreJVM, xml, hocon, yaml, inputJS, inputJVM, live, all)
+  .aggregate(playground, coreJS, coreJVM) //, xml, hocon, yaml, inputJS, inputJVM, live, all)
   .settings(
     name := "profig",
     publish := {},
     publishLocal := {}
   )
 
-lazy val irPatch = project.in(file("irpatch"))
-  .enablePlugins(ScalaJSPlugin)
-  .settings(
-    libraryDependencies += "io.circe" %%% "circe-parser" % circeVersion,
-    crossScalaVersions := allScalaVersions
+lazy val playground = project.in(file("test")).settings(
+  libraryDependencies ++= Seq(
+    "com.lihaoyi" %%% "upickle" % uPickle,
+    "org.scala-lang.modules" %%% "scala-collection-compat" % collectionCompat
   )
-
-/*lazy val macros = crossProject(JSPlatform, JVMPlatform)
-  .crossType(CrossType.Full)
-  .in(file("macros"))
-  .settings(
-    name := "profig-macros",
-    libraryDependencies ++= Seq(
-      "io.circe" %%% "circe-core",
-      "io.circe" %%% "circe-generic",
-      "io.circe" %%% "circe-parser",
-    ).map(_ % circeVersion),
-    libraryDependencies ++= Seq(
-      "io.circe" %% "circe-jawn" % circeVersion,
-      "org.scala-lang.modules" %%% "scala-collection-compat" % collectionCompat
-    ),
-    crossScalaVersions in ThisBuild := allScalaVersions
-  )
-  .jsSettings(
-    manipulateBytecode in Compile := {    // Allows access to Json parsing at compile-time (for use with Macros)
-      val result = (manipulateBytecode in Compile).value
-
-      val classDir = (classDirectory in Compile).value
-      val irPatchesDirs = (products in (irPatch, Compile)).value
-
-      def recursiveCopy(file: File, dir: File): Unit = if (file.isFile && file.getName.endsWith(".sjsir")) {
-        dir.mkdirs()
-        val output = dir / file.getName
-        IO.copyFile(file, output)
-      } else if (file.isDirectory) {
-        file.listFiles().foreach(recursiveCopy(_, dir / file.getName))
-      }
-      irPatchesDirs.foreach(recursiveCopy(_, classDir))
-
-      result
-    }
-  )
-
-lazy val macrosJS = macros.js
-lazy val macrosJVM = macros.jvm*/
+)
 
 lazy val core = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Full)
   .in(file("core"))
-//  .dependsOn(macros % "compile->compile;test->test")
   .settings(
     name := "profig",
     libraryDependencies ++= Seq(
-      "io.circe" %%% "circe-core",
-      "io.circe" %%% "circe-generic",
-      "io.circe" %%% "circe-parser",
-    ).map(_ % circeVersion),
-    libraryDependencies ++= Seq(
-      "io.circe" %% "circe-jawn" % circeVersion,
+      "com.lihaoyi" %%% "upickle" % uPickle,
       "org.scala-lang.modules" %%% "scala-collection-compat" % collectionCompat
     ),
     crossScalaVersions := allScalaVersions
@@ -134,6 +87,7 @@ lazy val core = crossProject(JSPlatform, JVMPlatform)
 lazy val coreJS = core.js
 lazy val coreJVM = core.jvm
 
+/*
 lazy val xml = project
   .in(file("xml"))
   .settings(
@@ -209,4 +163,4 @@ lazy val all = project
     ),
     crossScalaVersions := allScalaVersions
   )
-  .dependsOn(coreJVM, xml, hocon, yaml, inputJVM)
+  .dependsOn(coreJVM, xml, hocon, yaml, inputJVM)*/

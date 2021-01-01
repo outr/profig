@@ -4,7 +4,6 @@ import java.io.File
 import java.net.URL
 import java.nio.file.Path
 
-import io.circe.Json
 import moduload.Moduload
 
 import scala.concurrent.{ExecutionContext, Future}

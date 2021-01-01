@@ -2,20 +2,18 @@ package profig
 
 import java.util.Properties
 
-import io.circe.Json
-
 trait ProfigJson {
   def apply(content: String): Json
 }
 
 object ProfigJson {
-  var default: ProfigJson = Circe
+  var default: ProfigJson = Json
 
   private var map = Map.empty[String, ProfigJson]
 
   def types: Set[String] = map.keySet
 
-  register(Circe, "conf", "json", "config")
+  register(Json, "conf", "json", "config")
   register(Properties, "prop", "props", "properties")
 
   def apply(content: String, `type`: Option[String]): Json = {
@@ -30,11 +28,8 @@ object ProfigJson {
     }
   }
 
-  object Circe extends ProfigJson {
-    override def apply(content: String): Json = io.circe.parser.parse(content) match {
-      case Left(pf) => throw new RuntimeException(s"Failed to parse JSON from: $content", pf)
-      case Right(json) => json
-    }
+  object Json extends ProfigJson {
+    override def apply(content: String): Json = Json(content)
   }
 
   object Properties extends ProfigJson {

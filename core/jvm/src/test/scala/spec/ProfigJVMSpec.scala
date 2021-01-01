@@ -6,8 +6,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import profig.Profig
 
-import io.circe.generic.auto._
-import io.circe.syntax._
+import upickle.default._
 import Special._
 
 class ProfigJVMSpec extends AnyWordSpec with Matchers {

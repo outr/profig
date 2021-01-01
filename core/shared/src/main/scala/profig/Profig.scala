@@ -1,14 +1,13 @@
 package profig
 
-import io.circe.Json
-
+import scala.collection.mutable
 import scala.concurrent.{ExecutionContext, Future}
 import scala.jdk.CollectionConverters._
 import scala.language.experimental.macros
 
 class Profig(val parent: Option[Profig] = Some(Profig)) extends ProfigPath {
-  private var _local: Json = Json.obj()
-  private var _global: Json = _local
+  private var _local: Json = Json()
+  private var _global: Json = Json()
 
   private var _lastModified: Long = System.currentTimeMillis()
 
@@ -49,12 +48,17 @@ class Profig(val parent: Option[Profig] = Some(Profig)) extends ProfigPath {
 
   private def updateGlobal(): Unit = synchronized {
     parent match {
-      case Some(p) => _global = p.json.deepMerge(_local)
+      case Some(p) => {
+        val map = new mutable.LinkedHashMap[String, ujson.Value]
+        map ++= p.json.value.obj
+        map ++= _local.value.obj
+        _global = Json(new ujson.Obj(map))
+      }
       case None => _global = _local
     }
   }
 
-  override def remove(): Unit = modify(_ => Json.obj())
+  override def remove(): Unit = modify(_ => Json())
 
   def clear(): Unit = remove()
 }
