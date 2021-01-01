@@ -5,6 +5,9 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AsyncWordSpec
 import profig._
 
+import io.circe.generic.auto._
+import io.circe.syntax._
+
 class ProfigSpec extends AsyncWordSpec with Matchers {
   "Profig" should {
     "init" in {
@@ -41,15 +44,15 @@ class ProfigSpec extends AsyncWordSpec with Matchers {
     }
     "load a case class from a path with default arguments" in {
       val person = Profig("people.me").as[Person]
-      person should be(Person("Matt"))
+      person should be(Person("Matt", None))
     }
     "storage a case class" in {
-      Profig("people", "john").store(Person("John Doe", 123))
+      Profig("people", "john").store(Person("John Doe", Some(123)))
       succeed
     }
     "load the stored case class from path" in {
       val person = Profig("people")("john").as[Person]
-      person should be(Person("John Doe", 123))
+      person should be(Person("John Doe", Some(123)))
     }
     "load an optional value that is not there" in {
       val value = Profig("this.does.not.exist").opt[String]
@@ -91,13 +94,6 @@ class ProfigSpec extends AsyncWordSpec with Matchers {
       val orphan = Profig(None)
       orphan("people.john.age").opt[Int] should be(None)
     }
-    "compile-time Json parsing" in {
-      val parsed = MacroTest.format("""{"name": "John Doe", "age": 1234}""")
-      parsed should be("""{
-                         |  "name" : "John Doe",
-                         |  "age" : 1234
-                         |}""".stripMargin)
-    }
     "validate loading a String value of true as Boolean" in {
       Profig("test.boolean").merge(Json.fromString("true"))
       Profig("test.boolean").as[Boolean] should be(true)
@@ -128,7 +124,7 @@ class ProfigSpec extends AsyncWordSpec with Matchers {
     }
   }
 
-  case class Person(name: String, age: Int = 21)
+  case class Person(name: String, age: Option[Int])
 
   case class JVMInfo(version: String, specification: Specification)
 

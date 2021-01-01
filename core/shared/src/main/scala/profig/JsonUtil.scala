@@ -1,20 +1,20 @@
 package profig
 
-import io.circe.Json
+import io.circe.{Decoder, Encoder, Json, Printer}
 
 import scala.language.experimental.macros
 
 object JsonUtil {
-  def fromJson[T](json: Json): T = macro Macros.fromJson[T]
-  def toJson[T](value: T): Json = macro Macros.toJson[T]
+  def fromJson[T](json: Json)(implicit decoder: Decoder[T]): T = decoder.decodeJson(json) match {
+    case Left(failure) => throw failure
+    case Right(t) => t
+  }
+  def toJson[T](value: T)(implicit encoder: Encoder[T]): Json = encoder(value)
 
-  def fromJsonString[T](jsonString: String): T = macro Macros.fromJsonString[T]
-  def toJsonString[T](value: T): String = macro Macros.toJsonString[T]
-
-  def decoder[T]: io.circe.Decoder[T] = macro Macros.decoder[T]
-  def encoder[T]: io.circe.Encoder[T] = macro Macros.encoder[T]
-
-  // TODO: fix this
-  implicit def exportedDecoder[T]: io.circe.export.Exported[io.circe.Decoder[T]] = macro Macros.exportedDecoder[T]
-  implicit def exportedEncoder[T]: io.circe.export.Exported[io.circe.Encoder[T]] = macro Macros.exportedEncoder[T]
+  def fromJsonString[T](jsonString: String)(implicit decoder: Decoder[T]): T = JsonParser.parse(jsonString) match {
+    case Left(failure) => throw failure
+    case Right(json) => fromJson[T](json)
+  }
+  def toJsonString[T](value: T, printer: Printer = Printer.noSpaces)
+                     (implicit encoder: Encoder[T]): String = toJson[T](value).printWith(printer)
 }

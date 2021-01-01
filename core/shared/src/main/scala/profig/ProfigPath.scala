@@ -29,7 +29,7 @@ trait ProfigPath {
     * @tparam T the type to represent the current path
     * @return T
     */
-  def as[T]: T = macro Macros.as[T]
+  def as[T](implicit decoder: Decoder[T]): T = JsonUtil.fromJson[T](apply())
 
   /**
     * Loads this path out as the defined type `T`. If no value is set for this path, the default will be used.
@@ -38,7 +38,7 @@ trait ProfigPath {
     * @tparam T the type to represent the current path
     * @return T
     */
-  def as[T](default: => T): T = macro Macros.asWithDefault[T]
+  def as[T](default: => T)(implicit decoder: Decoder[T]): T = get().map(JsonUtil.fromJson[T]).getOrElse(default)
 
   /**
     * Convenience functionality similar to `as` but returns an option if set.
@@ -46,7 +46,7 @@ trait ProfigPath {
     * @tparam T the type to represent the current path
     * @return T
     */
-  def opt[T]: Option[T] = macro Macros.opt[T]
+  def opt[T](implicit decoder: Decoder[T]): Option[T] = get().map(JsonUtil.fromJson[T])
 
   /**
     * Stores the supplied value into this path.
@@ -54,7 +54,7 @@ trait ProfigPath {
     * @param value the value to store
     * @tparam T the type of value
     */
-  def store[T](value: T): Unit = macro Macros.store[T]
+  def store[T](value: T)(implicit encoder: Encoder[T]): Unit = merge(JsonUtil.toJson[T](value))
 
   /**
     * Returns a Json representation of this path if there is anything defined at this level.
