@@ -5,14 +5,20 @@ import upickle.default._
 
 object Testing {
   def main(args: Array[String]): Unit = {
-    @inline implicit def rw[T]: RW[T] = macroRW
+    implicit def rw: RW[Person] = macroRW
 
     val s =
       """{
         | "name": "Matt"
         |}""".stripMargin
 
-    println(read[Person](s))
+//    println(read[Person](s))
+    println(as[Person](s))
+  }
+
+  def as[T](s: String)(implicit reader: Reader[T] = null): T = {
+    println(s"Reader? ${reader}")
+    read[T](s)
   }
 }
 
