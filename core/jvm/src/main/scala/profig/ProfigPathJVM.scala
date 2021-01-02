@@ -28,27 +28,14 @@ class ProfigPathJVM(val profigPath: ProfigPath) extends AnyVal {
     }
   }
 
-  def initConfigurationBlocking(startPath: Path = Paths.get("."),
-                                additionalPaths: List[Path] = Nil,
-                                recursiveParents: Boolean = true,
-                                includeClassPath: Boolean = true,
-                                fileNameMatcher: FileNameMatcher = FileNameMatcher.Default,
-                                errorHandler: Option[Throwable => Unit] = None): Unit = {
-    import scala.concurrent.ExecutionContext.Implicits.global
-    val future = initConfiguration(startPath, additionalPaths, recursiveParents, includeClassPath, fileNameMatcher, errorHandler)
-    Await.result(future, Duration.Inf)
-  }
-
   def initConfiguration(startPath: Path = Paths.get("."),
                         additionalPaths: List[Path] = Nil,
                         recursiveParents: Boolean = true,
                         includeClassPath: Boolean = true,
                         fileNameMatcher: FileNameMatcher = FileNameMatcher.Default,
-                        errorHandler: Option[Throwable => Unit] = None)
-                       (implicit ec: ExecutionContext): Future[Unit] = {
-    Profig.init().map { _ =>
-      loadConfiguration(startPath, additionalPaths, recursiveParents, includeClassPath, fileNameMatcher, errorHandler)
-    }
+                        errorHandler: Option[Throwable => Unit] = None): Unit = {
+    Profig.init()
+    loadConfiguration(startPath, additionalPaths, recursiveParents, includeClassPath, fileNameMatcher, errorHandler)
   }
 
   def loadConfiguration(startPath: Path = Paths.get("."),

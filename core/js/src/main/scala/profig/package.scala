@@ -1,7 +1,7 @@
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 package object profig extends SharedJSONConversions {
-  def initProfig(loadModules: Boolean)(implicit ec: ExecutionContext): Future[Unit] = {
+  def initProfig(loadModules: Boolean): Unit = {
     Future.successful(())
   }
 }

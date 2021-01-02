@@ -1,17 +1,16 @@
 package spec
 
-import io.circe.Json
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AsyncWordSpec
 import profig._
 
-import io.circe.generic.auto._
-import io.circe.syntax._
+import upickle.default._
 
 class ProfigSpec extends AsyncWordSpec with Matchers {
   "Profig" should {
     "init" in {
-      Profig.init().map(_ => succeed)
+      Profig.init()
+      succeed
     }
     "verify classloading not set" in {
       Profig("test.classloading").opt[String] should be(None)
@@ -32,6 +31,7 @@ class ProfigSpec extends AsyncWordSpec with Matchers {
       succeed
     }
     "load a String argument" in {
+      println(Profig.get())
       Profig("this.is.an.argument").as[String] should be("Wahoo!")
     }
     "load JVM information from properties" in {
@@ -95,12 +95,12 @@ class ProfigSpec extends AsyncWordSpec with Matchers {
       orphan("people.john.age").opt[Int] should be(None)
     }
     "validate loading a String value of true as Boolean" in {
-      Profig("test.boolean").merge(Json.fromString("true"))
+      Profig("test.boolean").merge(Json.parse("true"))
       Profig("test.boolean").as[Boolean] should be(true)
     }
     "validate overwrite" in {
       val profig = Profig.empty
-      profig.json should be(Json.obj())
+      profig.json should be(Json())
       profig.merge(Json.obj(
         "test" -> Json.fromString("one")
       ), MergeType.Overwrite)
@@ -126,7 +126,19 @@ class ProfigSpec extends AsyncWordSpec with Matchers {
 
   case class Person(name: String, age: Option[Int])
 
+  object Person {
+    implicit def rw: ReadWriter[Person] = macroRW
+  }
+
   case class JVMInfo(version: String, specification: Specification)
 
+  object JVMInfo {
+    implicit def rw: ReadWriter[JVMInfo] = macroRW
+  }
+
   case class Specification(vendor: String, name: String, version: String)
+
+  object Specification {
+    implicit def rw: ReadWriter[Specification] = macroRW
+  }
 }

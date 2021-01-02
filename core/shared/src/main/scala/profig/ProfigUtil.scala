@@ -18,7 +18,9 @@ object ProfigUtil {
   def map2Json(map: Map[String, String]): Json = {
     val hashMap = new mutable.LinkedHashMap[String, ujson.Value]
     map.foreach {
-      case (key, value) => hashMap += key -> string2JSON(value).value
+      case (key, value) => {
+        hashMap += key -> Json.fromString(value).value
+      }
     }
     Json(new Obj(hashMap))
   }
@@ -44,7 +46,7 @@ object ProfigUtil {
     var named = Map.empty[String, ujson.Value]
     var flag = Option.empty[String]
     args.foreach {
-      case NamedKeyValue(key, value) => named += key -> string2JSON(value).value
+      case NamedKeyValue(key, value) => named += key -> Json.fromString(value).value
       case NamedFlag(key) => {
         flag.foreach { f =>
           named += f -> ujson.True
@@ -53,10 +55,10 @@ object ProfigUtil {
       }
       case arg => flag match {
         case Some(key) => {
-          named += key -> string2JSON(arg).value
+          named += key -> Json.fromString(arg).value
           flag = None
         }
-        case None => anonymous = string2JSON(arg).value :: anonymous
+        case None => anonymous = Json.fromString(arg).value :: anonymous
       }
     }
     anonymous = anonymous.reverse
@@ -65,7 +67,7 @@ object ProfigUtil {
       case (json, index) => s"arg${index + 1}" -> json
     }
     val argsList = List("args" -> ujson.Arr(anonymous: _*))
-    val allArgsList = List("allArgs" -> ujson.Arr(args.map(string2JSON).map(_.value): _*))
+    val allArgsList = List("allArgs" -> ujson.Arr(args.map(Json.fromString).map(_.value): _*))
 
     val map = new mutable.LinkedHashMap[String, ujson.Value]
     (argsNamed ::: argsList ::: allArgsList ::: named.toList).foreach {
@@ -73,11 +75,6 @@ object ProfigUtil {
     }
     Json(new Obj(map))
   }
-
-  /**
-    * Converts a String based on its value into a Json object.
-    */
-  def string2JSON(s: String): Json = Json(read[ujson.Value](s))
 
   /**
     * Creates a Json representation breaking `name` for dot-separation.

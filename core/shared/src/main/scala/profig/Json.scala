@@ -31,6 +31,7 @@ class Json private(val value: ujson.Value) extends AnyVal {
   }
   def set[T: Writer](value: T, path: String*): Unit = {
     val o = obj(path.dropRight(1): _*)
+    println(s"Setting $value, Object? $o")
     o.value.obj += path.last -> Json(value).value
   }
   def merge[T: Writer](value: T, path: String*): Unit = {
@@ -72,6 +73,15 @@ object Json {
   def apply(value: ujson.Value): Json = new Json(value)
   def apply[T: Writer](value: T): Json = apply(writeJs(value))
   def apply(): Json = apply(ujson.Obj())
+  def obj(tuples: (String, Json)*): Json = {
+    val obj = ujson.Obj()
+    tuples.foreach {
+      case (key, json) => obj.value += key -> json.value
+    }
+    apply(obj)
+  }
+
+  def fromString(s: String): Json = Json(ujson.Str(s))
 
   def parse(json: String): Json = apply(read[ujson.Value](json))
 }

@@ -6,7 +6,6 @@ import java.nio.file.Path
 
 import moduload.Moduload
 
-import scala.concurrent.{ExecutionContext, Future}
 import scala.io.Source
 import scala.language.implicitConversions
 
@@ -35,7 +34,7 @@ trait ProfigJVMSupport extends SharedJSONConversions {
     source.close()
   }
 
-  def initProfig(loadModules: Boolean)(implicit ec: ExecutionContext): Future[Unit] = Future {
+  def initProfig(loadModules: Boolean): Unit = {
     if (loadModules) {
       Moduload.load()
     }

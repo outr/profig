@@ -86,11 +86,8 @@ object Profig extends Profig(None) {
     */
   def init(loadProperties: Boolean = true,
            loadEnvironmentVariables: Boolean = true,
-           loadModules: Boolean = true)
-          (implicit ec: ExecutionContext): Future[Unit] = synchronized {
-    if (loaded) {
-      Future.successful(())
-    } else {
+           loadModules: Boolean = true): Unit = synchronized {
+    if (!loaded) {
       loaded = true
       if (loadProperties) {
         this.loadProperties()
