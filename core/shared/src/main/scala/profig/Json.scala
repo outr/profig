@@ -63,30 +63,24 @@ class Json(val value: ujson.Value) extends AnyVal {
     }
   }
   def merge[T: Writer](value: T, path: String*): Unit = {
-    val o = new Json(writeJs(value))
-    if (o.value.objOpt.isEmpty) {
-      set[T](value, path: _*)   // Not an object, so we can't merge, just replace
-    } else {
-      val parent = obj(path: _*)
-      val parentObj = parent.value.obj
-      o.value.obj.foreach {
-        case (key, value) => parentObj += key -> value
+    def recurse(v: ujson.Value, path: List[String]): Unit = v.objOpt match {
+      case Some(map) => map.foreach {
+        case (key, value) => recurse(value, path ::: List(key))
       }
+      case None => set(v, path: _*)
     }
+    recurse(writeJs(value), path.toList)
   }
   def defaults[T: Writer](value: T, path: String*): Unit = {
-    val o = new Json(writeJs(value))
-    if (o.value.objOpt.isEmpty) {
-      set[T](value, path: _*)   // Not an object, so we can't merge, just replace
-    } else {
-      val parent = obj(path: _*)
-      val parentObj = parent.value.obj
-      o.value.obj.foreach {
-        case (key, value) => if (!parentObj.contains(key)) {
-          parentObj += key -> value
-        }
+    def recurse(v: ujson.Value, path: List[String]): Unit = v.objOpt match {
+      case Some(map) => map.foreach {
+        case (key, value) => recurse(value, path ::: List(key))
+      }
+      case None => if (get(path: _*).isEmpty) {
+        set(v, path: _*)
       }
     }
+    recurse(writeJs(value), path.toList)
   }
   def remove(path: String*): Unit = {
     val o = obj(path.dropRight(1): _*)
