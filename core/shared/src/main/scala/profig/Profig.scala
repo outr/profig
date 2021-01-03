@@ -1,28 +1,16 @@
 package profig
 
-import scala.collection.mutable
-import scala.concurrent.{ExecutionContext, Future}
 import scala.jdk.CollectionConverters._
 import scala.language.experimental.macros
 
-class Profig(val parent: Option[Profig] = Some(Profig)) extends ProfigPath {
-  private var _local: Json = Json()
-  private var _global: Json = Json()
-
+class Profig extends ProfigPath {
+  private var _json: Json = Json()
   private var _lastModified: Long = System.currentTimeMillis()
 
-  updateGlobal()
-
-  def json: Json = {
-    if (parent.map(_.lastModified).getOrElse(0L) > lastModified) {
-      updateGlobal()
-    }
-    _global
-  }
+  def json: Json = _json
 
   protected[profig] def modify(f: Json => Json): Unit = synchronized {
-    _local = f(_local)
-    updateGlobal()
+    _json = f(_json)
     _lastModified = System.currentTimeMillis()
   }
 
@@ -44,20 +32,6 @@ class Profig(val parent: Option[Profig] = Some(Profig)) extends ProfigPath {
     merge(props, `type`)
   }
 
-  def child(): Profig = new Profig(Some(this))
-
-  private def updateGlobal(): Unit = synchronized {
-    parent match {
-      case Some(p) => {
-        val map = new mutable.LinkedHashMap[String, ujson.Value]
-        map ++= p.json.value.obj
-        map ++= _local.value.obj
-        _global = Json(new ujson.Obj(map))
-      }
-      case None => _global = _local
-    }
-  }
-
   override def remove(): Unit = modify(_ => Json())
 
   def clear(): Unit = remove()
@@ -67,14 +41,12 @@ class Profig(val parent: Option[Profig] = Some(Profig)) extends ProfigPath {
   * Profig provides access to environment variables, properties, and other configuration all merged together into one
   * powerful system. Uses JSON internally to provide merging and integration. Paths are dot-separated.
   */
-object Profig extends Profig(None) {
+object Profig extends Profig {
   private var loaded = false
 
   def isLoaded: Boolean = loaded
 
-  def empty: Profig = new Profig(None)
-
-  def apply(parent: Option[Profig]): Profig = new Profig(parent)
+  def empty: Profig = new Profig
 
   /**
     * Initializes Profig

@@ -3,9 +3,13 @@ package profig
 import upickle.default._
 
 object JsonUtil {
-  def fromJson[T: Reader](json: Json): T = json.as[T]
-  def toJson[T: Writer](value: T): Json = Json(value)
+  def fromJson[T: Reader](json: Json): T = try {
+    json.as[T]
+  } catch {
+    case t: Throwable => throw new RuntimeException(s"Failed to convert: $json", t)
+  }
+  def toJson[T: Writer](value: T): Json = new Json(writeJs(value))
 
-  def fromJsonString[T: Reader](jsonString: String): T = fromJson[T](Json(jsonString))
+  def fromJsonString[T: Reader](jsonString: String): T = fromJson[T](Json.parse(jsonString))
   def toJsonString[T: Writer](value: T): String = toJson[T](value).toString
 }

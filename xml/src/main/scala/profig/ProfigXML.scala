@@ -1,6 +1,5 @@
 package profig
 
-import io.circe.Json
 import scala.xml._
 import moduload.Moduload
 
@@ -21,7 +20,7 @@ object ProfigXML extends Moduload with ProfigJson {
           if (text.isEmpty) {
             None
           } else {
-            Some(Json.fromString(text))
+            Some(Json.string(text))
           }
         } else {
           Some(Json.obj(attributes ::: children: _*))

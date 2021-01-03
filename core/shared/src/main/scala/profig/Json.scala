@@ -2,14 +2,14 @@ package profig
 
 import upickle.default._
 
-class Json private(val value: ujson.Value) extends AnyVal {
+class Json(val value: ujson.Value) extends AnyVal {
   def as[T: Reader]: T = read[T](value)
   def get(path: String*): Option[Json] = if (path.isEmpty) {
     Some(this)
   } else {
     val head = path.head
     value.objOpt match {
-      case Some(map) if map.contains(head) => Json(map(head)).get(path.tail: _*)
+      case Some(map) if map.contains(head) => new Json(map(head)).get(path.tail: _*)
       case _ => None
     }
   }
@@ -19,23 +19,51 @@ class Json private(val value: ujson.Value) extends AnyVal {
   } else {
     val head = path.head
     value.objOpt match {
-      case Some(map) if map.contains(head) => Json(map(head)).obj(path.tail: _*)
+      case Some(map) if map.contains(head) => new Json(map(head)).obj(path.tail: _*)
       case Some(map) => {
         val child = Json()
         map += head -> child.value
         child.obj(path.tail: _*)
       }
-      case None if path.tail.isEmpty => Json(value)
-      case None => throw new RuntimeException(s"Value in path expected as object but received: $value ($head)")
+//      case None if path.tail.isEmpty => new Json(value)
+      case None => {
+        val child = Json()
+        child.value.obj += head -> child.value
+        child.value.obj += "value" -> value
+        child.obj(path.tail: _*)
+      }
+//      case None => throw new RuntimeException(s"Value in path expected as object but received: $value ($head)")
     }
   }
   def set[T: Writer](value: T, path: String*): Unit = {
-    val o = obj(path.dropRight(1): _*)
-    println(s"Setting $value, Object? $o")
-    o.value.obj += path.last -> Json(value).value
+    val parentPath = path.dropRight(1)
+    val o = obj(parentPath: _*)
+    val json = writeJs(value)
+    if (o.value.objOpt.isEmpty) {
+      upgradeToObj(parentPath: _*)
+      set[T](value, path: _*)
+    } else {
+      try {
+        o.value.obj += path.last -> json
+      } catch {
+        case t: Throwable => throw new RuntimeException(s"Failed to write: $value ($path) - ${o.value} - ${this.value}")
+      }
+    }
+  }
+  private def upgradeToObj(path: String*): Unit = {
+    val key = path.last
+    val parentPath = path.dropRight(1)
+    if (obj(parentPath: _*).value.objOpt.isEmpty) {
+      upgradeToObj(path.dropRight(1): _*)
+    }
+    val parent = obj(parentPath: _*).value
+    val existing = parent(key)
+    if (existing.objOpt.isEmpty) {
+      parent(key) = ujson.Obj("value" -> existing)
+    }
   }
   def merge[T: Writer](value: T, path: String*): Unit = {
-    val o = Json(value)
+    val o = new Json(writeJs(value))
     if (o.value.objOpt.isEmpty) {
       set[T](value, path: _*)   // Not an object, so we can't merge, just replace
     } else {
@@ -47,7 +75,7 @@ class Json private(val value: ujson.Value) extends AnyVal {
     }
   }
   def defaults[T: Writer](value: T, path: String*): Unit = {
-    val o = Json(value)
+    val o = new Json(writeJs(value))
     if (o.value.objOpt.isEmpty) {
       set[T](value, path: _*)   // Not an object, so we can't merge, just replace
     } else {
@@ -64,24 +92,32 @@ class Json private(val value: ujson.Value) extends AnyVal {
     val o = obj(path.dropRight(1): _*)
     o.value.obj -= path.last
   }
-  def copy(): Json = Json(toString)
+  def copy(): Json = Json.parse(toString)
 
   override def toString: String = value.render()
 }
 
 object Json {
-  def apply(value: ujson.Value): Json = new Json(value)
-  def apply[T: Writer](value: T): Json = apply(writeJs(value))
-  def apply(): Json = apply(ujson.Obj())
+  def Null: Json = new Json(ujson.Null)
+
+  /*def apply(value: ujson.Value): Json = {
+    println(s"1: $value")
+    new Json(value)
+  }
+  def apply[T: Writer](value: T): Json = {
+    println(s"2: $value")
+    apply(writeJs(value))
+  }*/
+  def apply(): Json = new Json(ujson.Obj())
   def obj(tuples: (String, Json)*): Json = {
     val obj = ujson.Obj()
     tuples.foreach {
       case (key, json) => obj.value += key -> json.value
     }
-    apply(obj)
+    new Json(obj)
   }
 
-  def fromString(s: String): Json = Json(ujson.Str(s))
+  def string(s: String): Json = new Json(ujson.Str(s))
 
-  def parse(json: String): Json = apply(read[ujson.Value](json))
+  def parse(json: String): Json = new Json(read[ujson.Value](json))
 }

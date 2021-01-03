@@ -10,7 +10,7 @@ val scala2Versions = List(scala213, scala212)
 val compatScalaVersions = List(scala213, scala212)
 
 organization in ThisBuild := "com.outr"
-version in ThisBuild := "3.0.4-SNAPSHOT"
+version in ThisBuild := "3.1.0-SNAPSHOT"
 scalaVersion in ThisBuild := scala213
 scalacOptions in ThisBuild ++= Seq("-unchecked", "-deprecation", "-feature")
 
@@ -41,20 +41,16 @@ val scalatestVersion = "3.2.3"
 // Used for HOCON support
 val typesafeConfig = "1.4.1"
 
+// Used for YAML support
+val jacksonVersion = "2.12.0"
+
 lazy val root = project.in(file("."))
-  .aggregate(playground, coreJS, coreJVM) //, xml, hocon, yaml, inputJS, inputJVM, live, all)
+  .aggregate(coreJS, coreJVM, xml, hocon, yaml, all)
   .settings(
     name := "profig",
     publish := {},
     publishLocal := {}
   )
-
-lazy val playground = project.in(file("test")).settings(
-  libraryDependencies ++= Seq(
-    "com.lihaoyi" %%% "upickle" % uPickle,
-    "org.scala-lang.modules" %%% "scala-collection-compat" % collectionCompat
-  )
-)
 
 lazy val core = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Full)
@@ -87,12 +83,11 @@ lazy val core = crossProject(JSPlatform, JVMPlatform)
 lazy val coreJS = core.js
 lazy val coreJVM = core.jvm
 
-/*
 lazy val xml = project
   .in(file("xml"))
   .settings(
     name := "profig-xml",
-//    libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % scalaXMLVersion,
+    libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % scalaXMLVersion,
     crossScalaVersions := allScalaVersions
   )
   .dependsOn(core.jvm)
@@ -110,49 +105,10 @@ lazy val yaml = project
   .in(file("yaml"))
   .settings(
     name := "profig-yaml",
-//    libraryDependencies += "io.circe" %% "circe-yaml" % circeYamlVersion,
+    libraryDependencies += "com.fasterxml.jackson.dataformat" % "jackson-dataformat-yaml" % jacksonVersion,
     crossScalaVersions := allScalaVersions
   )
   .dependsOn(core.jvm)
-
-lazy val input = crossProject(JSPlatform, JVMPlatform)
-  .crossType(CrossType.Full)
-  .in(file("input"))
-  .dependsOn(core)
-  .settings(
-    name := "profig-input",
-    crossScalaVersions := allScalaVersions
-  )
-  .jvmSettings(
-    libraryDependencies ++= Seq(
-      "org.scalatest" %%% "scalatest" % scalatestVersion % "test"
-    )
-  )
-  .jsSettings(
-    test := {},                 // Temporary work-around for ScalaTest not working with Scala.js on Dotty
-    libraryDependencies ++= (
-      if (isDotty.value) {      // Temporary work-around for ScalaTest not working with Scala.js on Dotty
-        Nil
-      } else {
-        List("org.scalatest" %%% "scalatest" % scalatestVersion % "test")
-      }
-    )
-  )
-
-lazy val inputJS = input.js
-lazy val inputJVM = input.jvm
-
-lazy val live = project
-  .in(file("live"))
-  .dependsOn(coreJVM)
-  .settings(
-    name := "profig-live",
-    libraryDependencies ++= Seq(
-      "com.outr" %% "reactify" % reactify,
-      "org.scalatest" %% "scalatest" % scalatestVersion % "test"
-    ),
-    crossScalaVersions := allScalaVersions
-  )
 
 lazy val all = project
   .in(file("all"))
@@ -163,4 +119,4 @@ lazy val all = project
     ),
     crossScalaVersions := allScalaVersions
   )
-  .dependsOn(coreJVM, xml, hocon, yaml, inputJVM)*/
+  .dependsOn(coreJVM, xml, hocon, yaml)

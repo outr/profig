@@ -2,7 +2,6 @@ package profig
 
 import upickle.default._
 
-import scala.annotation.tailrec
 import scala.language.experimental.macros
 
 /**
@@ -46,7 +45,19 @@ trait ProfigPath {
     * @tparam T the type to represent the current path
     * @return T
     */
-  def opt[T: Reader]: Option[T] = get().map(JsonUtil.fromJson[T])
+  def opt[T: Reader]: Option[T] = {
+    get() match {
+      case Some(json) => json.value match {
+        case arr: ujson.Arr => if (arr.value.isEmpty) {
+          None
+        } else {
+          Some(JsonUtil.fromJson[T](new Json(arr.value.head)))
+        }
+        case _ => Some(JsonUtil.fromJson[T](json))
+      }
+      case None => None
+    }
+  }
 
   /**
     * Stores the supplied value into this path.

@@ -4,8 +4,6 @@ import java.io.File
 import java.nio.file.{Path, Paths}
 
 import scala.annotation.tailrec
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.io.Source
 import scala.jdk.CollectionConverters._
 

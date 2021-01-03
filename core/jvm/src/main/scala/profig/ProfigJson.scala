@@ -29,7 +29,7 @@ object ProfigJson {
   }
 
   object Json extends ProfigJson {
-    override def apply(content: String): Json = Json(content)
+    override def apply(content: String): Json = profig.Json.parse(content)
   }
 
   object Properties extends ProfigJson {

@@ -6,7 +6,6 @@ import scala.io.StdIn
 
 object ConsoleProfigInput extends ProfigInput {
   override protected def readStrings[T](data: InputData[T]): Future[Seq[Option[String]]] = Future {
-    println(s"Create new ${data.`type`}:")
     data.arguments.map { arg =>
       Option(prompt(arg))
     }

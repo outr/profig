@@ -16,13 +16,14 @@ object ProfigUtil {
     * Converts a `Map[String, String]` into a Json object with dot-separation.
     */
   def map2Json(map: Map[String, String]): Json = {
-    val hashMap = new mutable.LinkedHashMap[String, ujson.Value]
+    val json = Json()
     map.foreach {
       case (key, value) => {
-        hashMap += key -> Json.fromString(value).value
+        val path = key.split('.').toList
+        json.set(Json.string(value).value, path: _*)
       }
     }
-    Json(new Obj(hashMap))
+    json
   }
 
   /**
@@ -46,7 +47,7 @@ object ProfigUtil {
     var named = Map.empty[String, ujson.Value]
     var flag = Option.empty[String]
     args.foreach {
-      case NamedKeyValue(key, value) => named += key -> Json.fromString(value).value
+      case NamedKeyValue(key, value) => named += key -> Json.string(value).value
       case NamedFlag(key) => {
         flag.foreach { f =>
           named += f -> ujson.True
@@ -55,10 +56,10 @@ object ProfigUtil {
       }
       case arg => flag match {
         case Some(key) => {
-          named += key -> Json.fromString(arg).value
+          named += key -> Json.string(arg).value
           flag = None
         }
-        case None => anonymous = Json.fromString(arg).value :: anonymous
+        case None => anonymous = Json.string(arg).value :: anonymous
       }
     }
     anonymous = anonymous.reverse
@@ -67,29 +68,15 @@ object ProfigUtil {
       case (json, index) => s"arg${index + 1}" -> json
     }
     val argsList = List("args" -> ujson.Arr(anonymous: _*))
-    val allArgsList = List("allArgs" -> ujson.Arr(args.map(Json.fromString).map(_.value): _*))
+    val allArgsList = List("allArgs" -> ujson.Arr(args.map(Json.string).map(_.value): _*))
 
-    val map = new mutable.LinkedHashMap[String, ujson.Value]
+    val json = Json()
     (argsNamed ::: argsList ::: allArgsList ::: named.toList).foreach {
-      case (key, value) => map += key -> value
+      case (key, value) => {
+        val path = key.split('.').toList
+        json.set(value, path: _*)
+      }
     }
-    Json(new Obj(map))
-  }
-
-  /**
-    * Creates a Json representation breaking `name` for dot-separation.
-    */
-  def createJson(name: String, value: ujson.Value): Json = {
-    val index = name.indexOf('.')
-    if (index == -1) {
-      val map = new mutable.LinkedHashMap[String, ujson.Value]
-      map += name -> value
-      Json(Obj(map))
-    } else {
-      val n = name.substring(0, index)
-      val map = new mutable.LinkedHashMap[String, ujson.Value]
-      map += n -> createJson(name.substring(index + 1), value).value
-      Json(Obj(map))
-    }
+    json
   }
 }

@@ -31,7 +31,6 @@ class ProfigSpec extends AsyncWordSpec with Matchers {
       succeed
     }
     "load a String argument" in {
-      println(Profig.get())
       Profig("this.is.an.argument").as[String] should be("Wahoo!")
     }
     "load JVM information from properties" in {
@@ -73,25 +72,8 @@ class ProfigSpec extends AsyncWordSpec with Matchers {
       Profig("people.john.age").store(321)
       Profig("people.john.age").opt[Int] should be(Some(321))
     }
-    "create a child Profig Profig" in {
-      val child = Profig.child()
-      child("child.info").store("Child Local")
-      Profig("child.info").opt[String] should be(None)
-      child("child.info").opt[String] should be(Some("Child Local"))
-    }
-    "update parent and see in the child" in {
-      val child = Profig.child()
-      child("people.john.age").opt[Int] should be(Some(321))
-      Profig("people.john.age").opt[Int] should be(Some(321))
-      child("people.john.age").store(1234)
-      Profig("people.john.age").opt[Int] should be(Some(321))
-      child("people.john.age").opt[Int] should be(Some(1234))
-      child("people.john.age").remove()
-      child("people.john.age").opt[Int] should be(Some(321))
-      Profig("people.john.age").opt[Int] should be(Some(321))
-    }
     "see no spill-over in orphaned Profig" in {
-      val orphan = Profig(None)
+      val orphan = Profig.empty
       orphan("people.john.age").opt[Int] should be(None)
     }
     "validate loading a String value of true as Boolean" in {
@@ -102,29 +84,29 @@ class ProfigSpec extends AsyncWordSpec with Matchers {
       val profig = Profig.empty
       profig.json should be(Json())
       profig.merge(Json.obj(
-        "test" -> Json.fromString("one")
+        "test" -> Json.string("one")
       ), MergeType.Overwrite)
-      profig.json should be(Json.obj("test" -> Json.fromString("one")))
+      profig.json should be(Json.obj("test" -> Json.string("one")))
       profig.merge(Json.obj(
-        "test" -> Json.fromString("two")
+        "test" -> Json.string("two")
       ), MergeType.Overwrite)
-      profig.json should be(Json.obj("test" -> Json.fromString("two")))
+      profig.json should be(Json.obj("test" -> Json.string("two")))
     }
     "validate add" in {
       val profig = Profig.empty
       profig.json should be(Json.obj())
       profig.merge(Json.obj(
-        "test" -> Json.fromString("one")
+        "test" -> Json.string("one")
       ), MergeType.Add)
-      profig.json should be(Json.obj("test" -> Json.fromString("one")))
+      profig.json should be(Json.obj("test" -> Json.string("one")))
       profig.merge(Json.obj(
-        "test" -> Json.fromString("two")
+        "test" -> Json.string("two")
       ), MergeType.Add)
-      profig.json should be(Json.obj("test" -> Json.fromString("one")))
+      profig.json should be(Json.obj("test" -> Json.string("one")))
     }
   }
 
-  case class Person(name: String, age: Option[Int])
+  case class Person(name: String, age: Option[Int] = None)
 
   object Person {
     implicit def rw: ReadWriter[Person] = macroRW

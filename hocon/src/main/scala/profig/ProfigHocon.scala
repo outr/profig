@@ -1,7 +1,6 @@
 package profig
 
 import com.typesafe.config.{ConfigFactory, ConfigRenderOptions}
-import io.circe.Json
 import moduload.Moduload
 
 object ProfigHocon extends Moduload with ProfigJson {
@@ -12,6 +11,6 @@ object ProfigHocon extends Moduload with ProfigJson {
   override def apply(content: String): Json = {
     val conf = ConfigFactory.parseString(content).resolve()
     val jsonString = conf.root().render(ConfigRenderOptions.concise())
-    ProfigJson.Circe(jsonString)
+    Json.parse(jsonString)
   }
 }
