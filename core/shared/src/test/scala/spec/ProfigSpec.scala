@@ -3,7 +3,6 @@ package spec
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AsyncWordSpec
 import profig._
-import profig.Pickler._
 
 class ProfigSpec extends AsyncWordSpec with Matchers {
   "Profig" should {

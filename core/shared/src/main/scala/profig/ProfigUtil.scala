@@ -1,7 +1,7 @@
 package profig
 
 import java.util.Properties
-import profig.Pickler._
+import profig._
 
 import scala.jdk.CollectionConverters._
 

@@ -1,7 +1,5 @@
 package profig
 
-import Pickler._
-
 class Json(val value: ujson.Value) extends AnyVal {
   def as[T: Reader]: T = read[T](value)
   def get(path: String*): Option[Json] = if (path.isEmpty) {

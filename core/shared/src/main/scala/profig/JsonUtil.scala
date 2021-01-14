@@ -1,7 +1,5 @@
 package profig
 
-import Pickler._
-
 object JsonUtil {
   def fromJson[T: Reader](json: Json): T = try {
     json.as[T]

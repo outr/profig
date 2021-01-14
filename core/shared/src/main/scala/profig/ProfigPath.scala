@@ -1,7 +1,5 @@
 package profig
 
-import Pickler._
-
 import scala.language.experimental.macros
 
 /**

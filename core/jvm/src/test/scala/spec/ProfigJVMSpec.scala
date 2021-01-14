@@ -4,10 +4,8 @@ import java.io.File
 
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import profig.Profig
 
-import profig.Pickler._
-import Special._
+import profig._
 
 class ProfigJVMSpec extends AnyWordSpec with Matchers {
   "Profig JVM" should {

@@ -1,6 +1,12 @@
-package profig
+import java.util.Properties
 
-object Pickler extends upickle.AttributeTagged with PlatformPickler {
+import scala.language.implicitConversions
+
+package object profig extends upickle.AttributeTagged with PlatformPickler {
+  implicit def properties2JSON(properties: Properties): Json = ProfigUtil.properties2Json(properties)
+  implicit def args2JSON(args: Seq[String]): Json = ProfigUtil.args2Json(args)
+  implicit def json2Value(json: Json): ujson.Value = json.value
+
   override implicit def OptionWriter[T: Writer]: Writer[Option[T]] =
     implicitly[Writer[T]].comap[Option[T]] {
       case None => null.asInstanceOf[T]
