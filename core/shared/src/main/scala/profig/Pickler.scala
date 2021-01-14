@@ -1,6 +1,6 @@
 package profig
 
-object Pickler extends upickle.AttributeTagged {
+object Pickler extends upickle.AttributeTagged with PlatformPickler {
   override implicit def OptionWriter[T: Writer]: Writer[Option[T]] =
     implicitly[Writer[T]].comap[Option[T]] {
       case None => null.asInstanceOf[T]
