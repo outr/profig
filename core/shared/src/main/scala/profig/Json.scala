@@ -42,7 +42,7 @@ class Json(val value: ujson.Value) extends AnyVal {
       try {
         o.value.obj += path.last -> json
       } catch {
-        case t: Throwable => throw new RuntimeException(s"Failed to write: $value ($path) - ${o.value} - ${this.value}")
+        case t: Throwable => throw new RuntimeException(s"Failed to write: $value ($path) - ${o.value} - ${this.value}", t)
       }
     }
   }
