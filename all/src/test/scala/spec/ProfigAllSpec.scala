@@ -34,7 +34,6 @@ class ProfigAllSpec extends AnyWordSpec with Matchers {
     "load paths" in {
       Profig.loadConfiguration(errorHandler = Some(t => throw t))
       val test = Profig("test")
-      println(s"JSON: ${test.get()}")
       test("value").as[Boolean] should be(true)
       test("yaml").as[String] should be("yes")
       test("hocon").as[String] should be("yes")

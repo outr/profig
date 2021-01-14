@@ -90,14 +90,6 @@ class Json(val value: ujson.Value) extends AnyVal {
 object Json {
   def Null: Json = new Json(ujson.Null)
 
-  /*def apply(value: ujson.Value): Json = {
-    println(s"1: $value")
-    new Json(value)
-  }
-  def apply[T: Writer](value: T): Json = {
-    println(s"2: $value")
-    apply(writeJs(value))
-  }*/
   def apply(): Json = new Json(ujson.Obj())
   def obj(tuples: (String, Json)*): Json = {
     val obj = ujson.Obj()
