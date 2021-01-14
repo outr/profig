@@ -3,8 +3,7 @@ package spec
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AsyncWordSpec
 import profig._
-
-import upickle.default._
+import profig.Pickler._
 
 class ProfigSpec extends AsyncWordSpec with Matchers {
   "Profig" should {
@@ -32,6 +31,7 @@ class ProfigSpec extends AsyncWordSpec with Matchers {
     }
     "load a String argument" in {
       Profig("this.is.an.argument").as[String] should be("Wahoo!")
+      Profig("this")("is")("an")("argument").as[String] should be("Wahoo!")
     }
     "load JVM information from properties" in {
       val info = Profig("java").as[JVMInfo]

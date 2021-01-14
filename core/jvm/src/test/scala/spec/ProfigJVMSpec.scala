@@ -6,7 +6,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import profig.Profig
 
-import upickle.default._
+import profig.Pickler._
 import Special._
 
 class ProfigJVMSpec extends AnyWordSpec with Matchers {

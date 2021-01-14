@@ -1,6 +1,6 @@
 package profig
 
-import upickle.default._
+import Pickler._
 
 import scala.language.experimental.macros
 

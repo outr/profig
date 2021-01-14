@@ -1,6 +1,6 @@
 package profig
 
-import upickle.default._
+import Pickler._
 
 class Json(val value: ujson.Value) extends AnyVal {
   def as[T: Reader]: T = read[T](value)
@@ -25,14 +25,12 @@ class Json(val value: ujson.Value) extends AnyVal {
         map += head -> child.value
         child.obj(path.tail: _*)
       }
-//      case None if path.tail.isEmpty => new Json(value)
       case None => {
         val child = Json()
         child.value.obj += head -> child.value
         child.value.obj += "value" -> value
         child.obj(path.tail: _*)
       }
-//      case None => throw new RuntimeException(s"Value in path expected as object but received: $value ($head)")
     }
   }
   def set[T: Writer](value: T, path: String*): Unit = {

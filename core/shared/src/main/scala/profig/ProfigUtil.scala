@@ -1,11 +1,8 @@
 package profig
 
-import ujson.Obj
-
 import java.util.Properties
-import upickle.default._
+import profig.Pickler._
 
-import scala.collection.mutable
 import scala.jdk.CollectionConverters._
 
 /**

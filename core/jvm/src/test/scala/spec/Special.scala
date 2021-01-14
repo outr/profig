@@ -2,7 +2,7 @@ package spec
 
 import java.io.File
 
-import upickle.default._
+import profig.Pickler._
 
 case class Special(title: String, location: File)
 

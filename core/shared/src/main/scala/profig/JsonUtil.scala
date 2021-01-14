@@ -1,6 +1,6 @@
 package profig
 
-import upickle.default._
+import Pickler._
 
 object JsonUtil {
   def fromJson[T: Reader](json: Json): T = try {
