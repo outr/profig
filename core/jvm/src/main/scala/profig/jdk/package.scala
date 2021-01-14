@@ -1,3 +1,3 @@
 package profig
 
-package object jdk extends ProfigJVMSupport
+package object jdk extends PlatformPickler

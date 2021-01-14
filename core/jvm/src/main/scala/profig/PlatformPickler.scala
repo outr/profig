@@ -1,17 +1,17 @@
 package profig
 
+import moduload.Moduload
+
 import java.io.File
 import java.net.URL
 import java.nio.file.Path
-
-import io.circe.Json
-import moduload.Moduload
-
-import scala.concurrent.{ExecutionContext, Future}
 import scala.io.Source
+
 import scala.language.implicitConversions
 
-trait ProfigJVMSupport extends SharedJSONConversions {
+trait PlatformPickler {
+  implicit val fileReadWriter: ReadWriter[File] = readwriter[String].bimap(_.getAbsolutePath, new File(_))
+
   implicit def path2JSON(path: Path): Json = file2JSON(path.toFile)
   implicit def file2JSON(file: File): Json = source2Json(Source.fromFile(file), Some(file.getName))
   implicit def url2JSON(url: URL): Json = source2Json(Source.fromURL(url), Some(url.getFile))
@@ -36,11 +36,9 @@ trait ProfigJVMSupport extends SharedJSONConversions {
     source.close()
   }
 
-  def initProfig(loadModules: Boolean)(implicit ec: ExecutionContext): Future[Unit] = {
+  def initProfig(loadModules: Boolean): Unit = {
     if (loadModules) {
       Moduload.load()
-    } else {
-      Future.successful(())
     }
   }
 

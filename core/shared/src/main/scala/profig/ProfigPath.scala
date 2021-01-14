@@ -1,8 +1,5 @@
 package profig
 
-import io.circe._
-
-import scala.annotation.tailrec
 import scala.language.experimental.macros
 
 /**
@@ -29,7 +26,7 @@ trait ProfigPath {
     * @tparam T the type to represent the current path
     * @return T
     */
-  def as[T]: T = macro Macros.as[T]
+  def as[T: Reader]: T = JsonUtil.fromJson[T](apply())
 
   /**
     * Loads this path out as the defined type `T`. If no value is set for this path, the default will be used.
@@ -38,7 +35,7 @@ trait ProfigPath {
     * @tparam T the type to represent the current path
     * @return T
     */
-  def as[T](default: => T): T = macro Macros.asWithDefault[T]
+  def as[T: Reader](default: => T): T = get().map(JsonUtil.fromJson[T]).getOrElse(default)
 
   /**
     * Convenience functionality similar to `as` but returns an option if set.
@@ -46,7 +43,19 @@ trait ProfigPath {
     * @tparam T the type to represent the current path
     * @return T
     */
-  def opt[T]: Option[T] = macro Macros.opt[T]
+  def opt[T: Reader]: Option[T] = {
+    get() match {
+      case Some(json) => json.value match {
+        case arr: ujson.Arr => if (arr.value.isEmpty) {
+          None
+        } else {
+          Some(JsonUtil.fromJson[T](new Json(arr.value.head)))
+        }
+        case _ => Some(JsonUtil.fromJson[T](json))
+      }
+      case None => None
+    }
+  }
 
   /**
     * Stores the supplied value into this path.
@@ -54,36 +63,14 @@ trait ProfigPath {
     * @param value the value to store
     * @tparam T the type of value
     */
-  def store[T](value: T): Unit = macro Macros.store[T]
+  def store[T: Writer](value: T): Unit = merge(JsonUtil.toJson[T](value))
 
   /**
     * Returns a Json representation of this path if there is anything defined at this level.
     *
     * @return Option[Json]
     */
-  def get(): Option[Json] = {
-    @tailrec
-    def find(path: List[String], cursor: ACursor): Option[Json] = if (path.tail.isEmpty) {
-      cursor.get[Json](path.head) match {
-        case Left(_) => None
-        case Right(value) => Some(value)
-      }
-    } else {
-      find(path.tail, cursor.downField(path.head))
-    }
-    if (path.nonEmpty) {
-      if (path.tail.isEmpty) {
-        instance.json.hcursor.get[Json](path.head) match {
-          case Left(_) => None
-          case Right(value) => Some(value)
-        }
-      } else {
-        find(path.tail, instance.json.hcursor.downField(path.head))
-      }
-    } else {
-      Some(instance.json)
-    }
-  }
+  def get(): Option[Json] = instance.json.get(path: _*)
 
   /**
     * Returns a Json representation of this path. Works similar to `get()`, except will return an empty Json object if
@@ -91,7 +78,7 @@ trait ProfigPath {
     *
     * @return Json
     */
-  def apply(): Json = get().getOrElse(Json.obj())
+  def apply(): Json = instance.json.obj(path: _*)
 
   /**
     * True if this path exists in the config
@@ -102,17 +89,9 @@ trait ProfigPath {
     * Merges a Json object to this path.
     */
   def merge(json: Json, `type`: MergeType = MergeType.Overwrite): Unit = synchronized {
-    if (path.nonEmpty) {
-      val updated = ProfigUtil.createJson(path.mkString("."), json)
-      `type` match {
-        case MergeType.Overwrite => instance.modify(_.deepMerge(updated))
-        case MergeType.Add => instance.modify(updated.deepMerge)
-      }
-    } else {
-      `type` match {
-        case MergeType.Overwrite => instance.modify(_.deepMerge(json))
-        case MergeType.Add => instance.modify(json.deepMerge)
-      }
+    `type` match {
+      case MergeType.Overwrite => instance.json.merge(json.value, path: _*)
+      case MergeType.Add => instance.json.defaults(json.value, path: _*)
     }
   }
 
@@ -122,20 +101,7 @@ trait ProfigPath {
     * @param field the field below this path to remove
     */
   def remove(field: String): Unit = synchronized {
-    if (path.nonEmpty) {
-      @tailrec
-      def recurse(path: List[String], cursor: ACursor): Json = if (path.isEmpty) {
-        cursor.downField(field).delete.top.get
-      } else {
-        recurse(path.tail, cursor.downField(path.head))
-      }
-
-      instance.modify { json =>
-        recurse(path.tail, json.hcursor.downField(path.head))
-      }
-    } else {
-      instance.modify(json => Json.fromJsonObject(json.asObject.get.remove(field)))
-    }
+    instance.json.remove((path ::: List(field)): _*)
   }
 
   def remove(): Unit = instance(path.take(path.length - 1): _*).remove(path.last)

@@ -1,20 +1,13 @@
 package profig
 
-import io.circe.Json
-
-import scala.language.experimental.macros
-
 object JsonUtil {
-  def fromJson[T](json: Json): T = macro Macros.fromJson[T]
-  def toJson[T](value: T): Json = macro Macros.toJson[T]
+  def fromJson[T: Reader](json: Json): T = try {
+    json.as[T]
+  } catch {
+    case t: Throwable => throw new RuntimeException(s"Failed to convert: $json", t)
+  }
+  def toJson[T: Writer](value: T): Json = new Json(writeJs(value))
 
-  def fromJsonString[T](jsonString: String): T = macro Macros.fromJsonString[T]
-  def toJsonString[T](value: T): String = macro Macros.toJsonString[T]
-
-  def decoder[T]: io.circe.Decoder[T] = macro Macros.decoder[T]
-  def encoder[T]: io.circe.Encoder[T] = macro Macros.encoder[T]
-
-  // TODO: fix this
-  implicit def exportedDecoder[T]: io.circe.export.Exported[io.circe.Decoder[T]] = macro Macros.exportedDecoder[T]
-  implicit def exportedEncoder[T]: io.circe.export.Exported[io.circe.Encoder[T]] = macro Macros.exportedEncoder[T]
+  def fromJsonString[T: Reader](jsonString: String): T = fromJson[T](Json.parse(jsonString))
+  def toJsonString[T: Writer](value: T): String = toJson[T](value).toString
 }
