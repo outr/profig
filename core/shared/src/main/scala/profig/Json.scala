@@ -38,7 +38,7 @@ class Json(val value: ujson.Value) extends AnyVal {
     if (o.value.objOpt.isEmpty) {
       upgradeToObj(parentPath: _*)
       set[T](value, path: _*)
-    } else {
+    } else if (path.nonEmpty) {
       try {
         o.value.obj += path.last -> json
       } catch {

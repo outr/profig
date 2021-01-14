@@ -1,6 +1,6 @@
 # profig
 
-[![Build Status](https://travis-ci.org/outr/profig.svg?branch=master)](https://travis-ci.org/outr/profig)
+[![Build Status](https://travis-ci.com/outr/profig.svg?branch=master)](https://travis-ci.com/outr/profig)
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/outr/profig)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.outr/profig_2.13/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.outr/profig_2.12)
 [![Latest version](https://index.scala-lang.org/outr/profig/profig/latest.svg)](https://index.scala-lang.org/outr/profig)
