@@ -1,6 +1,5 @@
 package spec
 
-import io.circe.Json
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AsyncWordSpec
 import profig._
@@ -8,7 +7,8 @@ import profig._
 class ProfigSpec extends AsyncWordSpec with Matchers {
   "Profig" should {
     "init" in {
-      Profig.init().map(_ => succeed)
+      Profig.init()
+      succeed
     }
     "verify classloading not set" in {
       Profig("test.classloading").opt[String] should be(None)
@@ -30,6 +30,7 @@ class ProfigSpec extends AsyncWordSpec with Matchers {
     }
     "load a String argument" in {
       Profig("this.is.an.argument").as[String] should be("Wahoo!")
+      Profig("this")("is")("an")("argument").as[String] should be("Wahoo!")
     }
     "load JVM information from properties" in {
       val info = Profig("java").as[JVMInfo]
@@ -41,15 +42,15 @@ class ProfigSpec extends AsyncWordSpec with Matchers {
     }
     "load a case class from a path with default arguments" in {
       val person = Profig("people.me").as[Person]
-      person should be(Person("Matt"))
+      person should be(Person("Matt", None))
     }
     "storage a case class" in {
-      Profig("people", "john").store(Person("John Doe", 123))
+      Profig("people", "john").store(Person("John Doe", Some(123)))
       succeed
     }
     "load the stored case class from path" in {
       val person = Profig("people")("john").as[Person]
-      person should be(Person("John Doe", 123))
+      person should be(Person("John Doe", Some(123)))
     }
     "load an optional value that is not there" in {
       val value = Profig("this.does.not.exist").opt[String]
@@ -70,67 +71,55 @@ class ProfigSpec extends AsyncWordSpec with Matchers {
       Profig("people.john.age").store(321)
       Profig("people.john.age").opt[Int] should be(Some(321))
     }
-    "create a child Profig Profig" in {
-      val child = Profig.child()
-      child("child.info").store("Child Local")
-      Profig("child.info").opt[String] should be(None)
-      child("child.info").opt[String] should be(Some("Child Local"))
-    }
-    "update parent and see in the child" in {
-      val child = Profig.child()
-      child("people.john.age").opt[Int] should be(Some(321))
-      Profig("people.john.age").opt[Int] should be(Some(321))
-      child("people.john.age").store(1234)
-      Profig("people.john.age").opt[Int] should be(Some(321))
-      child("people.john.age").opt[Int] should be(Some(1234))
-      child("people.john.age").remove()
-      child("people.john.age").opt[Int] should be(Some(321))
-      Profig("people.john.age").opt[Int] should be(Some(321))
-    }
     "see no spill-over in orphaned Profig" in {
-      val orphan = Profig(None)
+      val orphan = Profig.empty
       orphan("people.john.age").opt[Int] should be(None)
     }
-    "compile-time Json parsing" in {
-      val parsed = MacroTest.format("""{"name": "John Doe", "age": 1234}""")
-      parsed should be("""{
-                         |  "name" : "John Doe",
-                         |  "age" : 1234
-                         |}""".stripMargin)
-    }
     "validate loading a String value of true as Boolean" in {
-      Profig("test.boolean").merge(Json.fromString("true"))
+      Profig("test.boolean").merge(Json.parse("true"))
       Profig("test.boolean").as[Boolean] should be(true)
     }
     "validate overwrite" in {
       val profig = Profig.empty
-      profig.json should be(Json.obj())
+      profig.json should be(Json())
       profig.merge(Json.obj(
-        "test" -> Json.fromString("one")
+        "test" -> Json.string("one")
       ), MergeType.Overwrite)
-      profig.json should be(Json.obj("test" -> Json.fromString("one")))
+      profig.json should be(Json.obj("test" -> Json.string("one")))
       profig.merge(Json.obj(
-        "test" -> Json.fromString("two")
+        "test" -> Json.string("two")
       ), MergeType.Overwrite)
-      profig.json should be(Json.obj("test" -> Json.fromString("two")))
+      profig.json should be(Json.obj("test" -> Json.string("two")))
     }
     "validate add" in {
       val profig = Profig.empty
       profig.json should be(Json.obj())
       profig.merge(Json.obj(
-        "test" -> Json.fromString("one")
+        "test" -> Json.string("one")
       ), MergeType.Add)
-      profig.json should be(Json.obj("test" -> Json.fromString("one")))
+      profig.json should be(Json.obj("test" -> Json.string("one")))
       profig.merge(Json.obj(
-        "test" -> Json.fromString("two")
+        "test" -> Json.string("two")
       ), MergeType.Add)
-      profig.json should be(Json.obj("test" -> Json.fromString("one")))
+      profig.json should be(Json.obj("test" -> Json.string("one")))
     }
   }
 
-  case class Person(name: String, age: Int = 21)
+  case class Person(name: String, age: Option[Int] = None)
+
+  object Person {
+    implicit def rw: ReadWriter[Person] = macroRW
+  }
 
   case class JVMInfo(version: String, specification: Specification)
 
+  object JVMInfo {
+    implicit def rw: ReadWriter[JVMInfo] = macroRW
+  }
+
   case class Specification(vendor: String, name: String, version: String)
+
+  object Specification {
+    implicit def rw: ReadWriter[Specification] = macroRW
+  }
 }

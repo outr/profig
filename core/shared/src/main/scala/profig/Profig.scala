@@ -1,29 +1,16 @@
 package profig
 
-import io.circe.Json
-
-import scala.concurrent.{ExecutionContext, Future}
 import scala.jdk.CollectionConverters._
 import scala.language.experimental.macros
 
-class Profig(val parent: Option[Profig] = Some(Profig)) extends ProfigPath {
-  private var _local: Json = Json.obj()
-  private var _global: Json = _local
-
+class Profig extends ProfigPath {
+  private var _json: Json = Json()
   private var _lastModified: Long = System.currentTimeMillis()
 
-  updateGlobal()
-
-  def json: Json = {
-    if (parent.map(_.lastModified).getOrElse(0L) > lastModified) {
-      updateGlobal()
-    }
-    _global
-  }
+  def json: Json = _json
 
   protected[profig] def modify(f: Json => Json): Unit = synchronized {
-    _local = f(_local)
-    updateGlobal()
+    _json = f(_json)
     _lastModified = System.currentTimeMillis()
   }
 
@@ -45,16 +32,7 @@ class Profig(val parent: Option[Profig] = Some(Profig)) extends ProfigPath {
     merge(props, `type`)
   }
 
-  def child(): Profig = new Profig(Some(this))
-
-  private def updateGlobal(): Unit = synchronized {
-    parent match {
-      case Some(p) => _global = p.json.deepMerge(_local)
-      case None => _global = _local
-    }
-  }
-
-  override def remove(): Unit = modify(_ => Json.obj())
+  override def remove(): Unit = modify(_ => Json())
 
   def clear(): Unit = remove()
 }
@@ -63,14 +41,12 @@ class Profig(val parent: Option[Profig] = Some(Profig)) extends ProfigPath {
   * Profig provides access to environment variables, properties, and other configuration all merged together into one
   * powerful system. Uses JSON internally to provide merging and integration. Paths are dot-separated.
   */
-object Profig extends Profig(None) {
+object Profig extends Profig {
   private var loaded = false
 
   def isLoaded: Boolean = loaded
 
-  def empty: Profig = new Profig(None)
-
-  def apply(parent: Option[Profig]): Profig = new Profig(parent)
+  def empty: Profig = new Profig
 
   /**
     * Initializes Profig
@@ -82,11 +58,8 @@ object Profig extends Profig(None) {
     */
   def init(loadProperties: Boolean = true,
            loadEnvironmentVariables: Boolean = true,
-           loadModules: Boolean = true)
-          (implicit ec: ExecutionContext): Future[Unit] = synchronized {
-    if (loaded) {
-      Future.successful(())
-    } else {
+           loadModules: Boolean = true): Unit = synchronized {
+    if (!loaded) {
       loaded = true
       if (loadProperties) {
         this.loadProperties()
