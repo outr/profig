@@ -18,4 +18,6 @@ package object profig extends upickle.AttributeTagged with PlatformPickler {
       override def visitNull(index: Int): Option[T] = None
     }
   }
+
+  implicit lazy val jsonRW: ReadWriter[Json] = readwriter[ujson.Value].bimap(_.value, new Json(_))
 }

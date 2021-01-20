@@ -58,14 +58,19 @@ class Json(val value: ujson.Value) extends AnyVal {
       parent(key) = ujson.Obj("value" -> existing)
     }
   }
-  def merge[T: Writer](value: T, path: String*): Unit = {
-    def recurse(v: ujson.Value, path: List[String]): Unit = v.objOpt match {
-      case Some(map) => map.foreach {
-        case (key, value) => recurse(value, path ::: List(key))
-      }
-      case None => set(v, path: _*)
+  private def recurse(v: ujson.Value, path: List[String]): Unit = v.objOpt match {
+    case Some(map) => map.foreach {
+      case (key, value) => recurse(value, path ::: List(key))
     }
+    case None => set(v, path: _*)
+  }
+  def merge[T: Writer](value: T, path: String*): Unit = {
     recurse(writeJs(value), path.toList)
+  }
+  def merge(json: Json): Json = {
+    val obj = copy()
+    obj.recurse(json.value, Nil)
+    obj
   }
   def defaults[T: Writer](value: T, path: String*): Unit = {
     def recurse(v: ujson.Value, path: List[String]): Unit = v.objOpt match {

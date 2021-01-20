@@ -103,6 +103,23 @@ class ProfigSpec extends AsyncWordSpec with Matchers {
       ), MergeType.Add)
       profig.json should be(Json.obj("test" -> Json.string("one")))
     }
+    "merge two Json objects" in {
+      val json1 = JsonUtil.fromJsonString[Json](
+        """{
+          |  "one": 1,
+          |  "two": 2,
+          |  "three": 3
+          |}""".stripMargin)
+      val json2 = JsonUtil.fromJsonString[Json](
+        """{
+          |  "three": "tres",
+          |  "four": "quatro",
+          |  "five": "cinco"
+          |}""".stripMargin
+      )
+      val merged = json1.merge(json2)
+      merged.render() should be("""{"one":1,"two":2,"three":"tres","four":"quatro","five":"cinco"}""")
+    }
   }
 
   case class Person(name: String, age: Option[Int] = None)
