@@ -117,7 +117,7 @@ class ProfigSpec extends AsyncWordSpec with Matchers {
           |  "five": "cinco"
           |}""".stripMargin
       )
-      val merged = json1.merge(json2)
+      val merged = Json.merge(json1, json2)
       merged.render() should be("""{"one":1,"two":2,"three":"tres","four":"quatro","five":"cinco"}""")
     }
   }

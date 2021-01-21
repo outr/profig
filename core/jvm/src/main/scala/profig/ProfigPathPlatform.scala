@@ -2,12 +2,15 @@ package profig
 
 import java.io.File
 import java.nio.file.{Path, Paths}
-
 import scala.annotation.tailrec
 import scala.io.Source
 import scala.jdk.CollectionConverters._
 
-class ProfigPathJVM(val profigPath: ProfigPath) extends AnyVal {
+import profig.jdk._
+
+trait ProfigPathPlatform {
+  this: ProfigPath =>
+
   def loadFile(file: File,
                mergeType: MergeType = MergeType.Overwrite,
                errorHandler: Option[Throwable => Unit] = None): Unit = {
@@ -19,7 +22,7 @@ class ProfigPathJVM(val profigPath: ProfigPath) extends AnyVal {
            mergeType: MergeType = MergeType.Overwrite,
            errorHandler: Option[Throwable => Unit] = None): Unit = try {
     val json = source2Json(source, Some(fileName))
-    profigPath.merge(json, mergeType)
+    merge(json, mergeType)
   } catch {
     case t: Throwable => errorHandler.foreach { eh =>
       eh(new RuntimeException(s"Failed to process: $fileName", t))
@@ -72,7 +75,7 @@ class ProfigPathJVM(val profigPath: ProfigPath) extends AnyVal {
 
     // ClassLoader
     if (includeClassPath) {
-      val classLoader = getClass().getClassLoader
+      val classLoader = getClass.getClassLoader
       files = FileNameMatcher.OverwritePrefixes.toList.flatMap { prefix =>
         FileNameMatcher.DefaultExtensions.toList.flatMap { extension =>
           val fileName = s"$prefix.$extension"

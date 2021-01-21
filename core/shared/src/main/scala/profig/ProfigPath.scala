@@ -6,7 +6,7 @@ import scala.language.experimental.macros
   * ProfigPath is the core of functionality in Profig. Profig extends from it for the root path and is used for looking
   * up deeper paths as well.
   */
-trait ProfigPath {
+trait ProfigPath extends ProfigPathPlatform {
   def instance: Profig
   def path: List[String]
 

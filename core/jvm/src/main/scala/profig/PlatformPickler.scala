@@ -41,6 +41,4 @@ trait PlatformPickler {
       Moduload.load()
     }
   }
-
-  implicit def path2JVM(path: ProfigPath): ProfigPathJVM = new ProfigPathJVM(path)
 }

@@ -1,6 +1,8 @@
 package profig
 
 class Json(val value: ujson.Value) extends AnyVal {
+  def isEmpty: Boolean = value.isNull || value.objOpt.exists(_.isEmpty)
+  def nonEmpty: Boolean = !isEmpty
   def as[T: Reader]: T = read[T](value)
   def get(path: String*): Option[Json] = if (path.isEmpty) {
     Some(this)
@@ -11,6 +13,7 @@ class Json(val value: ujson.Value) extends AnyVal {
       case _ => None
     }
   }
+  def \\(path: String): Json = apply(path)
   def apply(path: String*): Json = get(path: _*).getOrElse(throw new RuntimeException(s"Path not found: ${path.mkString(".")}"))
   def obj(path: String*): Json = if (path.isEmpty) {
     this
@@ -67,11 +70,6 @@ class Json(val value: ujson.Value) extends AnyVal {
   def merge[T: Writer](value: T, path: String*): Unit = {
     recurse(writeJs(value), path.toList)
   }
-  def merge(json: Json): Json = {
-    val obj = copy()
-    obj.recurse(json.value, Nil)
-    obj
-  }
   def defaults[T: Writer](value: T, path: String*): Unit = {
     def recurse(v: ujson.Value, path: List[String]): Unit = v.objOpt match {
       case Some(map) => map.foreach {
@@ -106,5 +104,13 @@ object Json {
 
   def string(s: String): Json = new Json(ujson.Str(s))
 
+  def array(entries: Json*): Json = new Json(ujson.Arr(entries.map(_.value): _*))
+
   def parse(json: String): Json = new Json(read[ujson.Value](json))
+
+  def merge(json: Json, more: Json*): Json = {
+    val obj = json.copy()
+    more.foreach(obj.recurse(_, Nil))
+    obj
+  }
 }
