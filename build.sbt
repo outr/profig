@@ -42,7 +42,7 @@ val scalatestVersion = "3.2.3"
 val typesafeConfig = "1.4.1"
 
 // Used for YAML support
-val jacksonVersion = "2.12.0"
+val jacksonVersion = "2.12.1"
 
 lazy val root = project.in(file("."))
   .aggregate(coreJS, coreJVM, xml, hocon, yaml, all)
