@@ -33,7 +33,7 @@ developers in ThisBuild := List(
 
 val uPickle = "1.2.3"
 val moduload = "1.1.0"
-val collectionCompat = "2.4.1"
+val collectionCompat = "2.4.2"
 val reactify = "4.0.3"
 val scalaXMLVersion = "2.0.0-M4"
 val scalatestVersion = "3.2.3"
