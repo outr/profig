@@ -36,7 +36,7 @@ val moduload = "1.1.2"
 val collectionCompat = "2.4.2"
 val reactify = "4.0.3"
 val scalaXMLVersion = "2.0.0-M5"
-val scalatestVersion = "3.2.3"
+val scalatestVersion = "3.2.5"
 
 // Used for HOCON support
 val typesafeConfig = "1.4.1"
