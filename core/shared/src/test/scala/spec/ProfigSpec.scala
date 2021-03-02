@@ -3,6 +3,9 @@ package spec
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AsyncWordSpec
 import profig._
+import hierarchical._
+import hierarchical.parse.Json
+import hierarchical.rw._
 
 class ProfigSpec extends AsyncWordSpec with Matchers {
   "Profig" should {
@@ -76,67 +79,67 @@ class ProfigSpec extends AsyncWordSpec with Matchers {
       orphan("people.john.age").opt[Int] should be(None)
     }
     "validate loading a String value of true as Boolean" in {
-      Profig("test.boolean").merge(Json.parse("true"))
+      Profig("test.boolean").merge(bool(true))
       Profig("test.boolean").as[Boolean] should be(true)
     }
     "validate overwrite" in {
       val profig = Profig.empty
-      profig.json should be(Json())
-      profig.merge(Json.obj(
-        "test" -> Json.string("one")
+      profig.json should be(obj())
+      profig.merge(obj(
+        "test" -> "one"
       ), MergeType.Overwrite)
-      profig.json should be(Json.obj("test" -> Json.string("one")))
-      profig.merge(Json.obj(
-        "test" -> Json.string("two")
+      profig.json should be(obj("test" -> "one"))
+      profig.merge(obj(
+        "test" -> "two"
       ), MergeType.Overwrite)
-      profig.json should be(Json.obj("test" -> Json.string("two")))
+      profig.json should be(obj("test" -> "two"))
     }
     "validate add" in {
       val profig = Profig.empty
-      profig.json should be(Json.obj())
-      profig.merge(Json.obj(
-        "test" -> Json.string("one")
+      profig.json should be(obj())
+      profig.merge(obj(
+        "test" -> "one"
       ), MergeType.Add)
-      profig.json should be(Json.obj("test" -> Json.string("one")))
-      profig.merge(Json.obj(
-        "test" -> Json.string("two")
+      profig.json should be(obj("test" -> "one"))
+      profig.merge(obj(
+        "test" -> "two"
       ), MergeType.Add)
-      profig.json should be(Json.obj("test" -> Json.string("one")))
+      profig.json should be(obj("test" -> "one"))
     }
     "merge two Json objects" in {
-      val json1 = JsonUtil.fromJsonString[Json](
+      val json1 = Json.parse(
         """{
           |  "one": 1,
           |  "two": 2,
           |  "three": 3
           |}""".stripMargin)
-      val json2 = JsonUtil.fromJsonString[Json](
+      val json2 = Json.parse(
         """{
           |  "three": "tres",
           |  "four": "quatro",
           |  "five": "cinco"
           |}""".stripMargin
       )
-      val merged = Json.merge(json1, json2)
-      merged.render() should be("""{"one":1,"two":2,"three":"tres","four":"quatro","five":"cinco"}""")
+      val merged = Value.merge(json1, json2)
+      merged.toString should be("""{"one":1,"two":2,"three":"tres","four":"quatro","five":"cinco"}""")
     }
   }
 
   case class Person(name: String, age: Option[Int] = None)
 
   object Person {
-    implicit def rw: ReadWriter[Person] = macroRW
+    implicit def rw: ReaderWriter[Person] = ccRW
   }
 
   case class JVMInfo(version: String, specification: Specification)
 
   object JVMInfo {
-    implicit def rw: ReadWriter[JVMInfo] = macroRW
+    implicit def rw: ReaderWriter[JVMInfo] = ccRW
   }
 
   case class Specification(vendor: String, name: String, version: String)
 
   object Specification {
-    implicit def rw: ReadWriter[Specification] = macroRW
+    implicit def rw: ReaderWriter[Specification] = ccRW
   }
 }

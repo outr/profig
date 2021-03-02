@@ -1,5 +1,8 @@
 package profig
 
+import hierarchical._
+import hierarchical.rw._
+
 import scala.language.experimental.macros
 
 /**
@@ -8,17 +11,14 @@ import scala.language.experimental.macros
   */
 trait ProfigPath extends ProfigPathPlatform {
   def instance: Profig
-  def path: List[String]
+  def path: Path
 
   /**
     * Look up a deeper path below the current path.
     *
     * @return ProfigPath
     */
-  def apply(path: String*): ProfigPath = {
-    val list = path.toList.flatMap(path2List)
-    ProfigPath(instance, this.path ::: list)
-  }
+  def apply(path: String*): ProfigPath = ProfigPath(instance, this.path \\ new Path(path.toList))
 
   /**
     * Loads this path out as the defined type `T`.
@@ -26,7 +26,7 @@ trait ProfigPath extends ProfigPathPlatform {
     * @tparam T the type to represent the current path
     * @return T
     */
-  def as[T: Reader]: T = JsonUtil.fromJson[T](apply())
+  def as[T: Writer]: T = apply().as[T]
 
   /**
     * Loads this path out as the defined type `T`. If no value is set for this path, the default will be used.
@@ -35,7 +35,7 @@ trait ProfigPath extends ProfigPathPlatform {
     * @tparam T the type to represent the current path
     * @return T
     */
-  def as[T: Reader](default: => T): T = get().map(JsonUtil.fromJson[T]).getOrElse(default)
+  def as[T: Writer](default: => T): T = opt[T].getOrElse(default)
 
   /**
     * Convenience functionality similar to `as` but returns an option if set.
@@ -43,19 +43,7 @@ trait ProfigPath extends ProfigPathPlatform {
     * @tparam T the type to represent the current path
     * @return T
     */
-  def opt[T: Reader]: Option[T] = {
-    get() match {
-      case Some(json) => json.value match {
-        case arr: ujson.Arr => if (arr.value.isEmpty) {
-          None
-        } else {
-          Some(JsonUtil.fromJson[T](new Json(arr.value.head)))
-        }
-        case _ => Some(JsonUtil.fromJson[T](json))
-      }
-      case None => None
-    }
-  }
+  def opt[T: Writer]: Option[T] = get().map(_.as[T])
 
   /**
     * Stores the supplied value into this path.
@@ -63,14 +51,14 @@ trait ProfigPath extends ProfigPathPlatform {
     * @param value the value to store
     * @tparam T the type of value
     */
-  def store[T: Writer](value: T): Unit = merge(JsonUtil.toJson[T](value))
+  def store[T: Reader](value: T): Unit = merge(value.toValue)
 
   /**
     * Returns a Json representation of this path if there is anything defined at this level.
     *
     * @return Option[Json]
     */
-  def get(): Option[Json] = instance.json.get(path: _*)
+  def get(): Option[Value] = instance.json.get(path)
 
   /**
     * Returns a Json representation of this path. Works similar to `get()`, except will return an empty Json object if
@@ -78,7 +66,7 @@ trait ProfigPath extends ProfigPathPlatform {
     *
     * @return Json
     */
-  def apply(): Json = instance.json.obj(path: _*)
+  def apply(): Value = instance.json(path)
 
   /**
     * True if this path exists in the config
@@ -88,29 +76,20 @@ trait ProfigPath extends ProfigPathPlatform {
   /**
     * Merges a Json object to this path.
     */
-  def merge(json: Json, `type`: MergeType = MergeType.Overwrite): Unit = synchronized {
-    `type` match {
-      case MergeType.Overwrite => instance.json.merge(json.value, path: _*)
-      case MergeType.Add => instance.json.defaults(json.value, path: _*)
-    }
-  }
+  def merge(json: Value, `type`: MergeType = MergeType.Overwrite): Unit = instance.modify(_.merge(json, path, `type`))
 
   /**
     * Removes a field from this path.
     *
     * @param field the field below this path to remove
     */
-  def remove(field: String): Unit = synchronized {
-    instance.json.remove((path ::: List(field)): _*)
-  }
+  def remove(field: String): Unit = instance.modify(_.remove(path \ field))
 
-  def remove(): Unit = instance(path.take(path.length - 1): _*).remove(path.last)
-
-  private def path2List(path: String): List[String] = path.split('.').toList
+  def remove(): Unit = instance.modify(_.remove(path))
 }
 
 object ProfigPath {
-  def apply(instance: Profig, path: List[String]): ProfigPath = new ProfigSubPath(instance, path)
+  def apply(instance: Profig, path: Path): ProfigPath = new ProfigSubPath(instance, path)
 
-  class ProfigSubPath(override val instance: Profig, override val path: List[String]) extends ProfigPath
+  class ProfigSubPath(override val instance: Profig, override val path: Path) extends ProfigPath
 }

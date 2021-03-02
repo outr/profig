@@ -1,5 +1,7 @@
 package profig
 
+import hierarchical.MergeType
+
 trait FileNameMatcher {
   def matches(prefix: String, extension: String): Option[MergeType]
 }

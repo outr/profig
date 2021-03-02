@@ -10,7 +10,7 @@ val scala2Versions = List(scala213, scala212)
 val compatScalaVersions = List(scala213, scala212)
 
 organization in ThisBuild := "com.outr"
-version in ThisBuild := "3.1.3-SNAPSHOT"
+version in ThisBuild := "3.2.0-SNAPSHOT"
 scalaVersion in ThisBuild := scala213
 scalacOptions in ThisBuild ++= Seq("-unchecked", "-deprecation", "-feature")
 
@@ -31,7 +31,7 @@ developers in ThisBuild := List(
   Developer(id="darkfrog", name="Matt Hicks", email="matt@matthicks.com", url=url("http://matthicks.com"))
 )
 
-val uPickle = "1.2.3"
+val hierarchical = "1.0.0-SNAPSHOT"
 val moduload = "1.1.2"
 val collectionCompat = "2.4.2"
 val reactify = "4.0.3"
@@ -58,7 +58,7 @@ lazy val core = crossProject(JSPlatform, JVMPlatform)
   .settings(
     name := "profig",
     libraryDependencies ++= Seq(
-      "com.lihaoyi" %%% "upickle" % uPickle,
+      "com.outr" %%% "hierarchical-parse" % hierarchical,
       "org.scala-lang.modules" %%% "scala-collection-compat" % collectionCompat
     ),
     crossScalaVersions := allScalaVersions

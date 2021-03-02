@@ -1,15 +1,17 @@
 package profig
 
+import hierarchical._
+
 import scala.jdk.CollectionConverters._
 import scala.language.experimental.macros
 
 class Profig extends ProfigPath {
-  private var _json: Json = Json()
+  private var _json: Value = obj()
   private var _lastModified: Long = System.currentTimeMillis()
 
-  def json: Json = _json
+  def json: Value = _json
 
-  protected[profig] def modify(f: Json => Json): Unit = synchronized {
+  protected[profig] def modify(f: Value => Value): Unit = synchronized {
     _json = f(_json)
     _lastModified = System.currentTimeMillis()
   }
@@ -17,7 +19,7 @@ class Profig extends ProfigPath {
   def lastModified: Long = _lastModified
 
   override def instance: Profig = this
-  override def path: List[String] = Nil
+  override def path: Path = Path.empty
 
   def loadEnvironmentVariables(`type`: MergeType = MergeType.Add): Unit = {
     val envMap = System.getenv().asScala.toMap
@@ -32,7 +34,7 @@ class Profig extends ProfigPath {
     merge(props, `type`)
   }
 
-  override def remove(): Unit = modify(_ => Json())
+  override def remove(): Unit = modify(_ => obj())
 
   def clear(): Unit = remove()
 }

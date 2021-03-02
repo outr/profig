@@ -1,11 +1,12 @@
 package spec
 
-import java.io.File
+import hierarchical.rw._
 
+import java.io.File
 import profig._
 
 case class Special(title: String, location: File)
 
 object Special {
-  implicit def rw: ReadWriter[Special] = macroRW
+  implicit def rw: ReaderWriter[Special] = ccRW
 }
