@@ -3,9 +3,9 @@ package spec
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AsyncWordSpec
 import profig._
-import hierarchical._
-import hierarchical.parse.Json
-import hierarchical.rw._
+import fabric._
+import fabric.parse.Json
+import fabric.rw._
 
 class ProfigSpec extends AsyncWordSpec with Matchers {
   "Profig" should {
@@ -28,7 +28,8 @@ class ProfigSpec extends AsyncWordSpec with Matchers {
       Profig("test.other").as[String]("no") should be("no")
     }
     "merge arguments" in {
-      Profig.merge(List("-this.is.an.argument", "Wahoo!"))
+      val value = ProfigUtil.args2Json(List("-this.is.an.argument", "Wahoo!"))
+      Profig.merge(value)
       succeed
     }
     "load a String argument" in {
@@ -121,7 +122,13 @@ class ProfigSpec extends AsyncWordSpec with Matchers {
           |}""".stripMargin
       )
       val merged = Value.merge(json1, json2)
-      merged.toString should be("""{"one":1,"two":2,"three":"tres","four":"quatro","five":"cinco"}""")
+      merged should be(obj(
+        "one" -> 1,
+        "two" -> 2,
+        "three" -> "tres",
+        "four" -> "quatro",
+        "five" -> "cinco"
+      ))
     }
   }
 

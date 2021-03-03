@@ -31,8 +31,7 @@ developers in ThisBuild := List(
   Developer(id="darkfrog", name="Matt Hicks", email="matt@matthicks.com", url=url("http://matthicks.com"))
 )
 
-val hierarchical = "1.0.0-SNAPSHOT"
-val moduload = "1.1.2"
+val fabric = "1.0.0-SNAPSHOT"
 val collectionCompat = "2.4.2"
 val reactify = "4.0.3"
 val scalaXMLVersion = "2.0.0-M5"
@@ -45,7 +44,7 @@ val typesafeConfig = "1.4.1"
 val jacksonVersion = "2.12.1"
 
 lazy val root = project.in(file("."))
-  .aggregate(coreJS, coreJVM, xml, hocon, yaml, all)
+  .aggregate(coreJS, coreJVM)
   .settings(
     name := "profig",
     publish := {},
@@ -58,14 +57,13 @@ lazy val core = crossProject(JSPlatform, JVMPlatform)
   .settings(
     name := "profig",
     libraryDependencies ++= Seq(
-      "com.outr" %%% "hierarchical-parse" % hierarchical,
+      "com.outr" %%% "fabric-parse" % fabric,
       "org.scala-lang.modules" %%% "scala-collection-compat" % collectionCompat
     ),
     crossScalaVersions := allScalaVersions
   )
   .jvmSettings(
     libraryDependencies ++= Seq(
-      "com.outr" %% "moduload" % moduload,
       "org.scalatest" %% "scalatest" % scalatestVersion % "test"
     )
   )
@@ -82,41 +80,3 @@ lazy val core = crossProject(JSPlatform, JVMPlatform)
 
 lazy val coreJS = core.js
 lazy val coreJVM = core.jvm
-
-lazy val xml = project
-  .in(file("xml"))
-  .settings(
-    name := "profig-xml",
-    libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % scalaXMLVersion,
-    crossScalaVersions := allScalaVersions
-  )
-  .dependsOn(core.jvm)
-
-lazy val hocon = project
-  .in(file("hocon"))
-  .settings(
-    name := "profig-hocon",
-    libraryDependencies += "com.typesafe" % "config" % typesafeConfig,
-    crossScalaVersions := allScalaVersions
-  )
-  .dependsOn(core.jvm)
-
-lazy val yaml = project
-  .in(file("yaml"))
-  .settings(
-    name := "profig-yaml",
-    libraryDependencies += "com.fasterxml.jackson.dataformat" % "jackson-dataformat-yaml" % jacksonVersion,
-    crossScalaVersions := allScalaVersions
-  )
-  .dependsOn(core.jvm)
-
-lazy val all = project
-  .in(file("all"))
-  .settings(
-    name := "profig-all",
-    libraryDependencies ++= Seq(
-      "org.scalatest" %% "scalatest" % scalatestVersion % "test"
-    ),
-    crossScalaVersions := allScalaVersions
-  )
-  .dependsOn(coreJVM, xml, hocon, yaml)

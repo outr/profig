@@ -1,7 +1,7 @@
 package profig
 
 import java.util.Properties
-import hierarchical._
+import fabric._
 
 import scala.jdk.CollectionConverters._
 

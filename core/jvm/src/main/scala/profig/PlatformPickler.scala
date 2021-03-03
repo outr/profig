@@ -1,14 +1,12 @@
 package profig
 
-import moduload.Moduload
-
 import java.io.File
 import java.net.URL
 import java.nio.file.Path
 import scala.io.Source
 
-import hierarchical._
-import hierarchical.rw._
+import fabric._
+import fabric.rw._
 
 import scala.language.implicitConversions
 
@@ -39,9 +37,5 @@ trait PlatformPickler {
     source.close()
   }
 
-  def initProfig(loadModules: Boolean): Unit = {
-    if (loadModules) {
-      Moduload.load()
-    }
-  }
+  def initProfig(): Unit = {}
 }

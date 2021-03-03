@@ -1,10 +1,10 @@
 package spec
 
-import java.io.File
+import fabric.Path
 
+import java.io.File
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-
 import profig._
 
 class ProfigJVMSpec extends AnyWordSpec with Matchers {
@@ -12,8 +12,8 @@ class ProfigJVMSpec extends AnyWordSpec with Matchers {
     "merge a special type" in {
       val location = new File(System.getProperty("user.home"))
       Profig("special").store(Special("testing", location))
-      Profig("special.title").as[String] should be("testing")
-      Profig("special.location").as[File] should be(location)
+      Profig(Path.parse("special.title")).as[String] should be("testing")
+      Profig(Path.parse("special.location")).as[File] should be(location)
     }
     "load a special type" in {
       val special = Profig("special").as[Special]

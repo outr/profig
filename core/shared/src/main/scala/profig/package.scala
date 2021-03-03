@@ -1,6 +1,6 @@
 import java.util.Properties
 
-import hierarchical._
+import fabric._
 import scala.language.implicitConversions
 
 package object profig extends PlatformPickler {

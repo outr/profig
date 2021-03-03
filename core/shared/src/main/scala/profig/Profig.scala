@@ -1,6 +1,6 @@
 package profig
 
-import hierarchical._
+import fabric._
 
 import scala.jdk.CollectionConverters._
 import scala.language.experimental.macros
@@ -55,12 +55,9 @@ object Profig extends Profig {
     *
     * @param loadProperties whether to load system properties
     * @param loadEnvironmentVariables whether to load environment variables
-    * @param loadModules whether to load external modules (ex. XML, Hocon, YAML support)
-    * @param ec the execution context to run this in
     */
   def init(loadProperties: Boolean = true,
-           loadEnvironmentVariables: Boolean = true,
-           loadModules: Boolean = true): Unit = synchronized {
+           loadEnvironmentVariables: Boolean = true): Unit = synchronized {
     if (!loaded) {
       loaded = true
       if (loadProperties) {
@@ -69,7 +66,6 @@ object Profig extends Profig {
       if (loadEnvironmentVariables) {
         this.loadEnvironmentVariables()
       }
-      initProfig(loadModules)
     }
   }
 }

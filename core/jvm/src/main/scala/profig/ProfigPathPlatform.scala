@@ -1,6 +1,6 @@
 package profig
 
-import hierarchical.MergeType
+import fabric.MergeType
 
 import java.io.File
 import java.nio.file.{Path, Paths}

@@ -1,6 +1,6 @@
 package spec
 
-import hierarchical.rw._
+import fabric.rw._
 
 import java.io.File
 import profig._

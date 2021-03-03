@@ -1,7 +1,7 @@
 package profig
 
-import hierarchical._
-import hierarchical.rw._
+import fabric._
+import fabric.rw._
 
 import scala.language.experimental.macros
 
@@ -18,7 +18,9 @@ trait ProfigPath extends ProfigPathPlatform {
     *
     * @return ProfigPath
     */
-  def apply(path: String*): ProfigPath = ProfigPath(instance, this.path \\ new Path(path.toList))
+  def apply(path: String*): ProfigPath = ProfigPath(instance, this.path \\ new Path(path.toList.flatMap(p => Path.parse(p).entries)))
+
+  def apply(path: Path): ProfigPath = ProfigPath(instance, this.path \\ path)
 
   /**
     * Loads this path out as the defined type `T`.
