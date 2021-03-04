@@ -10,7 +10,7 @@ val scala2Versions = List(scala213, scala212)
 val compatScalaVersions = List(scala213, scala212)
 
 organization in ThisBuild := "com.outr"
-version in ThisBuild := "3.2.0-SNAPSHOT"
+version in ThisBuild := "3.2.0"
 scalaVersion in ThisBuild := scala213
 scalacOptions in ThisBuild ++= Seq("-unchecked", "-deprecation", "-feature")
 
