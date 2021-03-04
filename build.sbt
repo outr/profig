@@ -4,8 +4,8 @@ import sbtcrossproject.CrossType
 // Scala versions
 val scala213 = "2.13.4"
 val scala212 = "2.12.12"
-//val scala3 = "3.0.0-M3"
-val allScalaVersions = List(scala213, scala212) //, scala3)
+val scala3 = "3.0.0-RC1"
+val allScalaVersions = List(scala213, scala212, scala3)
 val scala2Versions = List(scala213, scala212)
 val compatScalaVersions = List(scala213, scala212)
 
@@ -31,11 +31,11 @@ developers in ThisBuild := List(
   Developer(id="darkfrog", name="Matt Hicks", email="matt@matthicks.com", url=url("http://matthicks.com"))
 )
 
-val fabric = "1.0.0-SNAPSHOT"
+val fabric = "1.0.0"
 val collectionCompat = "2.4.2"
 val reactify = "4.0.3"
 val scalaXMLVersion = "2.0.0-M5"
-val scalatestVersion = "3.2.5"
+val munitVersion: String = "0.7.22"
 
 // Used for HOCON support
 val typesafeConfig = "1.4.1"
@@ -58,24 +58,11 @@ lazy val core = crossProject(JSPlatform, JVMPlatform)
     name := "profig",
     libraryDependencies ++= Seq(
       "com.outr" %%% "fabric-parse" % fabric,
-      "org.scala-lang.modules" %%% "scala-collection-compat" % collectionCompat
+      "org.scala-lang.modules" %%% "scala-collection-compat" % collectionCompat,
+      "org.scalameta" %%% "munit" % munitVersion % Test
     ),
+    testFrameworks += new TestFramework("munit.Framework"),
     crossScalaVersions := allScalaVersions
-  )
-  .jvmSettings(
-    libraryDependencies ++= Seq(
-      "org.scalatest" %% "scalatest" % scalatestVersion % "test"
-    )
-  )
-  .jsSettings(
-    test := {},                 // Temporary work-around for ScalaTest not working with Scala.js on Dotty
-    libraryDependencies ++= (
-      if (isDotty.value) {      // Temporary work-around for ScalaTest not working with Scala.js on Dotty
-        Nil
-      } else {
-        List("org.scalatest" %%% "scalatest" % scalatestVersion % "test")
-      }
-    )
   )
 
 lazy val coreJS = core.js

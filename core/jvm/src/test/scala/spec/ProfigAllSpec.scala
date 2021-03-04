@@ -1,16 +1,13 @@
 package spec
 
-import org.scalatest.matchers.should.Matchers
-import org.scalatest.wordspec.AnyWordSpec
 import profig._
 
 import fabric._
 
-class ProfigAllSpec extends AnyWordSpec with Matchers {
+class ProfigAllSpec extends Spec {
   "Profig all" should {
     "initialize" in {
       Profig.init()
-      succeed
     }
     "verify that XML, YAML, and HOCON are available" in {
       ProfigJson.types should be(Set("yaml", "hocon", "json", "config", "conf", "yml", "properties", "xml", "prop", "props"))

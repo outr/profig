@@ -3,11 +3,9 @@ package spec
 import fabric.Path
 
 import java.io.File
-import org.scalatest.matchers.should.Matchers
-import org.scalatest.wordspec.AnyWordSpec
 import profig._
 
-class ProfigJVMSpec extends AnyWordSpec with Matchers {
+class ProfigJVMSpec extends Spec {
   "Profig JVM" should {
     "merge a special type" in {
       val location = new File(System.getProperty("user.home"))

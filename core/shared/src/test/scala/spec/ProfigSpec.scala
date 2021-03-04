@@ -1,17 +1,17 @@
 package spec
 
-import org.scalatest.matchers.should.Matchers
-import org.scalatest.wordspec.AsyncWordSpec
 import profig._
 import fabric._
 import fabric.parse.Json
 import fabric.rw._
+import munit.FunSuite
 
-class ProfigSpec extends AsyncWordSpec with Matchers {
+import scala.language.implicitConversions
+
+class ProfigSpec extends Spec {
   "Profig" should {
     "init" in {
       Profig.init()
-      succeed
     }
     "verify classloading not set" in {
       Profig("test.classloading").opt[String] should be(None)
@@ -30,7 +30,6 @@ class ProfigSpec extends AsyncWordSpec with Matchers {
     "merge arguments" in {
       val value = ProfigUtil.args2Json(List("-this.is.an.argument", "Wahoo!"))
       Profig.merge(value)
-      succeed
     }
     "load a String argument" in {
       Profig("this.is.an.argument").as[String] should be("Wahoo!")
@@ -42,7 +41,6 @@ class ProfigSpec extends AsyncWordSpec with Matchers {
     }
     "store a single String" in {
       Profig("people", "me", "name").store("Matt")
-      succeed
     }
     "load a case class from a path with default arguments" in {
       val person = Profig("people.me").as[Person]
@@ -50,7 +48,6 @@ class ProfigSpec extends AsyncWordSpec with Matchers {
     }
     "storage a case class" in {
       Profig("people", "john").store(Person("John Doe", Some(123)))
-      succeed
     }
     "load the stored case class from path" in {
       val person = Profig("people")("john").as[Person]
@@ -149,4 +146,41 @@ class ProfigSpec extends AsyncWordSpec with Matchers {
   object Specification {
     implicit def rw: ReaderWriter[Specification] = ccRW
   }
+}
+
+trait Spec extends munit.FunSuite {
+  private var parts = List.empty[String]
+
+  implicit class Buildable(s: String) {
+    def should(f: => Unit): Unit = {
+      val current = parts
+      parts = "should" :: s :: parts
+      try {
+        f
+      } finally {
+        parts = current
+      }
+    }
+
+    def in(f: => Unit): Unit = {
+      val name = (s :: parts).reverse.mkString(" ")
+      test(name)(f)
+    }
+  }
+
+  implicit def t2Assertable[T](t: T): Assertable[T] = Assertable[T](t, this)
+
+  def be[T](expected: T): Assertion[T] = BeAssertion[T](expected, this)
+}
+
+case class Assertable[T](value: T, suite: FunSuite) {
+  def should(assertion: Assertion[T]): Unit = assertion.assertWith(value)
+}
+
+trait Assertion[T] {
+  def assertWith(value: T): Unit
+}
+
+case class BeAssertion[T](expected: T, suite: FunSuite) extends Assertion[T] {
+  override def assertWith(value: T): Unit = suite.assertEquals(value, expected)
 }
