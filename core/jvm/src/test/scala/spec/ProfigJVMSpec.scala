@@ -4,6 +4,7 @@ import fabric.Path
 
 import java.io.File
 import profig._
+import testy._
 
 class ProfigJVMSpec extends Spec {
   "Profig JVM" should {

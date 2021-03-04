@@ -3,6 +3,7 @@ package spec
 import profig._
 
 import fabric._
+import testy._
 
 class ProfigAllSpec extends Spec {
   "Profig all" should {

@@ -4,7 +4,7 @@ import profig._
 import fabric._
 import fabric.parse.Json
 import fabric.rw._
-import munit.FunSuite
+import testy._
 
 import scala.language.implicitConversions
 
@@ -146,41 +146,4 @@ class ProfigSpec extends Spec {
   object Specification {
     implicit def rw: ReaderWriter[Specification] = ccRW
   }
-}
-
-trait Spec extends munit.FunSuite {
-  private var parts = List.empty[String]
-
-  implicit class Buildable(s: String) {
-    def should(f: => Unit): Unit = {
-      val current = parts
-      parts = "should" :: s :: parts
-      try {
-        f
-      } finally {
-        parts = current
-      }
-    }
-
-    def in(f: => Unit): Unit = {
-      val name = (s :: parts).reverse.mkString(" ")
-      test(name)(f)
-    }
-  }
-
-  implicit def t2Assertable[T](t: T): Assertable[T] = Assertable[T](t, this)
-
-  def be[T](expected: T): Assertion[T] = BeAssertion[T](expected, this)
-}
-
-case class Assertable[T](value: T, suite: FunSuite) {
-  def should(assertion: Assertion[T]): Unit = assertion.assertWith(value)
-}
-
-trait Assertion[T] {
-  def assertWith(value: T): Unit
-}
-
-case class BeAssertion[T](expected: T, suite: FunSuite) extends Assertion[T] {
-  override def assertWith(value: T): Unit = suite.assertEquals(value, expected)
 }
