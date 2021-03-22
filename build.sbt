@@ -2,7 +2,7 @@ import sbtcrossproject.CrossPlugin.autoImport.crossProject
 import sbtcrossproject.CrossType
 
 // Scala versions
-val scala213 = "2.13.4"
+val scala213 = "2.13.5"
 val scala212 = "2.12.12"
 val scala3 = "3.0.0-RC1"
 val allScalaVersions = List(scala213, scala212, scala3)
@@ -31,11 +31,10 @@ developers in ThisBuild := List(
   Developer(id="darkfrog", name="Matt Hicks", email="matt@matthicks.com", url=url("http://matthicks.com"))
 )
 
-val fabric = "1.0.0"
+val fabric = "1.0.1"
 val collectionCompat = "2.4.2"
-val reactify = "4.0.3"
-val scalaXMLVersion = "2.0.0-M5"
-val testyVersion: String = "1.0.0"
+val reactify = "4.0.4"
+val testyVersion: String = "1.0.1"
 
 // Used for HOCON support
 val typesafeConfig = "1.4.1"
