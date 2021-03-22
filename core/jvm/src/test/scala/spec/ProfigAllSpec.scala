@@ -8,9 +8,6 @@ import testy._
 class ProfigAllSpec extends Spec {
   "Profig all" should {
     "initialize" in {
-      System.getenv().forEach {
-        case (key, value) => println(s"Key: $key, Value: $value")
-      }
       Profig.init()
     }
     "verify that XML, YAML, and HOCON are available" in {
