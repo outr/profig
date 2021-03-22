@@ -31,7 +31,7 @@ developers in ThisBuild := List(
   Developer(id="darkfrog", name="Matt Hicks", email="matt@matthicks.com", url=url("http://matthicks.com"))
 )
 
-val uPickle = "1.2.3"
+val uPickle = "1.3.7"
 val moduload = "1.1.2"
 val collectionCompat = "2.4.2"
 val reactify = "4.0.3"
