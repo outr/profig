@@ -10,7 +10,7 @@ val scala2Versions = List(scala213, scala212)
 val compatScalaVersions = List(scala213, scala212)
 
 organization in ThisBuild := "com.outr"
-version in ThisBuild := "3.2.0"
+version in ThisBuild := "3.2.1-SNAPSHOT"
 scalaVersion in ThisBuild := scala213
 scalacOptions in ThisBuild ++= Seq("-unchecked", "-deprecation", "-feature")
 
@@ -41,7 +41,7 @@ val testyVersion: String = "1.0.0"
 val typesafeConfig = "1.4.1"
 
 // Used for YAML support
-val jacksonVersion = "2.12.1"
+val jacksonVersion = "2.12.2"
 
 lazy val root = project.in(file("."))
   .aggregate(coreJS, coreJVM)
