@@ -1,11 +1,12 @@
 package profig
 
+import fabric.MergeType
+
 import java.io.File
 import java.nio.file.{Path, Paths}
 import scala.annotation.tailrec
 import scala.io.Source
 import scala.jdk.CollectionConverters._
-
 import profig.jdk._
 
 trait ProfigPathPlatform {

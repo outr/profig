@@ -1,15 +1,17 @@
 package profig
 
+import fabric._
+
 import scala.jdk.CollectionConverters._
 import scala.language.experimental.macros
 
 class Profig extends ProfigPath {
-  private var _json: Json = Json()
+  private var _json: Value = obj()
   private var _lastModified: Long = System.currentTimeMillis()
 
-  def json: Json = _json
+  def json: Value = _json
 
-  protected[profig] def modify(f: Json => Json): Unit = synchronized {
+  protected[profig] def modify(f: Value => Value): Unit = synchronized {
     _json = f(_json)
     _lastModified = System.currentTimeMillis()
   }
@@ -17,7 +19,7 @@ class Profig extends ProfigPath {
   def lastModified: Long = _lastModified
 
   override def instance: Profig = this
-  override def path: List[String] = Nil
+  override def path: Path = Path.empty
 
   def loadEnvironmentVariables(`type`: MergeType = MergeType.Add): Unit = {
     val envMap = System.getenv().asScala.toMap
@@ -32,7 +34,7 @@ class Profig extends ProfigPath {
     merge(props, `type`)
   }
 
-  override def remove(): Unit = modify(_ => Json())
+  override def remove(): Unit = modify(_ => obj())
 
   def clear(): Unit = remove()
 }
@@ -53,12 +55,9 @@ object Profig extends Profig {
     *
     * @param loadProperties whether to load system properties
     * @param loadEnvironmentVariables whether to load environment variables
-    * @param loadModules whether to load external modules (ex. XML, Hocon, YAML support)
-    * @param ec the execution context to run this in
     */
   def init(loadProperties: Boolean = true,
-           loadEnvironmentVariables: Boolean = true,
-           loadModules: Boolean = true): Unit = synchronized {
+           loadEnvironmentVariables: Boolean = true): Unit = synchronized {
     if (!loaded) {
       loaded = true
       if (loadProperties) {
@@ -67,7 +66,6 @@ object Profig extends Profig {
       if (loadEnvironmentVariables) {
         this.loadEnvironmentVariables()
       }
-      initProfig(loadModules)
     }
   }
 }

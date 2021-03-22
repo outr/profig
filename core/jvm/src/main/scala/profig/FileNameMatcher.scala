@@ -1,5 +1,7 @@
 package profig
 
+import fabric.MergeType
+
 trait FileNameMatcher {
   def matches(prefix: String, extension: String): Option[MergeType]
 }

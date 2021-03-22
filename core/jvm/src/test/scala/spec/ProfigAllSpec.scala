@@ -1,35 +1,35 @@
 package spec
 
-import org.scalatest.matchers.should.Matchers
-import org.scalatest.wordspec.{AnyWordSpec, AsyncWordSpec}
 import profig._
 
-class ProfigAllSpec extends AnyWordSpec with Matchers {
+import fabric._
+import testy._
+
+class ProfigAllSpec extends Spec {
   "Profig all" should {
     "initialize" in {
       Profig.init()
-      succeed
     }
     "verify that XML, YAML, and HOCON are available" in {
       ProfigJson.types should be(Set("yaml", "hocon", "json", "config", "conf", "yml", "properties", "xml", "prop", "props"))
     }
     "verify YAML support works" in {
-      ProfigYaml(
+      ProfigJson.Yaml(
         """
           |test:
           |  yaml: "yes"
-          |""".stripMargin) should be(Json.obj("test" -> Json.obj("yaml" -> Json.string("yes"))))
+          |""".stripMargin) should be(obj("test" -> obj("yaml" -> "yes")))
     }
     "verify HOCON support works" in {
-      ProfigHocon(
+      ProfigJson.Hocon(
         """
           |test.hocon = "yes"
-          |""".stripMargin) should be(Json.obj("test" -> Json.obj("hocon" -> Json.string("yes"))))
+          |""".stripMargin) should be(obj("test" -> obj("hocon" -> "yes")))
     }
     "verify XML support works" in {
-      ProfigXML(
+      ProfigJson.XML(
         """
-          |<test><xml>yes</xml></test>""".stripMargin) should be(Json.obj("test" -> Json.obj("xml" -> Json.string("yes"))))
+          |<test><xml>yes</xml></test>""".stripMargin) should be(obj("test" -> obj("xml" -> "yes")))
     }
     "load paths" in {
       Profig.loadConfiguration(errorHandler = Some(t => throw t))

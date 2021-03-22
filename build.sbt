@@ -2,15 +2,15 @@ import sbtcrossproject.CrossPlugin.autoImport.crossProject
 import sbtcrossproject.CrossType
 
 // Scala versions
-val scala213 = "2.13.4"
+val scala213 = "2.13.5"
 val scala212 = "2.12.12"
-//val scala3 = "3.0.0-M3"
-val allScalaVersions = List(scala213, scala212) //, scala3)
+val scala3 = "3.0.0-RC1"
+val allScalaVersions = List(scala213, scala212, scala3)
 val scala2Versions = List(scala213, scala212)
 val compatScalaVersions = List(scala213, scala212)
 
 organization in ThisBuild := "com.outr"
-version in ThisBuild := "3.1.3-SNAPSHOT"
+version in ThisBuild := "3.2.1-SNAPSHOT"
 scalaVersion in ThisBuild := scala213
 scalacOptions in ThisBuild ++= Seq("-unchecked", "-deprecation", "-feature")
 
@@ -31,12 +31,10 @@ developers in ThisBuild := List(
   Developer(id="darkfrog", name="Matt Hicks", email="matt@matthicks.com", url=url("http://matthicks.com"))
 )
 
-val uPickle = "1.3.7"
-val moduload = "1.1.2"
+val fabric = "1.0.1"
 val collectionCompat = "2.4.2"
-val reactify = "4.0.3"
-val scalaXMLVersion = "2.0.0-M5"
-val scalatestVersion = "3.2.6"
+val reactify = "4.0.4"
+val testyVersion: String = "1.0.1"
 
 // Used for HOCON support
 val typesafeConfig = "1.4.1"
@@ -45,7 +43,7 @@ val typesafeConfig = "1.4.1"
 val jacksonVersion = "2.12.2"
 
 lazy val root = project.in(file("."))
-  .aggregate(coreJS, coreJVM, xml, hocon, yaml, all)
+  .aggregate(coreJS, coreJVM)
   .settings(
     name := "profig",
     publish := {},
@@ -58,65 +56,16 @@ lazy val core = crossProject(JSPlatform, JVMPlatform)
   .settings(
     name := "profig",
     libraryDependencies ++= Seq(
-      "com.lihaoyi" %%% "upickle" % uPickle,
-      "org.scala-lang.modules" %%% "scala-collection-compat" % collectionCompat
+      "com.outr" %%% "fabric-parse" % fabric,
+      "org.scala-lang.modules" %%% "scala-collection-compat" % collectionCompat,
+      "com.outr" %%% "testy" % testyVersion % Test
     ),
+    testFrameworks += new TestFramework("munit.Framework"),
     crossScalaVersions := allScalaVersions
   )
-  .jvmSettings(
-    libraryDependencies ++= Seq(
-      "com.outr" %% "moduload" % moduload,
-      "org.scalatest" %% "scalatest" % scalatestVersion % "test"
-    )
-  )
   .jsSettings(
-    test := {},                 // Temporary work-around for ScalaTest not working with Scala.js on Dotty
-    libraryDependencies ++= (
-      if (isDotty.value) {      // Temporary work-around for ScalaTest not working with Scala.js on Dotty
-        Nil
-      } else {
-        List("org.scalatest" %%% "scalatest" % scalatestVersion % "test")
-      }
-    )
+    Test / scalaJSLinkerConfig ~= { _.withModuleKind(ModuleKind.CommonJSModule) }
   )
 
 lazy val coreJS = core.js
 lazy val coreJVM = core.jvm
-
-lazy val xml = project
-  .in(file("xml"))
-  .settings(
-    name := "profig-xml",
-    libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % scalaXMLVersion,
-    crossScalaVersions := allScalaVersions
-  )
-  .dependsOn(core.jvm)
-
-lazy val hocon = project
-  .in(file("hocon"))
-  .settings(
-    name := "profig-hocon",
-    libraryDependencies += "com.typesafe" % "config" % typesafeConfig,
-    crossScalaVersions := allScalaVersions
-  )
-  .dependsOn(core.jvm)
-
-lazy val yaml = project
-  .in(file("yaml"))
-  .settings(
-    name := "profig-yaml",
-    libraryDependencies += "com.fasterxml.jackson.dataformat" % "jackson-dataformat-yaml" % jacksonVersion,
-    crossScalaVersions := allScalaVersions
-  )
-  .dependsOn(core.jvm)
-
-lazy val all = project
-  .in(file("all"))
-  .settings(
-    name := "profig-all",
-    libraryDependencies ++= Seq(
-      "org.scalatest" %% "scalatest" % scalatestVersion % "test"
-    ),
-    crossScalaVersions := allScalaVersions
-  )
-  .dependsOn(coreJVM, xml, hocon, yaml)

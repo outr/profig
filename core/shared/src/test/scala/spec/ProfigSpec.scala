@@ -1,14 +1,17 @@
 package spec
 
-import org.scalatest.matchers.should.Matchers
-import org.scalatest.wordspec.AsyncWordSpec
 import profig._
+import fabric._
+import fabric.parse.Json
+import fabric.rw._
+import testy._
 
-class ProfigSpec extends AsyncWordSpec with Matchers {
+import scala.language.implicitConversions
+
+class ProfigSpec extends Spec {
   "Profig" should {
     "init" in {
       Profig.init()
-      succeed
     }
     "verify classloading not set" in {
       Profig("test.classloading").opt[String] should be(None)
@@ -25,8 +28,8 @@ class ProfigSpec extends AsyncWordSpec with Matchers {
       Profig("test.other").as[String]("no") should be("no")
     }
     "merge arguments" in {
-      Profig.merge(List("-this.is.an.argument", "Wahoo!"))
-      succeed
+      val value = ProfigUtil.args2Json(List("-this.is.an.argument", "Wahoo!"))
+      Profig.merge(value)
     }
     "load a String argument" in {
       Profig("this.is.an.argument").as[String] should be("Wahoo!")
@@ -38,7 +41,6 @@ class ProfigSpec extends AsyncWordSpec with Matchers {
     }
     "store a single String" in {
       Profig("people", "me", "name").store("Matt")
-      succeed
     }
     "load a case class from a path with default arguments" in {
       val person = Profig("people.me").as[Person]
@@ -46,7 +48,6 @@ class ProfigSpec extends AsyncWordSpec with Matchers {
     }
     "storage a case class" in {
       Profig("people", "john").store(Person("John Doe", Some(123)))
-      succeed
     }
     "load the stored case class from path" in {
       val person = Profig("people")("john").as[Person]
@@ -76,67 +77,73 @@ class ProfigSpec extends AsyncWordSpec with Matchers {
       orphan("people.john.age").opt[Int] should be(None)
     }
     "validate loading a String value of true as Boolean" in {
-      Profig("test.boolean").merge(Json.parse("true"))
+      Profig("test.boolean").merge(bool(true))
       Profig("test.boolean").as[Boolean] should be(true)
     }
     "validate overwrite" in {
       val profig = Profig.empty
-      profig.json should be(Json())
-      profig.merge(Json.obj(
-        "test" -> Json.string("one")
+      profig.json should be(obj())
+      profig.merge(obj(
+        "test" -> "one"
       ), MergeType.Overwrite)
-      profig.json should be(Json.obj("test" -> Json.string("one")))
-      profig.merge(Json.obj(
-        "test" -> Json.string("two")
+      profig.json should be(obj("test" -> "one"))
+      profig.merge(obj(
+        "test" -> "two"
       ), MergeType.Overwrite)
-      profig.json should be(Json.obj("test" -> Json.string("two")))
+      profig.json should be(obj("test" -> "two"))
     }
     "validate add" in {
       val profig = Profig.empty
-      profig.json should be(Json.obj())
-      profig.merge(Json.obj(
-        "test" -> Json.string("one")
+      profig.json should be(obj())
+      profig.merge(obj(
+        "test" -> "one"
       ), MergeType.Add)
-      profig.json should be(Json.obj("test" -> Json.string("one")))
-      profig.merge(Json.obj(
-        "test" -> Json.string("two")
+      profig.json should be(obj("test" -> "one"))
+      profig.merge(obj(
+        "test" -> "two"
       ), MergeType.Add)
-      profig.json should be(Json.obj("test" -> Json.string("one")))
+      profig.json should be(obj("test" -> "one"))
     }
     "merge two Json objects" in {
-      val json1 = JsonUtil.fromJsonString[Json](
+      val json1 = Json.parse(
         """{
           |  "one": 1,
           |  "two": 2,
           |  "three": 3
           |}""".stripMargin)
-      val json2 = JsonUtil.fromJsonString[Json](
+      val json2 = Json.parse(
         """{
           |  "three": "tres",
           |  "four": "quatro",
           |  "five": "cinco"
           |}""".stripMargin
       )
-      val merged = Json.merge(json1, json2)
-      merged.render() should be("""{"one":1,"two":2,"three":"tres","four":"quatro","five":"cinco"}""")
+      val merged = Value.merge(json1, json2)
+      merged should be(obj(
+        "one" -> 1,
+        "two" -> 2,
+        "three" -> "tres",
+        "four" -> "quatro",
+        "five" -> "cinco"
+      ))
     }
   }
 
   case class Person(name: String, age: Option[Int] = None)
 
   object Person {
-    implicit def rw: ReadWriter[Person] = macroRW
+    implicit def rw: ReaderWriter[Person] = ccRW
   }
 
   case class JVMInfo(version: String, specification: Specification)
 
   object JVMInfo {
-    implicit def rw: ReadWriter[JVMInfo] = macroRW
+    implicit def rw: ReaderWriter[JVMInfo] = ccRW
   }
 
   case class Specification(vendor: String, name: String, version: String)
 
   object Specification {
-    implicit def rw: ReadWriter[Specification] = macroRW
+    implicit def rw: ReaderWriter[Specification] = ccRW
   }
 }
