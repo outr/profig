@@ -34,7 +34,7 @@ developers in ThisBuild := List(
 val fabric = "1.0.3"
 val collectionCompat = "2.4.3"
 val reactify = "4.0.4"
-val testyVersion: String = "1.0.2"
+val testyVersion: String = "1.0.3"
 
 // Used for HOCON support
 val typesafeConfig = "1.4.1"
