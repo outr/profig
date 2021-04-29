@@ -4,43 +4,43 @@ import sbtcrossproject.CrossType
 // Scala versions
 val scala213 = "2.13.5"
 val scala212 = "2.12.12"
-val scala3 = "3.0.0-RC1"
-val allScalaVersions = List(scala213, scala212, scala3)
-val scala2Versions = List(scala213, scala212)
+val scala3 = List("3.0.0-RC2", "3.0.0-RC3")
+val scala2 = List(scala213, scala212)
+val allScalaVersions = scala2 ::: scala3
 val compatScalaVersions = List(scala213, scala212)
 
-organization in ThisBuild := "com.outr"
-version in ThisBuild := "3.2.1"
-scalaVersion in ThisBuild := scala213
-scalacOptions in ThisBuild ++= Seq("-unchecked", "-deprecation", "-feature")
+ThisBuild / organization := "com.outr"
+ThisBuild / version := "3.2.2-SNAPSHOT"
+ThisBuild / scalaVersion := scala213
+ThisBuild / scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature")
 
-publishTo in ThisBuild := sonatypePublishTo.value
-publishConfiguration in ThisBuild := publishConfiguration.value.withOverwrite(true)
-sonatypeProfileName in ThisBuild := "com.outr"
-publishMavenStyle in ThisBuild := true
-licenses in ThisBuild := Seq("MIT" -> url("https://github.com/outr/profig/blob/master/LICENSE"))
-sonatypeProjectHosting in ThisBuild := Some(xerial.sbt.Sonatype.GitHubHosting("outr", "profig", "matt@outr.com"))
-homepage in ThisBuild := Some(url("https://github.com/outr/profig"))
-scmInfo in ThisBuild := Some(
+ThisBuild / publishTo := sonatypePublishTo.value
+ThisBuild / publishConfiguration := publishConfiguration.value.withOverwrite(true)
+ThisBuild / sonatypeProfileName := "com.outr"
+ThisBuild / publishMavenStyle := true
+ThisBuild / licenses := Seq("MIT" -> url("https://github.com/outr/profig/blob/master/LICENSE"))
+ThisBuild / sonatypeProjectHosting := Some(xerial.sbt.Sonatype.GitHubHosting("outr", "profig", "matt@outr.com"))
+ThisBuild / homepage := Some(url("https://github.com/outr/profig"))
+ThisBuild / scmInfo := Some(
   ScmInfo(
     url("https://github.com/outr/profig"),
     "scm:git@github.com:outr/profig.git"
   )
 )
-developers in ThisBuild := List(
+ThisBuild / developers := List(
   Developer(id="darkfrog", name="Matt Hicks", email="matt@matthicks.com", url=url("http://matthicks.com"))
 )
 
-val fabric = "1.0.4"
-val collectionCompat = "2.4.3"
-val reactify = "4.0.4"
-val testyVersion: String = "1.0.3"
+val fabric: String = "1.0.5"
+val collectionCompat: String = "2.4.3"
+val reactify: String = "4.0.5"
+val testyVersion: String = "1.0.5"
 
 // Used for HOCON support
 val typesafeConfig = "1.4.1"
 
-// Used for YAML support
-val jacksonVersion = "2.12.2"
+// Used for YAML and XML support
+val jacksonVersion = "2.12.3"
 
 lazy val root = project.in(file("."))
   .aggregate(coreJS, coreJVM)
