@@ -2,8 +2,8 @@ import sbtcrossproject.CrossPlugin.autoImport.crossProject
 import sbtcrossproject.CrossType
 
 // Scala versions
-val scala213 = "2.13.5"
-val scala212 = "2.12.12"
+val scala213 = "2.13.7"
+val scala212 = "2.12.15"
 val scala3 = List("3.0.2")
 val scala2 = List(scala213, scala212)
 val allScalaVersions = scala2 ::: scala3
@@ -31,8 +31,8 @@ ThisBuild / developers := List(
   Developer(id="darkfrog", name="Matt Hicks", email="matt@matthicks.com", url=url("http://matthicks.com"))
 )
 
-val fabric: String = "1.0.11"
-val collectionCompat: String = "2.5.0"
+val fabric: String = "1.1.1"
+val collectionCompat: String = "2.6.0"
 val reactify: String = "4.0.6"
 val testyVersion: String = "1.0.7"
 
