@@ -10,10 +10,12 @@ val allScalaVersions = scala2 ::: scala3
 val compatScalaVersions = List(scala213, scala212)
 
 ThisBuild / organization := "com.outr"
-ThisBuild / version := "3.2.9-SNAPSHOT"
+ThisBuild / version := "3.2.9"
 ThisBuild / scalaVersion := scala213
 ThisBuild / scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature")
 
+ThisBuild / sonatypeCredentialHost := "s01.oss.sonatype.org"
+ThisBuild / sonatypeRepository := "https://s01.oss.sonatype.org/service/local"
 ThisBuild / publishTo := sonatypePublishTo.value
 ThisBuild / publishConfiguration := publishConfiguration.value.withOverwrite(true)
 ThisBuild / sonatypeProfileName := "com.outr"
@@ -28,7 +30,7 @@ ThisBuild / scmInfo := Some(
   )
 )
 ThisBuild / developers := List(
-  Developer(id="darkfrog", name="Matt Hicks", email="matt@matthicks.com", url=url("http://matthicks.com"))
+  Developer(id="darkfrog", name="Matt Hicks", email="matt@matthicks.com", url=url("https://matthicks.com"))
 )
 
 val fabric: String = "1.2.5"
