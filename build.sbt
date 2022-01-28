@@ -36,7 +36,7 @@ ThisBuild / developers := List(
 val fabric: String = "1.2.5"
 val collectionCompat: String = "2.6.0"
 val reactify: String = "4.0.6"
-val testyVersion: String = "1.0.7"
+val scalaTest: String = "3.2.11"
 
 // Used for HOCON support
 val typesafeConfig = "1.4.1"
@@ -60,13 +60,9 @@ lazy val core = crossProject(JSPlatform, JVMPlatform)
     libraryDependencies ++= Seq(
       "com.outr" %%% "fabric-parse" % fabric,
       "org.scala-lang.modules" %%% "scala-collection-compat" % collectionCompat,
-      "com.outr" %%% "testy" % testyVersion % Test
+      "org.scalatest" %% "scalatest" % scalaTest % "test"
     ),
-    testFrameworks += new TestFramework("munit.Framework"),
     crossScalaVersions := allScalaVersions
-  )
-  .jsSettings(
-    Test / scalaJSLinkerConfig ~= { _.withModuleKind(ModuleKind.CommonJSModule) }
   )
 
 lazy val coreJS = core.js

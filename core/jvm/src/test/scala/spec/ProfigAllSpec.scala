@@ -1,11 +1,11 @@
 package spec
 
 import profig._
-
 import fabric._
-import testy._
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class ProfigAllSpec extends Spec {
+class ProfigAllSpec extends AnyWordSpec with Matchers {
   "Profig all" should {
     "initialize" in {
       Profig.init()

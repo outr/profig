@@ -4,11 +4,12 @@ import profig._
 import fabric._
 import fabric.parse.Json
 import fabric.rw._
-import testy._
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
 import scala.language.implicitConversions
 
-class ProfigSpec extends Spec {
+class ProfigSpec extends AnyWordSpec with Matchers {
   "Profig" should {
     "init" in {
       Profig.init()
