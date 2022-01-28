@@ -1,6 +1,6 @@
 # profig
 
-[![Build Status](https://travis-ci.com/outr/profig.svg?branch=master)](https://travis-ci.com/outr/profig)
+[![CI](https://github.com/outr/profig/actions/workflows/ci.yml/badge.svg)](https://github.com/outr/profig/actions/workflows/ci.yml)
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/outr/profig)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.outr/profig_2.13/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.outr/profig_2.12)
 [![Latest version](https://index.scala-lang.org/outr/profig/profig/latest.svg)](https://index.scala-lang.org/outr/profig)
@@ -41,14 +41,14 @@ and overriding configuration in your application.
 Profig is published to Sonatype OSS and synchronized to Maven Central supporting JVM and Scala.js on 2.11 and 2.12:
 
 ```
-libraryDependencies += "com.outr" %% "profig" % "3.0.4"   // Scala
-libraryDependencies += "com.outr" %%% "profig" % "3.0.4"  // Scala.js / Cross-Build
+libraryDependencies += "com.outr" %% "profig" % "3.2.9"   // Scala
+libraryDependencies += "com.outr" %%% "profig" % "3.2.9"  // Scala.js / Cross-Build
 ```
 
 On the JVM, if you wish to get access to all file formats and extension features of Profig, you can utilize `profig-all`:
 
 ```
-libraryDependencies += "com.outr" %% "profig-all" % "3.0.4"
+libraryDependencies += "com.outr" %% "profig-all" % "3.2.9"
 ```
 
 ## Getting Started
@@ -143,7 +143,7 @@ case class MyConfig(path: String = "/my/application",
 Profig.merge(MyConfig(path = "/another/path"))
 ```
 
-If you would prefer to merge in an object without overwriting existing values you can use `defaults` instead of `merge`:
+If you prefer to merge in an object without overwriting existing values you can use `defaults` instead of `merge`:
 
 ```scala
 Profig.merge(MyConfig(path = "/another/path"), MergeType.Add)
