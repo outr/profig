@@ -25,8 +25,8 @@ class ProfigSpec extends AnyWordSpec with Matchers {
       Profig("test.files").opt[String] should be(Some("yes"))
     }
     "verify `as` with default" in {
-      Profig("test.files").as[String]("no") should be("yes")
-      Profig("test.other").as[String]("no") should be("no")
+      Profig("test.files").asOr[String]("no") should be("yes")
+      Profig("test.other").asOr[String]("no") should be("no")
     }
     "merge arguments" in {
       val value = ProfigUtil.args2Json(List("-this.is.an.argument", "Wahoo!"))

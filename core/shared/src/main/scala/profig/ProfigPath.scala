@@ -37,7 +37,7 @@ trait ProfigPath extends ProfigPathPlatform {
     * @tparam T the type to represent the current path
     * @return T
     */
-  def as[T: Writer](default: => T): T = opt[T].getOrElse(default)
+  def asOr[T: Writer](default: => T): T = opt[T].getOrElse(default)
 
   /**
     * Convenience functionality similar to `as` but returns an option if set.
