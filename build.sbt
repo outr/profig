@@ -10,7 +10,7 @@ val allScalaVersions = scala2 ::: scala3
 val compatScalaVersions = List(scala213, scala212)
 
 ThisBuild / organization := "com.outr"
-ThisBuild / version := "3.3.0"
+ThisBuild / version := "3.3.1-SNAPSHOT"
 ThisBuild / scalaVersion := scala213
 ThisBuild / scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature")
 
@@ -62,7 +62,8 @@ lazy val core = crossProject(JSPlatform, JVMPlatform)
       "org.scala-lang.modules" %%% "scala-collection-compat" % collectionCompat,
       "org.scalatest" %% "scalatest" % scalaTest % "test"
     ),
-    crossScalaVersions := allScalaVersions
+    crossScalaVersions := allScalaVersions,
+    test / fork := true
   )
 
 lazy val coreJS = core.js
