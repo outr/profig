@@ -21,7 +21,7 @@ class Profig extends ProfigPath {
   override def instance: Profig = this
   override def path: Path = Path.empty
 
-  def loadEnvironmentVariables(`type`: MergeType = MergeType.Add): Unit = {
+  def loadEnvironmentVariables(`type`: MergeType = MergeType.Overwrite): Unit = {
     val envMap = System.getenv().asScala.toMap
     val envConverted = ProfigUtil.map2Json(envMap.map {
       case (key, value) => key.toLowerCase.replace('_', '.') -> value

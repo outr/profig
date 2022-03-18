@@ -81,7 +81,7 @@ trait ProfigPathPlatform {
         FileNameMatcher.DefaultExtensions.toList.flatMap { extension =>
           val fileName = s"$prefix.$extension"
           classLoader.getResources(fileName).asScala.map { url =>
-            (fileName, Source.fromURL(url), MergeType.Overwrite)
+            (fileName, Source.fromURL(url), MergeType.Add)
           }
         }
       } ::: files
