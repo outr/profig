@@ -8,6 +8,7 @@ import org.scalatest.wordspec.AnyWordSpec
 class ProfigAllSpec extends AnyWordSpec with Matchers {
   "Profig all" should {
     "initialize" in {
+      Profig.reset()
       Profig.init()
     }
     "verify that XML, YAML, and HOCON are available" in {

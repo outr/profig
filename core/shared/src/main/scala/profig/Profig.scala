@@ -68,4 +68,9 @@ object Profig extends Profig {
       }
     }
   }
+
+  def reset(): Unit = synchronized {
+    clear()
+    loaded = false
+  }
 }

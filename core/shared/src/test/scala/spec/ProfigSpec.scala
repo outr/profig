@@ -12,6 +12,7 @@ import scala.language.implicitConversions
 class ProfigSpec extends AnyWordSpec with Matchers {
   "Profig" should {
     "init" in {
+      Profig.reset()
       Profig.init()
     }
     "verify classloading not set" in {

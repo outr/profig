@@ -9,6 +9,10 @@ import profig._
 
 class ProfigJVMSpec extends AnyWordSpec with Matchers {
   "Profig JVM" should {
+    "init" in {
+      Profig.reset()
+      Profig.init()
+    }
     "merge a special type" in {
       val location = new File(System.getProperty("user.home"))
       Profig("special").store(Special("testing", location))
