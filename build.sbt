@@ -10,7 +10,7 @@ val allScalaVersions = scala2 ::: scala3
 val compatScalaVersions = List(scala213, scala212)
 
 ThisBuild / organization := "com.outr"
-ThisBuild / version := "3.3.1"
+ThisBuild / version := "3.3.2"
 ThisBuild / scalaVersion := scala213
 ThisBuild / scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature")
 
@@ -33,7 +33,7 @@ ThisBuild / developers := List(
   Developer(id="darkfrog", name="Matt Hicks", email="matt@matthicks.com", url=url("https://matthicks.com"))
 )
 
-val fabric: String = "1.2.7"
+val fabric: String = "1.2.8"
 val collectionCompat: String = "2.6.0"
 val reactify: String = "4.0.7"
 val scalaTest: String = "3.2.11"
