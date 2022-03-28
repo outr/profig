@@ -34,8 +34,11 @@ ThisBuild / developers := List(
 )
 
 val fabric: String = "1.2.9"
-val collectionCompat: String = "2.6.0"
+
+val collectionCompat: String = "2.7.0"
+
 val reactify: String = "4.0.7"
+
 val scalaTest: String = "3.2.11"
 
 // Used for HOCON support
