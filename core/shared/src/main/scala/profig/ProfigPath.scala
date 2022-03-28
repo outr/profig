@@ -87,6 +87,22 @@ trait ProfigPath extends ProfigPathPlatform {
     */
   def remove(field: String): Unit = instance.modify(_.remove(path \ field))
 
+  /**
+    * Maps from an existing key (if found) to a new key within this path. This is sort of like aliasing from one key to
+    * a new key, but it will actually copy the values.
+    *
+    * @param keys (from, to)
+    */
+  def map(keys: (String, String)*): Unit = keys.foreach {
+    case (from, to) => apply(from).get() match {
+      case Some(value) => apply(to).merge(value)
+      case None => // Not found
+    }
+  }
+
+  /**
+    * Removes this path
+    */
   def remove(): Unit = instance.modify(_.remove(path))
 }
 

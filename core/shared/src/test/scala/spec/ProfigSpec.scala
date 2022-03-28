@@ -129,6 +129,21 @@ class ProfigSpec extends AnyWordSpec with Matchers {
         "five" -> "cinco"
       ))
     }
+    "map values" in {
+      val p = Profig.empty
+      p.merge(obj(
+        "one" -> obj(
+          "two" -> obj(
+            "three" -> 3
+          )
+        )
+      ))
+      p("one").map(
+        "two.three" -> "threeValue",
+        "two.three.four" -> "fourValue"
+      )
+      p("one.threeValue").get() should be(Some(num(3)))
+    }
   }
 
   case class Person(name: String, age: Option[Int] = None)
