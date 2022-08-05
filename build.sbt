@@ -34,7 +34,7 @@ ThisBuild / developers := List(
 
 val fabric: String = "1.2.9"
 
-val collectionCompat: String = "2.7.0"
+val collectionCompat: String = "2.8.1"
 
 val reactify: String = "4.0.7"
 
