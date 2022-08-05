@@ -38,7 +38,7 @@ val collectionCompat: String = "2.8.1"
 
 val reactify: String = "4.0.7"
 
-val scalaTest: String = "3.2.11"
+val scalaTest: String = "3.2.13"
 
 // Used for HOCON support
 val typesafeConfig = "1.4.1"
