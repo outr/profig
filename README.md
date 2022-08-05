@@ -38,17 +38,11 @@ and overriding configuration in your application.
 
 ## SBT Configuration
 
-Profig is published to Sonatype OSS and synchronized to Maven Central supporting JVM and Scala.js on 2.11 and 2.12:
+Profig is published to Sonatype OSS and synchronized to Maven Central supporting JVM and Scala.js on 2.11, 2.12, 2.13, and Scala 3.x:
 
 ```
-libraryDependencies += "com.outr" %% "profig" % "3.2.9"   // Scala
-libraryDependencies += "com.outr" %%% "profig" % "3.2.9"  // Scala.js / Cross-Build
-```
-
-On the JVM, if you wish to get access to all file formats and extension features of Profig, you can utilize `profig-all`:
-
-```
-libraryDependencies += "com.outr" %% "profig-all" % "3.2.9"
+libraryDependencies += "com.outr" %% "profig" % "3.4.0"   // Scala
+libraryDependencies += "com.outr" %%% "profig" % "3.4.0"  // Scala.js / Cross-Build
 ```
 
 ## Getting Started
@@ -65,14 +59,6 @@ only class you really need be concerned with is `Profig`.
 As of version 3.0, you now need to initialize Profig in order to fully utilize it:
 
 `Profig.init()`
-
-This returns a `Future[Unit]` that makes the system fully available when it completes.
-
-Note: an implicit `ExecutionContext` is necessary for init to complete. Under most circumstances you can just use:
-
-`import scala.concurrent.ExecutionContext.Implicits.global`
-
-Or: `import scribe.Execution.global` if you're using Scribe (https://github.com/outr/scribe)
 
 ### Loading Command-Line arguments
 
