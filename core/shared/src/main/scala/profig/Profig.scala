@@ -6,12 +6,12 @@ import scala.jdk.CollectionConverters._
 import scala.language.experimental.macros
 
 class Profig extends ProfigPath {
-  private var _json: Value = obj()
+  private var _json: Json = obj()
   private var _lastModified: Long = System.currentTimeMillis()
 
-  def json: Value = _json
+  def json: Json = _json
 
-  protected[profig] def modify(f: Value => Value): Unit = synchronized {
+  protected[profig] def modify(f: Json => Json): Unit = synchronized {
     _json = f(_json)
     _lastModified = System.currentTimeMillis()
   }

@@ -53,14 +53,14 @@ trait ProfigPath extends ProfigPathPlatform {
     * @param value the value to store
     * @tparam T the type of value
     */
-  def store[T: Reader](value: T): Unit = merge(value.toValue)
+  def store[T: Reader](value: T): Unit = merge(value.json)
 
   /**
     * Returns a Json representation of this path if there is anything defined at this level.
     *
     * @return Option[Json]
     */
-  def get(): Option[Value] = instance.json.get(path)
+  def get(): Option[Json] = instance.json.get(path)
 
   /**
     * Returns a Json representation of this path. Works similar to `get()`, except will return an empty Json object if
@@ -68,7 +68,7 @@ trait ProfigPath extends ProfigPathPlatform {
     *
     * @return Json
     */
-  def apply(): Value = instance.json(path)
+  def apply(): Json = instance.json(path)
 
   /**
     * True if this path exists in the config
@@ -78,7 +78,7 @@ trait ProfigPath extends ProfigPathPlatform {
   /**
     * Merges a Json object to this path.
     */
-  def merge(json: Value, `type`: MergeType = MergeType.Overwrite): Unit = instance.modify(_.merge(json, path, `type`))
+  def merge(json: Json, `type`: MergeType = MergeType.Overwrite): Unit = instance.modify(_.merge(json, path, `type`))
 
   /**
     * Removes a field from this path.

@@ -9,7 +9,7 @@ val scala2 = List(scala213, scala212)
 val allScalaVersions = scala2 ::: scala3
 
 ThisBuild / organization := "com.outr"
-ThisBuild / version := "3.3.3"
+ThisBuild / version := "3.4.0-SNAPSHOT"
 ThisBuild / scalaVersion := scala213
 ThisBuild / scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature")
 
@@ -36,15 +36,7 @@ val fabric: String = "1.3.0"
 
 val collectionCompat: String = "2.8.1"
 
-val reactify: String = "4.0.7"
-
 val scalaTest: String = "3.2.13"
-
-// Used for HOCON support
-val typesafeConfig = "1.4.1"
-
-// Used for YAML and XML support
-val jacksonVersion = "2.12.3"
 
 lazy val root = project.in(file("."))
   .aggregate(coreJS, coreJVM)

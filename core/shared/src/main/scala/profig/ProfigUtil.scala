@@ -12,12 +12,12 @@ object ProfigUtil {
   /**
     * Converts a `Map[String, String]` into a Json object with dot-separation.
     */
-  def map2Json(map: Map[String, String]): Value = Obj.process(map)
+  def map2Json(map: Map[String, String]): Json = Obj.process(map)
 
   /**
     * Converts a `Properties` into a Json object with dot-separation.
     */
-  def properties2Json(properties: Properties): Value = {
+  def properties2Json(properties: Properties): Json = {
     val map = properties.asScala.map {
       case (key, value) => key -> value
     }.toMap
@@ -30,23 +30,21 @@ object ProfigUtil {
   /**
     * Converts a sequence of args into a Json object with dot-separation.
     */
-  def args2Json(args: Seq[String]): Value = {
-    var anonymous = List.empty[Value]
-    var named = Map.empty[String, Value]
+  def args2Json(args: Seq[String]): Json = {
+    var anonymous = List.empty[Json]
+    var named = Map.empty[String, Json]
     var flag = Option.empty[String]
     args.foreach {
       case NamedKeyValue(key, value) => named += key -> str(value)
-      case NamedFlag(key) => {
+      case NamedFlag(key) =>
         flag.foreach { f =>
           named += f -> true
         }
         flag = Option(key)
-      }
       case arg => flag match {
-        case Some(key) => {
+        case Some(key) =>
           named += key -> str(arg)
           flag = None
-        }
         case None => anonymous = str(arg) :: anonymous
       }
     }
@@ -58,7 +56,7 @@ object ProfigUtil {
     val argsList = List("args" -> Arr(anonymous.toVector))
     val allArgsList = List("allArgs" -> Arr(args.map(str).toVector))
 
-    var v: Value = obj()
+    var v: Json = obj()
     (argsNamed ::: argsList ::: allArgsList ::: named.toList).foreach {
       case (key, value) => v = v.merge(value, Path.parse(key))
     }

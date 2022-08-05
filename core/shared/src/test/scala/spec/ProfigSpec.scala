@@ -2,7 +2,7 @@ package spec
 
 import profig._
 import fabric._
-import fabric.parse.Json
+import fabric.parse.JsonParser
 import fabric.rw._
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -107,20 +107,20 @@ class ProfigSpec extends AnyWordSpec with Matchers {
       profig.json should be(obj("test" -> "one"))
     }
     "merge two Json objects" in {
-      val json1 = Json.parse(
+      val json1 = JsonParser.parse(
         """{
           |  "one": 1,
           |  "two": 2,
           |  "three": 3
           |}""".stripMargin)
-      val json2 = Json.parse(
+      val json2 = JsonParser.parse(
         """{
           |  "three": "tres",
           |  "four": "quatro",
           |  "five": "cinco"
           |}""".stripMargin
       )
-      val merged = Value.merge(json1, json2)
+      val merged = Json.merge(json1, json2)
       merged should be(obj(
         "one" -> 1,
         "two" -> 2,
