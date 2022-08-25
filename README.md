@@ -41,8 +41,8 @@ and overriding configuration in your application.
 Profig is published to Sonatype OSS and synchronized to Maven Central supporting JVM and Scala.js on 2.11, 2.12, 2.13, and Scala 3.x:
 
 ```
-libraryDependencies += "com.outr" %% "profig" % "3.4.0"   // Scala
-libraryDependencies += "com.outr" %%% "profig" % "3.4.0"  // Scala.js / Cross-Build
+libraryDependencies += "com.outr" %% "profig" % "3.4.1"   // Scala
+libraryDependencies += "com.outr" %%% "profig" % "3.4.1"  // Scala.js / Cross-Build
 ```
 
 ## Getting Started
