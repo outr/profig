@@ -144,23 +144,32 @@ class ProfigSpec extends AnyWordSpec with Matchers {
       )
       p("one.threeValue").get() should be(Some(num(3)))
     }
+    "load a value that doesn't exist from defaults" in {
+      val p = Profig("information").as[Information]
+    }
   }
 
   case class Person(name: String, age: Option[Int] = None)
 
   object Person {
-    implicit def rw: ReaderWriter[Person] = ccRW
+    implicit val rw: RW[Person] = ccRW
   }
 
   case class JVMInfo(version: String, specification: Specification)
 
   object JVMInfo {
-    implicit def rw: ReaderWriter[JVMInfo] = ccRW
+    implicit val rw: RW[JVMInfo] = ccRW
   }
 
   case class Specification(vendor: String, name: String, version: String)
 
   object Specification {
-    implicit def rw: ReaderWriter[Specification] = ccRW
+    implicit val rw: RW[Specification] = ccRW
+  }
+  
+  case class Information(description: String = "default")
+  
+  object Information {
+    implicit val rw: RW[Information] = ccRW
   }
 }

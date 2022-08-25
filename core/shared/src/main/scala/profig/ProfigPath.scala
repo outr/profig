@@ -68,7 +68,7 @@ trait ProfigPath extends ProfigPathPlatform {
     *
     * @return Json
     */
-  def apply(): Json = instance.json(path)
+  def apply(): Json = instance.json.get(path).getOrElse(obj())
 
   /**
     * True if this path exists in the config
