@@ -3,22 +3,20 @@ import sbtcrossproject.CrossType
 
 // Scala versions
 val scala213 = "2.13.8"
-val scala212 = "2.12.16"
 val scala3 = List("3.2.0")
-val scala2 = List(scala213, scala212)
+val scala2 = List(scala213)
 val allScalaVersions = scala2 ::: scala3
 
 ThisBuild / organization := "com.outr"
-ThisBuild / version := "3.4.1"
+ThisBuild / version := "3.4.2-SNAPSHOT"
 ThisBuild / scalaVersion := scala213
 ThisBuild / scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature")
 
 ThisBuild / sonatypeCredentialHost := "s01.oss.sonatype.org"
 ThisBuild / sonatypeRepository := "https://s01.oss.sonatype.org/service/local"
-ThisBuild / publishTo := sonatypePublishTo.value
+ThisBuild / publishTo := sonatypePublishToBundle.value
 ThisBuild / publishConfiguration := publishConfiguration.value.withOverwrite(true)
 ThisBuild / sonatypeProfileName := "com.outr"
-ThisBuild / publishMavenStyle := true
 ThisBuild / licenses := Seq("MIT" -> url("https://github.com/outr/profig/blob/master/LICENSE"))
 ThisBuild / sonatypeProjectHosting := Some(xerial.sbt.Sonatype.GitHubHosting("outr", "profig", "matt@outr.com"))
 ThisBuild / homepage := Some(url("https://github.com/outr/profig"))
@@ -32,7 +30,7 @@ ThisBuild / developers := List(
   Developer(id="darkfrog", name="Matt Hicks", email="matt@matthicks.com", url=url("https://matthicks.com"))
 )
 
-val fabric: String = "1.3.0"
+val fabric: String = "1.5.0"
 
 val collectionCompat: String = "2.8.1"
 
@@ -52,7 +50,7 @@ lazy val core = crossProject(JSPlatform, JVMPlatform)
   .settings(
     name := "profig",
     libraryDependencies ++= Seq(
-      "com.outr" %%% "fabric-parse" % fabric,
+      "com.outr" %%% "fabric-io" % fabric,
       "org.scala-lang.modules" %%% "scala-collection-compat" % collectionCompat,
       "org.scalatest" %% "scalatest" % scalaTest % "test"
     ),

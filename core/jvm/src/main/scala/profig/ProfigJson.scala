@@ -1,6 +1,7 @@
 package profig
 
 import fabric._
+import fabric.io.{Format, JsonParser}
 
 import java.util.Properties
 
@@ -34,22 +35,22 @@ object ProfigJson {
   }
 
   object Json extends ProfigJson {
-    override def apply(content: String): Json = fabric.parse.JsonParser.parse(content)
+    override def apply(content: String): Json = JsonParser(content, Format.Json)
   }
 
   object Properties extends ProfigJson {
-    override def apply(content: String): Json = fabric.parse.Properties.parse(content)
+    override def apply(content: String): Json = JsonParser(content, Format.Properties)
   }
 
   object Hocon extends ProfigJson {
-    override def apply(content: String): Json = fabric.parse.Hocon.parse(content)
+    override def apply(content: String): Json = JsonParser(content, Format.Hocon)
   }
 
   object XML extends ProfigJson {
-    override def apply(content: String): Json = fabric.parse.XML.parse(content)
+    override def apply(content: String): Json = JsonParser(content, Format.XML)
   }
 
   object Yaml extends ProfigJson {
-    override def apply(content: String): Json = fabric.parse.Yaml.parse(content)
+    override def apply(content: String): Json = JsonParser(content, Format.Yaml)
   }
 }
