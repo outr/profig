@@ -28,11 +28,11 @@ and overriding configuration in your application.
 
 # File Formats
 
-* JSON (supported in `profig-core`)
-* Properties (support in `profig-core`)
-* YAML (supported in `profig-yaml`)
-* HOCON (supported in `profig-hocon`)
-* XML (supported in `profig-xml`)
+* JSON
+* Properties
+* YAML
+* HOCON
+* XML
 
 # Setup
 
@@ -41,8 +41,8 @@ and overriding configuration in your application.
 Profig is published to Sonatype OSS and synchronized to Maven Central supporting JVM and Scala.js on 2.11, 2.12, 2.13, and Scala 3.x:
 
 ```
-libraryDependencies += "com.outr" %% "profig" % "3.4.1"   // Scala
-libraryDependencies += "com.outr" %%% "profig" % "3.4.1"  // Scala.js / Cross-Build
+libraryDependencies += "com.outr" %% "profig" % "3.4.2"   // Scala
+libraryDependencies += "com.outr" %%% "profig" % "3.4.2"  // Scala.js / Cross-Build
 ```
 
 ## Getting Started
