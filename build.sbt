@@ -8,7 +8,7 @@ val scala2 = List(scala213)
 val allScalaVersions = scala2 ::: scala3
 
 ThisBuild / organization := "com.outr"
-ThisBuild / version := "3.4.3-SNAPSHOT"
+ThisBuild / version := "3.4.3"
 ThisBuild / scalaVersion := scala213
 ThisBuild / scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature")
 
@@ -60,3 +60,14 @@ lazy val core = crossProject(JSPlatform, JVMPlatform)
 
 lazy val coreJS = core.js
 lazy val coreJVM = core.jvm
+
+lazy val docs = project
+  .in(file("documentation"))
+  .dependsOn(core.jvm)
+  .enablePlugins(MdocPlugin)
+  .settings(
+    mdocVariables := Map(
+      "VERSION" -> version.value
+    ),
+    mdocOut := file(".")
+  )

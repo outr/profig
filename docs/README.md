@@ -8,7 +8,7 @@
 Powerful configuration management for Scala (JSON, properties, command-line arguments, and environment variables)
 
 # Latest version
-3.4.3
+@VERSION@
 
 # Justification
 
@@ -44,15 +44,15 @@ and overriding configuration in your application.
 Profig is published to Sonatype OSS and synchronized to Maven Central supporting JVM and Scala.js on 2.11, 2.12, 2.13, and Scala 3.x:
 
 ```
-libraryDependencies += "com.outr" %% "profig" % "3.4.3"   // Scala
-libraryDependencies += "com.outr" %%% "profig" % "3.4.3"  // Scala.js / Cross-Build
+libraryDependencies += "com.outr" %% "profig" % "@VERSION@"   // Scala
+libraryDependencies += "com.outr" %%% "profig" % "@VERSION@"  // Scala.js / Cross-Build
 ```
 
 ## Getting Started
 
 Whether you are using this in JVM or JS you need one import to access everything:
 
-```scala
+```scala mdoc
 import profig._
 ```
 
@@ -63,7 +63,7 @@ only class you really need be concerned with is `Profig`.
 
 As of version 3.0, you now need to initialize Profig in order to fully utilize it:
 
-```scala
+```scala mdoc
 Profig.init()
 ```
 
@@ -82,7 +82,7 @@ loading.
 Profig supports many configuration formats and can look in the classpath as well as the filesystem to find configuration
 to load. Of course, this is only supported on the JVM, but to load a file simply call:
 
-```scala
+```scala mdoc
 Profig.loadFile(new java.io.File("config.json"))
 ```
 
@@ -91,7 +91,7 @@ of `loadFile` is: `Profig.loadFile(file: File, mergeType: MergeType = MergeType.
 
 However, if your application doesn't need very explicit files to be loaded you can load defaults instead:
 
-```scala
+```scala mdoc
 Profig.loadConfiguration()
 ```
 
@@ -106,14 +106,13 @@ Finally, you can use `Profig.initConfigurationBlocking()` if you want initializa
 As stated above, system properties and environment variables are automatically loaded into the configuration. So if we
 wanted to access the system property "java.version" we can easily do so:
 
-```scala
+```scala mdoc
 val javaVersion = Profig("java.version").as[String]
-// javaVersion: String = "1.8.0_345"
 ```
 
 You can also load from a higher level as a case class to get more information. For example:
 
-```scala
+```scala mdoc
 import fabric.rw._
 
 case class JVMInfo(version: String, specification: Specification)
@@ -129,14 +128,6 @@ object Specification {
 }
 
 val info = Profig("java").as[JVMInfo]
-// info: JVMInfo = JVMInfo(
-//   version = "1.8.0_345",
-//   specification = Specification(
-//     vendor = "Oracle Corporation",
-//     name = "Java Platform API Specification",
-//     version = "1.8"
-//   )
-// )
 ```
 
 Configuration files will automatically be loaded from config.json, config.conf, configuration.json, configuration.conf,
@@ -150,7 +141,7 @@ the config. However, if any required parameters are missing an exception will be
 Adding values at runtime is almost exactly the same as reading values. For example, if we want to store a basic
 configuration:
 
-```scala
+```scala mdoc
 import fabric._
 
 case class MyConfig(path: String = "/my/application",
@@ -163,15 +154,13 @@ object MyConfig {
 }
 
 val json: Json = MyConfig(path = "/another/path").json
-// json: Json = {"path": "/another/path", "timeout": 1000, "username": "root", "password": "password"}
 Profig.merge(json)
 ```
 
 If you prefer to merge in an object without overwriting existing values you can use `defaults` instead of `merge`:
 
-```scala
+```scala mdoc
 val myConfig: Json = MyConfig(path = "/another/path").json
-// myConfig: Json = {"path": "/another/path", "timeout": 1000, "username": "root", "password": "password"}
 Profig.merge(json, MergeType.Add)
 ```
 
