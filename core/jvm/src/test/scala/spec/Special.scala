@@ -8,5 +8,5 @@ case class Special(title: String, location: File)
 
 object Special {
   implicit def fileRW: RW[File] = profig.fileReadWriter
-  implicit def rw: RW[Special] = ccRW
+  implicit def rw: RW[Special] = RW.gen
 }

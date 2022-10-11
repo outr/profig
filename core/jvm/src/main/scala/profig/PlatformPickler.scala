@@ -11,7 +11,7 @@ import fabric.rw._
 import scala.language.implicitConversions
 
 trait PlatformPickler {
-  implicit val fileReadWriter: RW[File] = RW[File](f => str(f.getAbsolutePath), v => new File(v.asStr.value))
+  implicit val fileReadWriter: RW[File] = RW.from[File](f => str(f.getAbsolutePath), v => new File(v.asStr.value))
 
   implicit def path2JSON(path: Path): Json = file2JSON(path.toFile)
   implicit def file2JSON(file: File): Json = source2Json(Source.fromFile(file), Some(file.getName))

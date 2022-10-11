@@ -151,24 +151,24 @@ class ProfigSpec extends AnyWordSpec with Matchers {
   case class Person(name: String, age: Option[Int] = None)
 
   object Person {
-    implicit val rw: RW[Person] = ccRW
+    implicit val rw: RW[Person] = RW.gen
   }
 
   case class JVMInfo(version: String, specification: Specification)
 
   object JVMInfo {
-    implicit val rw: RW[JVMInfo] = ccRW
+    implicit val rw: RW[JVMInfo] = RW.gen
   }
 
   case class Specification(vendor: String, name: String, version: String)
 
   object Specification {
-    implicit val rw: RW[Specification] = ccRW
+    implicit val rw: RW[Specification] = RW.gen
   }
   
   case class Information(description: String = "default")
   
   object Information {
-    implicit val rw: RW[Information] = ccRW
+    implicit val rw: RW[Information] = RW.gen
   }
 }

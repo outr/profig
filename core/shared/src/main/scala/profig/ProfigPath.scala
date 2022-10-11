@@ -1,6 +1,7 @@
 package profig
 
 import fabric._
+import fabric.merge.{MergeConfig, MergeConfigBuilder}
 import fabric.rw._
 
 import scala.language.experimental.macros
@@ -78,7 +79,7 @@ trait ProfigPath extends ProfigPathPlatform {
   /**
     * Merges a Json object to this path.
     */
-  def merge(json: Json, `type`: MergeType = MergeType.Overwrite): Unit = instance.modify(_.merge(json, path, `type`))
+  def merge(json: Json, `type`: MergeType = MergeType.Overwrite): Unit = instance.modify(_.merge(json, path, MergeConfigBuilder(`type`)))
 
   /**
     * Removes a field from this path.

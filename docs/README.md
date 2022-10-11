@@ -118,13 +118,13 @@ import fabric.rw._
 case class JVMInfo(version: String, specification: Specification)
 
 object JVMInfo {
-  implicit val rw: RW[JVMInfo] = ccRW
+  implicit val rw: RW[JVMInfo] = RW.gen
 }
 
 case class Specification(vendor: String, name: String, version: String)
 
 object Specification {
-  implicit val rw: RW[Specification] = ccRW
+  implicit val rw: RW[Specification] = RW.gen
 }
 
 val info = Profig("java").as[JVMInfo]
@@ -150,7 +150,7 @@ case class MyConfig(path: String = "/my/application",
                     password: String = "password")
                     
 object MyConfig {
-  implicit val rw: RW[MyConfig] = ccRW
+  implicit val rw: RW[MyConfig] = RW.gen
 }
 
 val json: Json = MyConfig(path = "/another/path").json
