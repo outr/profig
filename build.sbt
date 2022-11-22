@@ -8,7 +8,7 @@ val scala2 = List(scala213)
 val allScalaVersions = scala2 ::: scala3
 
 ThisBuild / organization := "com.outr"
-ThisBuild / version := "3.4.4"
+ThisBuild / version := "3.4.5-SNAPSHOT"
 ThisBuild / scalaVersion := scala213
 ThisBuild / scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature")
 
@@ -30,7 +30,7 @@ ThisBuild / developers := List(
   Developer(id="darkfrog", name="Matt Hicks", email="matt@matthicks.com", url=url("https://matthicks.com"))
 )
 
-val fabric: String = "1.7.0"
+val fabric: String = "1.7.3"
 
 val collectionCompat: String = "2.8.1"
 
@@ -50,7 +50,7 @@ lazy val core = crossProject(JSPlatform, JVMPlatform)
   .settings(
     name := "profig",
     libraryDependencies ++= Seq(
-      "com.outr" %%% "fabric-io" % fabric,
+      "org.typelevel" %%% "fabric-io" % fabric,
       "org.scala-lang.modules" %%% "scala-collection-compat" % collectionCompat,
       "org.scalatest" %% "scalatest" % scalaTest % "test"
     ),
