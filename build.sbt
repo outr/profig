@@ -2,7 +2,7 @@ import sbtcrossproject.CrossPlugin.autoImport.crossProject
 import sbtcrossproject.CrossType
 
 // Scala versions
-val scala213 = "2.13.9"
+val scala213 = "2.13.10"
 val scala3 = List("3.2.1")
 val scala2 = List(scala213)
 val allScalaVersions = scala2 ::: scala3
