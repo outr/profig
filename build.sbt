@@ -32,7 +32,7 @@ ThisBuild / developers := List(
 
 val fabric: String = "1.7.3"
 
-val collectionCompat: String = "2.8.1"
+val collectionCompat: String = "2.9.0"
 
 val scalaTest: String = "3.2.14"
 
