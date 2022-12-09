@@ -4,14 +4,14 @@ import java.io.File
 import java.net.URL
 import java.nio.file.Path
 import scala.io.Source
-
 import fabric._
+import fabric.define.DefType
 import fabric.rw._
 
 import scala.language.implicitConversions
 
 trait PlatformPickler {
-  implicit val fileReadWriter: RW[File] = RW.from[File](f => str(f.getAbsolutePath), v => new File(v.asStr.value))
+  implicit val fileReadWriter: RW[File] = RW.from[File](f => str(f.getAbsolutePath), v => new File(v.asStr.value), DefType.Str)
 
   implicit def path2JSON(path: Path): Json = file2JSON(path.toFile)
   implicit def file2JSON(file: File): Json = source2Json(Source.fromFile(file), Some(file.getName))
