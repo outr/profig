@@ -19,7 +19,7 @@ class Profig extends ProfigPath {
   def lastModified: Long = _lastModified
 
   override def instance: Profig = this
-  override def path: Path = Path.empty
+  override def path: JsonPath = JsonPath.empty
 
   def loadEnvironmentVariables(`type`: MergeType = MergeType.Overwrite): Unit = {
     val envMap = System.getenv().asScala.toMap

@@ -12,16 +12,16 @@ import scala.language.experimental.macros
   */
 trait ProfigPath extends ProfigPathPlatform {
   def instance: Profig
-  def path: Path
+  def path: JsonPath
 
   /**
     * Look up a deeper path below the current path.
     *
     * @return ProfigPath
     */
-  def apply(path: String*): ProfigPath = ProfigPath(instance, this.path \\ new Path(path.toList.flatMap(p => Path.parse(p).entries)))
+  def apply(path: String*): ProfigPath = ProfigPath(instance, this.path \\ new JsonPath(path.toList.flatMap(p => JsonPath.parse(p).entries)))
 
-  def apply(path: Path): ProfigPath = ProfigPath(instance, this.path \\ path)
+  def apply(path: JsonPath): ProfigPath = ProfigPath(instance, this.path \\ path)
 
   /**
     * Loads this path out as the defined type `T`.
@@ -108,7 +108,7 @@ trait ProfigPath extends ProfigPathPlatform {
 }
 
 object ProfigPath {
-  def apply(instance: Profig, path: Path): ProfigPath = new ProfigSubPath(instance, path)
+  def apply(instance: Profig, path: JsonPath): ProfigPath = new ProfigSubPath(instance, path)
 
-  class ProfigSubPath(override val instance: Profig, override val path: Path) extends ProfigPath
+  class ProfigSubPath(override val instance: Profig, override val path: JsonPath) extends ProfigPath
 }

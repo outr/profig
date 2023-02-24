@@ -58,7 +58,7 @@ object ProfigUtil {
 
     var v: Json = obj()
     (argsNamed ::: argsList ::: allArgsList ::: named.toList).foreach {
-      case (key, value) => v = v.merge(value, Path.parse(key))
+      case (key, value) => v = v.merge(value, JsonPath.parse(key))
     }
     v
   }
