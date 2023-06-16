@@ -29,7 +29,7 @@ trait ProfigPath extends ProfigPathPlatform {
     * @tparam T the type to represent the current path
     * @return T
     */
-  def as[T: Writer]: T = apply().as[T]
+  def as[T: RW]: T = apply().as[T]
 
   /**
     * Loads this path out as the defined type `T`. If no value is set for this path, the default will be used.
@@ -38,7 +38,7 @@ trait ProfigPath extends ProfigPathPlatform {
     * @tparam T the type to represent the current path
     * @return T
     */
-  def asOr[T: Writer](default: => T): T = opt[T].getOrElse(default)
+  def asOr[T: RW](default: => T): T = opt[T].getOrElse(default)
 
   /**
     * Convenience functionality similar to `as` but returns an option if set.
@@ -46,7 +46,7 @@ trait ProfigPath extends ProfigPathPlatform {
     * @tparam T the type to represent the current path
     * @return T
     */
-  def opt[T: Writer]: Option[T] = get().map(_.as[T])
+  def opt[T: RW]: Option[T] = get().map(_.as[T])
 
   /**
     * Stores the supplied value into this path.
@@ -54,7 +54,7 @@ trait ProfigPath extends ProfigPathPlatform {
     * @param value the value to store
     * @tparam T the type of value
     */
-  def store[T: Reader](value: T): Unit = merge(value.json)
+  def store[T: RW](value: T): Unit = merge(value.json)
 
   /**
     * Returns a Json representation of this path if there is anything defined at this level.
