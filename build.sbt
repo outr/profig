@@ -32,7 +32,7 @@ ThisBuild / developers := List(
   Developer(id="darkfrog", name="Matt Hicks", email="matt@matthicks.com", url=url("https://matthicks.com"))
 )
 
-val fabric: String = "1.12.0"
+val fabric: String = "1.12.1"
 
 val collectionCompat: String = "2.11.0"
 
