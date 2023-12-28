@@ -67,6 +67,63 @@ As of version 3.0, you now need to initialize Profig in order to fully utilize i
 Profig.init()
 ```
 
+### Simple Usage
+
+While Profig has a lot of very powerful features, the most useful feature is its ability to provide multiple levels of
+configuration. Instead of locking yourself to only file configuration, environment variables, or command-line arguments,
+Profig allows you hierarchical overrides to be able to specify configuration at any level.
+
+Configuration is loaded level-by-level with configuration at the lower-level overriding that at a higher level:
+- File Configuration
+- Environment Variables
+- Command-Line arguments
+
+For example:
+If the application is executed with a `config.json` of:
+```json
+{
+  "server": {
+    "port": 8888
+  }
+}
+```
+```scala mdoc:invisible
+import fabric._
+Profig.merge(obj(
+  "server" -> obj(
+    "port" -> 8888
+  )
+))
+```
+```scala mdoc
+Profig("server.port").as[Int]
+```
+However, if there were an environment variable `SERVER_PORT=8889`:
+```scala mdoc:invisible
+Profig.loadEnvironmentMap(Map("SERVER_PORT" -> "8889"))
+```
+```scala mdoc
+Profig("server.port").as[Int]
+```
+Finally, if a command-line property were set, for example:
+```
+runCommand -server.port 8890
+```
+```scala mdoc:invisible
+Profig.merge(List("-server.port", "8890"))
+```
+```scala mdoc
+Profig("server.port").as[Int]
+```
+So, to summarize, command-line arguments take the highest priority, followed by environment variables, and finally
+configuration files.
+
+The easiest way (explained in greater detail below) to properly initialize Profig:
+```scala
+Profig.initConfiguration()  // Loads everything except the command-line arguments
+Profig.merge(args)          // This can be a `List[String]` or `Array[String]` depending on your application
+```
+
 ### Loading Command-Line arguments
 
 When your application starts it is reasonable to want to allow execution of the application to override existing

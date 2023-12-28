@@ -30,8 +30,7 @@ class ProfigSpec extends AnyWordSpec with Matchers {
       Profig("test.other").asOr[String]("no") should be("no")
     }
     "merge arguments" in {
-      val value = ProfigUtil.args2Json(List("-this.is.an.argument", "Wahoo!"))
-      Profig.merge(value)
+      Profig.merge(List("-this.is.an.argument", "Wahoo!"))
     }
     "load a String argument" in {
       Profig("this.is.an.argument").as[String] should be("Wahoo!")

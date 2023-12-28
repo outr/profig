@@ -67,6 +67,52 @@ As of version 3.0, you now need to initialize Profig in order to fully utilize i
 Profig.init()
 ```
 
+### Simple Usage
+
+While Profig has a lot of very powerful features, the most useful feature is its ability to provide multiple levels of
+configuration. Instead of locking yourself to only file configuration, environment variables, or command-line arguments,
+Profig allows you hierarchical overrides to be able to specify configuration at any level.
+
+Configuration is loaded level-by-level with configuration at the lower-level overriding that at a higher level:
+- File Configuration
+- Environment Variables
+- Command-Line arguments
+
+For example:
+If the application is executed with a `config.json` of:
+```json
+{
+  "server": {
+    "port": 8888
+  }
+}
+```
+```scala
+Profig("server.port").as[Int]
+// res2: Int = 8888
+```
+However, if there were an environment variable `SERVER_PORT=8889`:
+```scala
+Profig("server.port").as[Int]
+// res4: Int = 8889
+```
+Finally, if a command-line property were set, for example:
+```
+runCommand -server.port 8890
+```
+```scala
+Profig("server.port").as[Int]
+// res6: Int = 8890
+```
+So, to summarize, command-line arguments take the highest priority, followed by environment variables, and finally
+configuration files.
+
+The easiest way (explained in greater detail below) to properly initialize Profig:
+```scala
+Profig.initConfiguration()  // Loads everything except the command-line arguments
+Profig.merge(args)          // This can be a `List[String]` or `Array[String]` depending on your application
+```
+
 ### Loading Command-Line arguments
 
 When your application starts it is reasonable to want to allow execution of the application to override existing
@@ -108,7 +154,7 @@ wanted to access the system property "java.version" we can easily do so:
 
 ```scala
 val javaVersion = Profig("java.version").as[String]
-// javaVersion: String = "20"
+// javaVersion: String = "21"
 ```
 
 You can also load from a higher level as a case class to get more information. For example:
@@ -130,11 +176,11 @@ object Specification {
 
 val info = Profig("java").as[JVMInfo]
 // info: JVMInfo = JVMInfo(
-//   version = "20",
+//   version = "21",
 //   specification = Specification(
 //     vendor = "Oracle Corporation",
 //     name = "Java Platform API Specification",
-//     version = "20"
+//     version = "21"
 //   )
 // )
 ```
