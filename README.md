@@ -8,7 +8,7 @@
 Powerful configuration management for Scala (JSON, properties, command-line arguments, and environment variables)
 
 # Latest version
-3.4.11
+3.4.12
 
 # Justification
 
@@ -44,8 +44,8 @@ and overriding configuration in your application.
 Profig is published to Sonatype OSS and synchronized to Maven Central supporting JVM and Scala.js on 2.11, 2.12, 2.13, and Scala 3.x:
 
 ```
-libraryDependencies += "com.outr" %% "profig" % "3.4.11"   // Scala
-libraryDependencies += "com.outr" %%% "profig" % "3.4.11"  // Scala.js / Cross-Build
+libraryDependencies += "com.outr" %% "profig" % "3.4.12"   // Scala
+libraryDependencies += "com.outr" %%% "profig" % "3.4.12"  // Scala.js / Cross-Build
 ```
 
 ## Getting Started
