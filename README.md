@@ -8,7 +8,7 @@
 Powerful configuration management for Scala (JSON, properties, command-line arguments, and environment variables)
 
 # Latest version
-3.4.12
+3.4.13
 
 # Justification
 
@@ -44,8 +44,8 @@ and overriding configuration in your application.
 Profig is published to Sonatype OSS and synchronized to Maven Central supporting JVM and Scala.js on 2.11, 2.12, 2.13, and Scala 3.x:
 
 ```
-libraryDependencies += "com.outr" %% "profig" % "3.4.12"   // Scala
-libraryDependencies += "com.outr" %%% "profig" % "3.4.12"  // Scala.js / Cross-Build
+libraryDependencies += "com.outr" %% "profig" % "3.4.13"   // Scala
+libraryDependencies += "com.outr" %%% "profig" % "3.4.13"  // Scala.js / Cross-Build
 ```
 
 ## Getting Started
@@ -154,7 +154,7 @@ wanted to access the system property "java.version" we can easily do so:
 
 ```scala
 val javaVersion = Profig("java.version").as[String]
-// javaVersion: String = "21"
+// javaVersion: String = "21.0.2"
 ```
 
 You can also load from a higher level as a case class to get more information. For example:
@@ -176,7 +176,7 @@ object Specification {
 
 val info = Profig("java").as[JVMInfo]
 // info: JVMInfo = JVMInfo(
-//   version = "21",
+//   version = "21.0.2",
 //   specification = Specification(
 //     vendor = "Oracle Corporation",
 //     name = "Java Platform API Specification",
