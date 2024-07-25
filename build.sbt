@@ -36,7 +36,7 @@ val fabric: String = "1.14.2"
 
 val collectionCompat: String = "2.11.0"
 
-val scalaTest: String = "3.2.18"
+val scalaTest: String = "3.2.19"
 
 lazy val root = project.in(file("."))
   .aggregate(coreJS, coreJVM)
