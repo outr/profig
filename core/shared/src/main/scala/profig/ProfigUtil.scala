@@ -2,6 +2,7 @@ package profig
 
 import java.util.Properties
 import fabric._
+import fabric.dsl._
 
 import scala.jdk.CollectionConverters._
 
@@ -38,7 +39,7 @@ object ProfigUtil {
       case NamedKeyValue(key, value) => named += key -> str(value)
       case NamedFlag(key) =>
         flag.foreach { f =>
-          named += f -> true
+          named += f -> bool(true)
         }
         flag = Option(key)
       case arg => flag match {
@@ -47,6 +48,9 @@ object ProfigUtil {
           flag = None
         case None => anonymous = str(arg) :: anonymous
       }
+    }
+    flag.foreach { f =>
+      named += f -> bool(true)
     }
     anonymous = anonymous.reverse
 

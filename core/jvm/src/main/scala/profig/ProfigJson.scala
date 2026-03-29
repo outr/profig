@@ -16,7 +16,7 @@ object ProfigJson {
 
   def types: Set[String] = map.keySet
 
-  register(Json, "conf", "json", "config")
+  register(Json, "json")
   register(Properties, "prop", "props", "properties")
   register(Hocon, "conf", "config", "hocon")
   register(XML, "xml")

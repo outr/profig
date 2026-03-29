@@ -25,8 +25,9 @@ trait ProfigPathPlatform {
     val json = source2Json(source, Some(fileName))
     merge(json, mergeType)
   } catch {
-    case t: Throwable => errorHandler.foreach { eh =>
-      eh(new RuntimeException(s"Failed to process: $fileName", t))
+    case t: Throwable => errorHandler match {
+      case Some(eh) => eh(new RuntimeException(s"Failed to process: $fileName", t))
+      case None => throw t
     }
   }
 
@@ -52,7 +53,8 @@ trait ProfigPathPlatform {
 
     @tailrec
     def explorePath(directory: File, recursive: Boolean): Unit = {
-      files = files ::: directory.listFiles().toList.filter(_.isFile).flatMap { f =>
+      val children = Option(directory.listFiles()).getOrElse(Array.empty[File])
+      files = files ::: children.toList.filter(_.isFile).flatMap { f =>
         val fileName = f.getName.toLowerCase
         val dot = fileName.indexOf('.')
         val (prefix, extension) = if (dot == -1) {
@@ -81,7 +83,7 @@ trait ProfigPathPlatform {
         FileNameMatcher.DefaultExtensions.toList.flatMap { extension =>
           val fileName = s"$prefix.$extension"
           classLoader.getResources(fileName).asScala.map { url =>
-            (fileName, Source.fromURL(url), MergeType.Add)
+            (fileName, Source.fromURL(url), MergeType.Overwrite)
           }
         }
       } ::: files
