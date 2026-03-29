@@ -89,6 +89,7 @@ If the application is executed with a `config.json` of:
 ```
 ```scala mdoc:invisible
 import fabric._
+import fabric.dsl._
 Profig.merge(obj(
   "server" -> obj(
     "port" -> 8888
