@@ -34,7 +34,7 @@ ThisBuild / developers := List(
 
 val fabric: String = "1.20.1"
 
-val collectionCompat: String = "2.13.0"
+val collectionCompat: String = "2.14.0"
 
 val scalaTest: String = "3.2.20"
 
