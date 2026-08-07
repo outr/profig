@@ -4,7 +4,7 @@ import sbtcrossproject.CrossType
 // Scala versions
 val scala213 = "2.13.18"
 
-val scala3 = List("3.3.7")
+val scala3 = List("3.3.8")
 
 val scala2 = List(scala213)
 val allScalaVersions = scala2 ::: scala3
@@ -31,7 +31,7 @@ ThisBuild / developers := List(
   Developer(id="darkfrog", name="Matt Hicks", email="matt@matthicks.com", url=url("https://matthicks.com"))
 )
 
-val fabric: String = "1.27.0"
+val fabric: String = "1.30.0"
 
 val collectionCompat: String = "2.14.0"
 
