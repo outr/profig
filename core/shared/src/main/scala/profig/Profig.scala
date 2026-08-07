@@ -48,33 +48,39 @@ class Profig extends ProfigPath {
   * powerful system. Uses JSON internally to provide merging and integration. Paths are dot-separated.
   */
 object Profig extends Profig {
-  private var loaded = false
-
-  def isLoaded: Boolean = loaded
-
   def empty: Profig = new Profig
 
+  loadDefaults()
+
   /**
-    * Initializes Profig
+    * Loads the default configuration sources in ascending priority, each layer overriding the previous on conflict:
+    * config files (classpath, then filesystem), environment variables, system properties, and command-line arguments.
     *
-    * @param loadProperties whether to load system properties
-    * @param loadEnvironmentVariables whether to load environment variables
+    * This is invoked automatically the first time the Profig object is used and normally never needs to be called
+    * directly. Loading happens against a detached instance and is swapped in atomically, so concurrent readers never
+    * observe a partially loaded state.
     */
-  def init(loadProperties: Boolean = true,
-           loadEnvironmentVariables: Boolean = true): Unit = synchronized {
-    if (!loaded) {
-      loaded = true
-      if (loadProperties) {
-        this.loadProperties()
-      }
-      if (loadEnvironmentVariables) {
-        this.loadEnvironmentVariables()
-      }
-    }
+  def loadDefaults(): Unit = synchronized {
+    // Failures must not escape: an exception thrown from the object initializer would permanently poison this object
+    val defaults = empty
+    attempt("configuration files")(initProfig(defaults))
+    attempt("environment variables")(defaults.loadEnvironmentVariables())
+    attempt("system properties")(defaults.loadProperties(MergeType.Overwrite))
+    attempt("command-line arguments")(defaultArguments match {
+      case Nil => // No arguments detected
+      case arguments => defaults.merge(ProfigUtil.args2Json(arguments))
+    })
+    modify(_ => defaults.json)
   }
 
-  def reset(): Unit = synchronized {
-    clear()
-    loaded = false
+  private def attempt(description: String)(f: => Unit): Unit = try {
+    f
+  } catch {
+    case t: Throwable => System.err.println(s"Profig failed to load $description: ${t.getMessage}")
   }
+
+  /**
+    * Discards all stored values and restores the freshly loaded default configuration.
+    */
+  def reset(): Unit = loadDefaults()
 }

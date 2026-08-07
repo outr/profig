@@ -33,5 +33,20 @@ trait PlatformPickler {
     source.close()
   }
 
-  def initProfig(): Unit = {}
+  def initProfig(profig: Profig): Unit = {
+    // Referencing ProfigJson registers the extra file extensions (yaml, xml, hocon, etc.) before the scan below
+    ProfigJson.types
+    profig.loadConfiguration(errorHandler = Some { t =>
+      System.err.println(s"Profig failed to load configuration file: ${t.getMessage}")
+    })
+  }
+
+  /**
+    * Best-effort detection of the application's command-line arguments via the `sun.java.command` system property.
+    * Arguments containing spaces will be split incorrectly; use `Profig.merge(args)` for exact control.
+    */
+  def defaultArguments: List[String] = Option(System.getProperty("sun.java.command")).map(_.trim) match {
+    case Some(command) if command.nonEmpty => command.split("""\s+""").toList.drop(1)
+    case _ => Nil
+  }
 }

@@ -9,9 +9,8 @@ import org.scalatest.wordspec.AnyWordSpec
 
 class ProfigAllSpec extends AnyWordSpec with Matchers {
   "Profig all" should {
-    "initialize" in {
+    "reset" in {
       Profig.reset()
-      Profig.init()
     }
     "verify that XML, YAML, and HOCON are available" in {
       ProfigJson.types should be(Set("yaml", "hocon", "json", "config", "conf", "yml", "properties", "xml", "prop", "props"))

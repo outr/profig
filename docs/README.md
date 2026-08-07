@@ -61,11 +61,15 @@ only class you really need be concerned with is `Profig`.
 
 ### Initializing
 
-As of version 3.0, you now need to initialize Profig in order to fully utilize it:
+As of version 4.0, no initialization is necessary. The first time the `Profig` object is used it automatically loads,
+in ascending priority (each layer overriding the previous on conflict):
 
-```scala mdoc
-Profig.init()
-```
+1. Configuration files (classpath, then filesystem)
+2. Environment variables
+3. System properties (`-D` arguments)
+4. Command-line arguments
+
+Creating a custom instance (`Profig.empty`) still starts out blank.
 
 ### Simple Usage
 
@@ -116,20 +120,14 @@ Profig.merge(List("-server.port", "8890"))
 ```scala mdoc
 Profig("server.port").as[Int]
 ```
-So, to summarize, command-line arguments take the highest priority, followed by environment variables, and finally
-configuration files.
-
-The easiest way (explained in greater detail below) to properly initialize Profig:
-```scala
-Profig.initConfiguration()  // Loads everything except the command-line arguments
-Profig.merge(args)          // This can be a `List[String]` or `Array[String]` depending on your application
-```
+So, to summarize, command-line arguments take the highest priority, followed by system properties, then environment
+variables, and finally configuration files. All of this loading happens automatically the first time `Profig` is used.
 
 ### Loading Command-Line arguments
 
-When your application starts it is reasonable to want to allow execution of the application to override existing
-configuration via the command-line. In order to effectively do this we can simply invoke `Profig.merge(args)` within our
-main method. This will merge all command-line arguments into Profig.
+Command-line arguments are detected automatically. On the JVM this uses the `sun.java.command` system property, which
+has one limitation: an argument containing spaces will be split incorrectly. If you need exact arguments, invoke
+`Profig.merge(args)` within your main method to merge the real arguments into Profig.
 
 Note that the signature of `merge` is `def merge(json: Json, ``type``: MergeType = MergeType.Overwrite): Unit`. If you
 set the type to `MergeType.Add`, existing configuration will not be overwritten. This is useful for default configuration
@@ -154,10 +152,8 @@ Profig.loadConfiguration()
 ```
 
 This will look for any standardized configuration file in the classpath and filesystem and load it into the system.
-
-You can also use `Profig.initConfiguration()` to initialize and load configuration in a single call.
-
-Finally, you can use `Profig.initConfigurationBlocking()` if you want initialization and loading to block before continuing with your application.
+This same discovery already happens automatically at first use; call `loadConfiguration` directly only when you need
+custom paths, matchers, or an explicit reload.
 
 ### Accessing values
 

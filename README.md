@@ -8,7 +8,7 @@
 Powerful configuration management for Scala (JSON, properties, command-line arguments, and environment variables)
 
 # Latest version
-3.7.1
+4.0.0-SNAPSHOT
 
 # Justification
 
@@ -44,8 +44,8 @@ and overriding configuration in your application.
 Profig is published to Sonatype OSS and synchronized to Maven Central supporting JVM and Scala.js on 2.11, 2.12, 2.13, and Scala 3.x:
 
 ```
-libraryDependencies += "com.outr" %% "profig" % "3.7.1"   // Scala
-libraryDependencies += "com.outr" %%% "profig" % "3.7.1"  // Scala.js / Cross-Build
+libraryDependencies += "com.outr" %% "profig" % "4.0.0-SNAPSHOT"   // Scala
+libraryDependencies += "com.outr" %%% "profig" % "4.0.0-SNAPSHOT"  // Scala.js / Cross-Build
 ```
 
 ## Getting Started
@@ -61,11 +61,15 @@ only class you really need be concerned with is `Profig`.
 
 ### Initializing
 
-As of version 3.0, you now need to initialize Profig in order to fully utilize it:
+As of version 4.0, no initialization is necessary. The first time the `Profig` object is used it automatically loads,
+in ascending priority (each layer overriding the previous on conflict):
 
-```scala
-Profig.init()
-```
+1. Configuration files (classpath, then filesystem)
+2. Environment variables
+3. System properties (`-D` arguments)
+4. Command-line arguments
+
+Creating a custom instance (`Profig.empty`) still starts out blank.
 
 ### Simple Usage
 
@@ -89,12 +93,12 @@ If the application is executed with a `config.json` of:
 ```
 ```scala
 Profig("server.port").as[Int]
-// res2: Int = 8888
+// res1: Int = 8888
 ```
 However, if there were an environment variable `SERVER_PORT=8889`:
 ```scala
 Profig("server.port").as[Int]
-// res4: Int = 8889
+// res3: Int = 8889
 ```
 Finally, if a command-line property were set, for example:
 ```
@@ -102,22 +106,16 @@ runCommand -server.port 8890
 ```
 ```scala
 Profig("server.port").as[Int]
-// res6: Int = 8890
+// res5: Int = 8890
 ```
-So, to summarize, command-line arguments take the highest priority, followed by environment variables, and finally
-configuration files.
-
-The easiest way (explained in greater detail below) to properly initialize Profig:
-```scala
-Profig.initConfiguration()  // Loads everything except the command-line arguments
-Profig.merge(args)          // This can be a `List[String]` or `Array[String]` depending on your application
-```
+So, to summarize, command-line arguments take the highest priority, followed by system properties, then environment
+variables, and finally configuration files. All of this loading happens automatically the first time `Profig` is used.
 
 ### Loading Command-Line arguments
 
-When your application starts it is reasonable to want to allow execution of the application to override existing
-configuration via the command-line. In order to effectively do this we can simply invoke `Profig.merge(args)` within our
-main method. This will merge all command-line arguments into Profig.
+Command-line arguments are detected automatically. On the JVM this uses the `sun.java.command` system property, which
+has one limitation: an argument containing spaces will be split incorrectly. If you need exact arguments, invoke
+`Profig.merge(args)` within your main method to merge the real arguments into Profig.
 
 Note that the signature of `merge` is `def merge(json: Json, ``type``: MergeType = MergeType.Overwrite): Unit`. If you
 set the type to `MergeType.Add`, existing configuration will not be overwritten. This is useful for default configuration
@@ -142,10 +140,8 @@ Profig.loadConfiguration()
 ```
 
 This will look for any standardized configuration file in the classpath and filesystem and load it into the system.
-
-You can also use `Profig.initConfiguration()` to initialize and load configuration in a single call.
-
-Finally, you can use `Profig.initConfigurationBlocking()` if you want initialization and loading to block before continuing with your application.
+This same discovery already happens automatically at first use; call `loadConfiguration` directly only when you need
+custom paths, matchers, or an explicit reload.
 
 ### Accessing values
 
@@ -154,7 +150,7 @@ wanted to access the system property "java.version" we can easily do so:
 
 ```scala
 val javaVersion = Profig("java.version").as[String]
-// javaVersion: String = "25.0.3"
+// javaVersion: String = "17.0.18"
 ```
 
 You can also load from a higher level as a case class to get more information. For example:
@@ -176,11 +172,11 @@ object Specification {
 
 val info = Profig("java").as[JVMInfo]
 // info: JVMInfo = JVMInfo(
-//   version = "25.0.3",
+//   version = "17.0.18",
 //   specification = Specification(
 //     vendor = "Oracle Corporation",
 //     name = "Java Platform API Specification",
-//     version = "25"
+//     version = "17"
 //   )
 // )
 ```

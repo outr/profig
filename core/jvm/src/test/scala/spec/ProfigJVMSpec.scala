@@ -10,9 +10,17 @@ import profig._
 
 class ProfigJVMSpec extends AnyWordSpec with Matchers {
   "Profig JVM" should {
-    "init" in {
-      Profig.reset()
-      Profig.init()
+    "auto-load filesystem config files" in {
+      Profig("test.files").opt[String] should be(Some("yes"))
+    }
+    "auto-load classpath config files" in {
+      Profig("test.classloading").opt[String] should be(Some("yes"))
+    }
+    "auto-load system properties" in {
+      Profig("java.specification.vendor").opt[String] shouldBe defined
+    }
+    "auto-load environment variables" in {
+      Profig("path").exists() should be(true)
     }
     "merge a special type" in {
       val location = new File(System.getProperty("user.home"))

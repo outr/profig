@@ -31,24 +31,12 @@ trait ProfigPathPlatform {
     }
   }
 
-  def initConfiguration(startPath: Path = Paths.get("."),
-                        additionalPaths: List[Path] = Nil,
-                        recursiveParents: Boolean = true,
-                        includeClassPath: Boolean = true,
-                        fileNameMatcher: FileNameMatcher = FileNameMatcher.Default,
-                        errorHandler: Option[Throwable => Unit] = None): Unit = {
-    Profig.init()
-    loadConfiguration(startPath, additionalPaths, recursiveParents, includeClassPath, fileNameMatcher, errorHandler)
-  }
-
   def loadConfiguration(startPath: Path = Paths.get("."),
                         additionalPaths: List[Path] = Nil,
                         recursiveParents: Boolean = true,
                         includeClassPath: Boolean = true,
                         fileNameMatcher: FileNameMatcher = FileNameMatcher.Default,
                         errorHandler: Option[Throwable => Unit] = None): Unit = {
-    assert(Profig.isLoaded, "loadConfiguration cannot be executed without first initializing Profig (Profig.init())")
-
     var files = List.empty[(String, Source, MergeType)]
 
     @tailrec

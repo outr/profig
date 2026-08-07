@@ -10,7 +10,7 @@ val scala2 = List(scala213)
 val allScalaVersions = scala2 ::: scala3
 
 ThisBuild / organization := "com.outr"
-ThisBuild / version := "3.7.1"
+ThisBuild / version := "3.8.0-SNAPSHOT"
 ThisBuild / scalaVersion := scala213
 ThisBuild / scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature")
 
@@ -53,9 +53,11 @@ lazy val core = crossProject(JSPlatform, JVMPlatform)
     libraryDependencies ++= Seq(
       "org.typelevel" %%% "fabric-io" % fabric,
       "org.scala-lang.modules" %%% "scala-collection-compat" % collectionCompat,
-      "org.scalatest" %% "scalatest" % scalaTest % "test"
+      "org.scalatest" %%% "scalatest" % scalaTest % "test"
     ),
-    crossScalaVersions := allScalaVersions
+    crossScalaVersions := allScalaVersions,
+    // Test suites share the mutable Profig singleton and must not run concurrently
+    Test / parallelExecution := false
   )
 
 lazy val coreJS = core.js

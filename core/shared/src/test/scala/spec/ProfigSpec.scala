@@ -12,15 +12,8 @@ import scala.language.implicitConversions
 
 class ProfigSpec extends AnyWordSpec with Matchers {
   "Profig" should {
-    "init" in {
+    "reset" in {
       Profig.reset()
-      Profig.init()
-    }
-    "verify classloading not set" in {
-      Profig("test.classloading").opt[String] should be(None)
-    }
-    "verify files not set" in {
-      Profig("test.files").opt[String] should be(None)
     }
     "verify `opt` usage" in {
       Profig("test.files").store("yes")
