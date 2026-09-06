@@ -4,7 +4,7 @@ import sbtcrossproject.CrossType
 // Scala versions
 val scala213 = "2.13.18"
 
-val scala3 = List("3.3.8")
+val scala3 = List("3.9.0")
 
 val scala2 = List(scala213)
 val allScalaVersions = scala2 ::: scala3
